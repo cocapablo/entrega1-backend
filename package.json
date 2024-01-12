@@ -1,0 +1,17 @@
+{
+  "name": "primera-entrega",
+  "version": "1.0.0",
+  "description": "Proyecto del curso de BackEnd de Coderhouse",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "watch": "node --watch app.js"
+  
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

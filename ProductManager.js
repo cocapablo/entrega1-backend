@@ -1,4 +1,5 @@
 const fs = require("fs");
+const fsp = require("fs/promises");
 
 class ProductManager {
     #products;
@@ -181,10 +182,231 @@ class ProductManager {
 
         return productos;
     }
+
+    async #leerProductosEnArchivoAsync() {
+        let productos = [];
+        let cadenaJson;
+
+        try {
+            if (await fsp.access(this.#path).then(() => true).catch(() => false)) {
+                cadenaJson =  await fsp.readFile(this.#path); 
+                productos = JSON.parse(cadenaJson);  
+            
+            }
+        }
+        catch (error) {
+            console.error("ERROR: ", error);
+            throw new Error("ERROR: " + error);
+        }
+
+        return productos;
+    }
+
+    async #grabarProductosEnArchivoAsync(productos) {
+        //Grabo los producots de forma asincrónica 
+             
+        //Paso 1: Convierto los productos a json
+        let cadenaJson = JSON.stringify(productos, null, 4);
+
+        try {
+            //Paso 2: Grabo los productos en el archivo
+            await fsp.writeFile(this.#path, cadenaJson);
+        }
+        catch (error) {
+            console.error("ERROR: ", error);
+            throw new Error("ERROR: " + error);   
+        }
+
+        
+    }
+
+    async getProductsAsync() {
+
+        try {
+            this.#products = await this.#leerProductosEnArchivoAsync();
+        }
+        catch (error) {
+            console.error("ERROR: ", error);
+            throw new Error(error);
+        }
+
+
+        return this.#products;
+    }
+
+    async addProductAsync({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1}) {
+        let newProduct;
+
+        try {
+            //Validaciones
+            if (title.trim().length === 0) {
+                throw new Error("ERROR: title vacío");
+            }
+
+            if (description.trim().length === 0) {
+                throw new Error("ERROR: description vacío");
+            }
+
+            if (price <=0) {
+                throw new Error("ERROR: price debe ser mayor que cero");    
+            }
+
+            if (thumbnail.trim().length === 0) {
+                throw new Error("ERROR: thumbnail vacío");
+            }
+
+            if (code.trim().length === 0) {
+                throw new Error("ERROR: code vacío");
+            }
+
+            if (stock <=0) {
+                throw new Error("ERROR: stock debe ser mayor que cero");    
+            }
+
+            //Cargo los productos anteriores
+            this.#products = await this.#leerProductosEnArchivoAsync();
+
+            //Me fijo que el code no exista ya
+            if (this.#products.find(product => product.code === code)) {
+                throw new Error("ERROR: code ya existente");        
+            }
+
+            //Agrego el producto
+            newProduct = {
+                id: this.#products.length === 0 ? 1 : this.#products[this.#products.length - 1].id + 1, //Esto funciona porque el array siempre está ordenado por id de menor a mayor
+                title,
+                description,
+                price,
+                thumbnail,
+                code,
+                stock  
+            }
+
+            this.#products.push(newProduct);
+
+            //Grabo los productos en el archivo
+            await this.#grabarProductosEnArchivoAsync(this.#products);
+    
+        }
+        catch (error) {
+            throw (error);
+        }
+
+
+
+        return newProduct;
+
+    }
+
+    async updateProductAsync(productoModificado) {
+        let newProduct;
+
+        try {
+            //Validaciones
+            if (!productoModificado.id) {
+                throw new Error("ERROR: id Producto inválido");
+            }
+
+            //Cargo los productos anteriores
+            this.#products = await this.#leerProductosEnArchivoAsync();
+
+            let viejoProducto = await this.getProductByIdAsync(productoModificado.id);
+
+            if (viejoProducto === "Not found") {
+                throw new Error("ERROR: El producto con el id especificado no existe");
+            }
+
+            //Me fijo que el code no exista ya en algún producto que no sea el especificado para hacer el update
+            if (this.#products.find(product => ((product.code === productoModificado.code) && (product.id !== productoModificado.id)))) {
+                throw new Error("ERROR: code ya existente");        
+            }
+
+            //Actualizo el producto
+            newProduct = {
+                ...viejoProducto,
+                ...productoModificado //Solo cambio las propiedades especificadas acá
+            }
+            
+            //Borro el producto del array actual
+            this.#products = this.#products.filter(product => product.id !== newProduct.id);
+            console.log("Así quedaron los productos en updateProductAsync", this.#products);
+
+            //Agrego el producto con las modificaciones
+            this.#products.push(newProduct);
+
+            //Ordeno el array por id
+            this.#products.sort((a, b) => a.id - b.id);
+
+            //Grabo los productos en el archivo
+            await this.#grabarProductosEnArchivoAsync(this.#products);
+        }
+        catch (error) {
+            throw (error);
+        }
+
+        return newProduct;
+
+    }
+
+    async getProductByIdAsync(idProduct) {
+        let productSelected; 
+
+        try {
+
+            //Cargo los prodctos desde el archivo
+            this.#products = await this.#leerProductosEnArchivoAsync();
+
+            productSelected = this.#products.find(product => product.id === idProduct);
+
+            if (!productSelected) {
+                console.log("Not found");
+                return "Not found";
+            }
+        }
+        catch (error) {
+            throw error;
+        }
+
+        return productSelected;
+
+    }
+
+    async deleteProductAsync(idProducto) {
+       
+        try {
+            //Validaciones
+            if (idProducto <= 0) {
+                throw new Error("ERROR: id Producto inválido");
+            }
+
+            //Cargo los productos anteriores
+            this.#products = await this.#leerProductosEnArchivoAsync();
+
+                    
+            //Borro el producto del array actual
+            this.#products = this.#products.filter(product => product.id !== idProducto);
+            console.log("Así quedaron los productos en deleteProductAsync", this.#products);
+
+            //Ordeno el array por id
+            this.#products.sort((a, b) => a.id - b.id);
+
+            //Grabo los productos en el archivo
+            await this.#grabarProductosEnArchivoAsync(this.#products);
+        }
+        catch (error) {
+            throw error;
+        }
+
+        return true;
+
+    }
 }
 
+module.exports = ProductManager;
+
+
 //Pruebas
-let prodManager = new ProductManager("productos.json");
+/* let prodManager = new ProductManager("productos.json");
 
 let prod1 = prodManager.addProduct({title: "Berenjenas", description: "Sabroso vegetal alargada", price: 1000, thumbnail: "https://th.bing.com/th?id=OIP.nH0F9FpvxnWmKP0reKs98QHaHR&w=252&h=247&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "BEREN", stock: 150});
 console.log(prod1);
@@ -225,5 +447,47 @@ prodManager.deleteProduct(2);
 
 //Muestro todos los productos
 console.log(prodManager.getProducts());
+
+const productos = prodManager.getProducts();
+
+console.log("Productos como objeto ", {productos});
+
+//Prueba con mètodos asincrónicos
+prodManager.getProductsAsync().then(productos => console.log("Productos asincrónicos: ", productos)).catch(error => console.error(error));
+
+async function pruebasAsincronicas(prodManagerAsync) {
+    try {
+        //Agregar nuevo producto
+        let prod6 = await prodManagerAsync.addProductAsync({title: "Uvas", description: "Pequeñas delicias de dificil semilla escupir", price: 1000, thumbnail: "https://th.bing.com/th?id=OIP.S0MwlWV6Tgy2br4GfBaJcgHaE6&w=306&h=203&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "UVA", stock: 4000 });
+
+        console.log(prod6); 
+
+        let productos = await prodManagerAsync.getProductsAsync()
+
+        console.log("Nuevos Productos asincrónicos: ", productos);
+
+        //Actualizo las berenjenas
+        prod6 = await prodManagerAsync.updateProductAsync({id:1, stock: 15555});
+
+        console.log("Berenjenas actualizadas: ", prod6);
+
+        //Borro las uvas que tristeza!
+        await prodManagerAsync.deleteProductAsync(5);
+        
+        
+    }
+    catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
+pruebasAsincronicas(prodManager); */
+
+//Fin pruebas
+
+
+
+
+
 
 
