@@ -1,5 +1,5 @@
-const fs = require("fs");
-const fsp = require("fs/promises");
+import { writeFileSync, existsSync, readFileSync } from "fs";
+import { access, readFile, writeFile } from "fs/promises";
 
 class ProductManager {
     #products;
@@ -11,7 +11,7 @@ class ProductManager {
         this.#path = path;
     }
 
-    addProduct({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1}) {
+    addProduct({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1, category = "", status = true}) {
                 
         //Validaciones
         if (title.trim().length === 0) {
@@ -26,8 +26,8 @@ class ProductManager {
             return "ERROR: price debe ser mayor que cero";    
         }
 
-        if (thumbnail.trim().length === 0) {
-            return "ERROR: thumbnail vacío";
+        if (category.trim().length === 0) {
+            return "ERROR: category vacío";
         }
 
         if (code.trim().length === 0) {
@@ -54,7 +54,9 @@ class ProductManager {
             price,
             thumbnail,
             code,
-            stock  
+            stock,
+            category,
+            status  
         }
 
         this.#products.push(newProduct);
@@ -166,7 +168,7 @@ class ProductManager {
         let cadenaJson = JSON.stringify(productos, null, 4);
 
         //Paso 2: Grabo los productos en el archivo
-        fs.writeFileSync(this.#path, cadenaJson)
+        writeFileSync(this.#path, cadenaJson)
         
     }
 
@@ -175,8 +177,8 @@ class ProductManager {
         let cadenaJson;
 
         //Chequeo que el archivo exista
-        if (fs.existsSync(this.#path) === true) {
-            cadenaJson = fs.readFileSync(this.#path);
+        if (existsSync(this.#path) === true) {
+            cadenaJson = readFileSync(this.#path);
             productos = JSON.parse(cadenaJson);
         }
 
@@ -188,8 +190,8 @@ class ProductManager {
         let cadenaJson;
 
         try {
-            if (await fsp.access(this.#path).then(() => true).catch(() => false)) {
-                cadenaJson =  await fsp.readFile(this.#path); 
+            if (await access(this.#path).then(() => true).catch(() => false)) {
+                cadenaJson =  await readFile(this.#path); 
                 productos = JSON.parse(cadenaJson);  
             
             }
@@ -210,7 +212,7 @@ class ProductManager {
 
         try {
             //Paso 2: Grabo los productos en el archivo
-            await fsp.writeFile(this.#path, cadenaJson);
+            await writeFile(this.#path, cadenaJson);
         }
         catch (error) {
             console.error("ERROR: ", error);
@@ -234,7 +236,7 @@ class ProductManager {
         return this.#products;
     }
 
-    async addProductAsync({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1}) {
+    async addProductAsync({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1, category = "", status = true}) {
         let newProduct;
 
         try {
@@ -251,8 +253,8 @@ class ProductManager {
                 throw new Error("ERROR: price debe ser mayor que cero");    
             }
 
-            if (thumbnail.trim().length === 0) {
-                throw new Error("ERROR: thumbnail vacío");
+            if (category.trim().length === 0) {
+                throw new Error("ERROR: category vacío");
             }
 
             if (code.trim().length === 0) {
@@ -279,7 +281,9 @@ class ProductManager {
                 price,
                 thumbnail,
                 code,
-                stock  
+                stock,
+                category,
+                status  
             }
 
             this.#products.push(newProduct);
@@ -402,7 +406,7 @@ class ProductManager {
     }
 }
 
-module.exports = ProductManager;
+export default ProductManager;
 
 
 //Pruebas
