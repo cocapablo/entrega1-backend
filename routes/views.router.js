@@ -27,8 +27,4 @@ router.get("/realtimeproducts", (req, res) => {
 });
 
 
-router.get("/desgracias", (req, res) => {
-    res.render("desgracias", {});
-})
-
 export default router;
