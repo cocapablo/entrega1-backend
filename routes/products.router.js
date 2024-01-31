@@ -1,5 +1,6 @@
 import express from "express";
 import ProductManager from "../ProductManager.js";
+import socketServer from "../app.js";
 
 const router = express.Router();
 
@@ -55,8 +56,8 @@ router.post("/api/products", (req, res) => {
     let nuevoProducto;
 
     nuevoProducto = req.body;
-    console.log("Request: ", req);
-    console.log("Nuevo Producto: ", nuevoProducto);
+    /* console.log("Request: ", req);
+    console.log("Nuevo Producto: ", nuevoProducto); */
 
     prodManager.addProductAsync(nuevoProducto).then(prodAgregado => {
         res.json({
@@ -64,6 +65,11 @@ router.post("/api/products", (req, res) => {
             message: "Producto agregado correctamente",
             nuevoProducto: prodAgregado
         })
+
+        //Actualizo los sockets
+        prodManager.getProductsAsync().then(productos => 
+            socketServer.emit("obtenerProductos", productos)
+        )
     }
     ).catch(err => {
         console.log("ERROR: ", err);
@@ -81,8 +87,8 @@ router.put("/api/products/:pid", (req, res) => {
     let nuevoProducto;
 
     nuevoProducto = req.body;
-    console.log("Request: ", req);
-    console.log("Actualizaciones del Producto: ", nuevoProducto);
+    /* console.log("Request: ", req);
+    console.log("Actualizaciones del Producto: ", nuevoProducto); */
 
     if (req.params.pid && !isNaN(idProducto = parseInt(req.params.pid))) {
         let prodActualizaciones = {
@@ -95,6 +101,11 @@ router.put("/api/products/:pid", (req, res) => {
                 message: "Producto actualizado correctamente",
                 nuevoProducto: prodModificado
             })
+
+            //Actualizo los sockets
+            prodManager.getProductsAsync().then(productos => 
+                socketServer.emit("obtenerProductos", productos)
+            )
         }
         ).catch(err => {
             console.log("ERROR: ", err);
@@ -118,7 +129,7 @@ router.delete("/api/products/:pid", (req, res) => {
     let idProducto;
     
 
-    console.log("Request: ", req);
+    //console.log("Request: ", req);
 
     if (req.params.pid && !isNaN(idProducto = parseInt(req.params.pid))) {
         prodManager.deleteProductAsync(idProducto).then(resultado => {
@@ -127,6 +138,11 @@ router.delete("/api/products/:pid", (req, res) => {
                 status: "accepted",
                 message: "Producto eliminado correctamente"                
             })
+
+            //Actualizo los sockets
+            prodManager.getProductsAsync().then(productos => 
+                socketServer.emit("obtenerProductos", productos)
+            )
         }
         ).catch(err => {
             console.log("ERROR: ", err);

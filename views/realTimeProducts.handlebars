@@ -1,0 +1,120 @@
+<h1 class="text-center my-5">Productos en Tiempo Real</h1> 
+<div class="container my-5" id="idListaProductos">
+    <div class="row">
+        {{#each productos}}
+
+
+            <div id="idProducto{{this.id}}" class="col-3 card w-25 m-3">
+                <div className="card-body p-0 my-3">
+                    <img src={{this.thumbnail}} class="w-100" alt="Imagen del producto" />
+                    <h5 class="card-title">{{this.title}}</h5>
+                    <p>{{this.description}}</p>
+                    <p><span class="fw-bold">Precio: </span>${{this.price}}</p>
+                    <p><span class="fw-bold">Stock: </span>{{this.stock}}</p>
+                    <p><span class="fw-bold">Categoría: </span>{{this.category}}</p>
+                </div>
+                <div className="card-footer">
+                    <button class="btn btn-primary my-3 mx-2" onclick="editarProducto({{this.id}})">Editar</a>
+                    <button class="btn btn-danger my-3 mx-2" onclick="eliminarProducto({{this.id}})">Eliminar</a>
+                </div>
+            </div>
+            
+            <div id="camposOcultos" style="display: none;">
+                <div  id="title{{this.id}}">{{this.title}}</div>
+                <div  id="description{{this.id}}">{{this.description}}</div>
+                <div  id="price{{this.id}}">{{this.price}}</div>
+                <div  id="thumbnail{{this.id}}">{{this.thumbnail}}</div>
+                <div  id="code{{this.id}}">{{this.code}}</div>
+                <div  id="stock{{this.id}}">{{this.stock}}</div>
+                <div  id="category{{this.id}}">{{this.category}}</div>
+                <div  id="status{{this.id}}">{{this.status}}</div>
+            </div>
+            
+            
+    
+        {{/each}}
+    
+    </div>
+    
+</div>
+
+<div class="container my-5">
+    <button class="btn btn-warning m-2" id="btnResetearForm" onclick="resetearForm()">Resetear Formulario</button>
+</div>
+
+
+{{!-- Formulario --}}
+
+<form class="container my-5">
+    <label class="form-control bg-warning text-black fw-bold" id="formError" style="display: none;"></label>
+    
+    <label style="display:none;" id="formIdProducto">0</label>   
+
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formTitle">Title</label>
+        <div class="col-sm-10">
+            <input type="text" id="formTitle" class="form-control" name="title" value="" ></input>
+        </div>
+    </div>
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formDescription">Description</label>
+        <div class="col-sm-10">
+            <input type="text" id="formDescription" class="form-control" name="description" value="" ></input>
+        </div>
+    </div>
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formPrice">Price</label>
+        <div class="col-sm-10">
+            <input type="number" id="formPrice" class="form-control" name="price" value="0.0" ></input>
+        </div>
+    </div>
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formThumbnail">Thumbnail</label>
+        <div class="col-sm-10">
+            <input type="text" id="formThumbnail" class="form-control" name="thumbnail" value="" ></input>
+        </div>
+    </div>
+
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formCode">Code</label>
+        <div class="col-sm-10">
+            <input type="text" id="formCode" class="form-control" name="code" value="" ></input>
+        </div>
+    </div>
+
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formStock">Stock</label>
+        <div class="col-sm-10">
+            <input type="number" id="formStock" class="form-control" name="stock" value="0" ></input>
+        </div>
+    </div>
+
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formCategory">Category</label>
+        <div class="col-sm-10">
+            <input type="text" id="formCategory" class="form-control" name="category" value="" ></input>
+        </div>
+    </div>
+
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="formStatus">Status</label>
+        <div class="col-sm-10">
+            <input type="text" id="formStatus" class="form-control" name="status" value="true" ></input>
+        </div>
+    </div>
+   
+    
+</form>
+
+<div class="container my-5">
+    <button class="btn btn-primary m-4" id="btnAgregarProducto" onclick="agregarProductoDeForm()">Agregar Producto</button>
+    <button class="btn btn-primary m-4" id="btnActualizarProducto" onclick="actualizarProductoDeForm()" style="display: none;">Actualizar Producto</button>
+</div>
+
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/realTime.js"></script>

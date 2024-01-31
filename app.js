@@ -1,21 +1,43 @@
 import express from "express";
+import handlebars from "express-handlebars";
+import {Server} from "socket.io";
+
+import path from "path";
+import { fileURLToPath } from 'url';
+
 import ProductManager from "./ProductManager.js";
 import CarritoManager from "./CarritoManager.js";
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
+import viewsRouter from "./routes/views.router.js";
 
 
 const port = 8080;
 
 const app = express();
 
+//Directorios
+const __filename = fileURLToPath(import.meta.url);
+console.log("Filename: ", __filename);
+let __dirname = path.dirname(__filename); 
+
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
+//Archivos estáticos
+app.use(express.static(path.join(__dirname, "public")));
+console.log("Dirname: ", __dirname);
+
+//Configuracion para handlebars
+app.engine("handlebars", handlebars.engine());
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "handlebars");
+
 //Routers
 app.use("/", productsRouter);
 app.use("/", cartsRouter);
+app.use("/", viewsRouter);
 
 //Endpoint
 
@@ -70,7 +92,17 @@ app.get("/products/:pid", (req, res) => {
 //Fin viejo codigo sin routers
 
 
-app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
+const httpServer = app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
+
+//WebSockets
+const socketServer = new Server(httpServer);
+
+socketServer.on("connection", socket => {
+    console.log("Nuevo cliente conectado");
+    
+})
+
+export default socketServer;
 
 //A partir de acá este código es solo para cargar productos y asegurarme que haya 
 
@@ -78,20 +110,23 @@ async function cargarProductosAsync(prodManagerAsync) {
     try {
         //Agregar productos
         let prod1 = await prodManager.addProductAsync({title: "Berenjenas", description: "Sabroso vegetal alargada", price: 1000, thumbnail: "https://th.bing.com/th?id=OIP.nH0F9FpvxnWmKP0reKs98QHaHR&w=252&h=247&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "BEREN", stock: 150, category: "Frutas", status: true});
-        console.log(prod1);
+        //console.log(prod1);
 
         let prod2 = await prodManager.addProductAsync({title: "Zapallitos", description: "Verdura recomendada por las abuelas", price: 1500, thumbnail: "https://th.bing.com/th?id=OIP.dRvFBCOqjHLpsJ6R1gGdjQHaFj&w=288&h=216&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "ZAPALL", stock: 300, category: "Frutas", status: true});
-        console.log(prod2);
+        //console.log(prod2);
 
         let prod3 = await prodManager.addProductAsync({title: "Bananas", description: "Fruta amarilla", price: 3000, thumbnail: "https://th.bing.com/th?id=OIP.UtpeqGM0X-sTDYUk3ZdJRwHaE8&w=305&h=204&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "BANAN", stock: 250, category: "Frutas", status: true });
-        console.log(prod3);
+        //console.log(prod3);
 
         let prod4 = await prodManager.addProductAsync({title: "Melones", description: "Fruta enorme y circular que es casi todo agua", price: 400, thumbnail: "https://th.bing.com/th?id=OIP.ZD-dcfECzgWSmj4qrpYyXwHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "MELON", stock: 1500, category: "Frutas", status: true });
-        console.log(prod4);
+        //console.log(prod4);
 
-        let prod6 = await prodManagerAsync.addProductAsync({title: "Uvas", description: "Pequeñas delicias de dificil semilla escupir", price: 1000, thumbnail: "https://th.bing.com/th?id=OIP.S0MwlWV6Tgy2br4GfBaJcgHaE6&w=306&h=203&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "UVA", stock: 4000, category: "Frutas", status: true });
+        let prod5 = await prodManagerAsync.addProductAsync({title: "Uvas", description: "Pequeñas delicias de dificil semilla escupir", price: 1000, thumbnail: "https://th.bing.com/th?id=OIP.S0MwlWV6Tgy2br4GfBaJcgHaE6&w=306&h=203&c=8&rs=1&qlt=90&o=6&dpr=1.5&pid=3.1&rm=2", code: "UVA", stock: 4000, category: "Frutas", status: true });
+        //console.log(prod5); 
 
-        console.log(prod6); 
+        let prod6 = await prodManagerAsync.addProductAsync({title: "Chorizos", description: "Delicia alargada infaltable en asados y canchas", price: 1500, thumbnail: "https://decarolis.com.ar/wp-content/uploads/2020/07/11-chorizo-saborizado.jpg", code: "CHORI", stock: 10000, category: "Achuras", status: true });
+
+
 
         let productos = await prodManagerAsync.getProductsAsync()
 
@@ -148,6 +183,6 @@ async function cargarCarritosAsync(carritoManagerAsync) {
     }
 }
 
-let carritoManager = new CarritoManager("carrito.json", prodManager);
+/* let carritoManager = new CarritoManager("carrito.json", prodManager);
 
-cargarCarritosAsync(carritoManager);
+cargarCarritosAsync(carritoManager); */
