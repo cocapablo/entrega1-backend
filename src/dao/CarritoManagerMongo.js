@@ -1,6 +1,5 @@
-import { writeFileSync, existsSync, readFileSync } from "fs";
-import { access, readFile, writeFile } from "fs/promises";
-import ProductManager from "./ProductManager.js";
+import mongoose from "mongoose";
+import cartModel from "./models/cartsModel.js";
 
 class CarritoManager {
     #carritos;
@@ -15,47 +14,33 @@ class CarritoManager {
  
     }
 
-    async #leerCarritosEnArchivoAsync() {
-        let carritos = [];
-        let cadenaJson;
-
-        try {
-            if (await access(this.#path).then(() => true).catch(() => false)) {
-                cadenaJson =  await readFile(this.#path); 
-                carritos = JSON.parse(cadenaJson);  
-            
-            }
-        }
-        catch (error) {
-            console.error("ERROR: ", error);
-            throw new Error("ERROR: " + error);
-        }
-
-        return carritos;
-    }
-
-    async #grabarCarritosEnArchivoAsync(carritos) {
-        //Grabo los carritos de forma asincrónica 
-             
-        //Paso 1: Convierto los carritos a json
-        let cadenaJson = JSON.stringify(carritos, null, 4);
-
-        try {
-            //Paso 2: Grabo los carritos en el archivo
-            await writeFile(this.#path, cadenaJson);
-        }
-        catch (error) {
-            console.error("ERROR: ", error);
-            throw new Error("ERROR: " + error);   
-        }
-
-        
-    }
-
+    
     async getCarritosAsync() {
 
         try {
-            this.#carritos = await this.#leerCarritosEnArchivoAsync();
+            let carritosBD = await cartModel.find();
+            //Armo el carrito con el formato que utilizamos
+            console.log("carritosBd: ", carritosBD);
+            
+            this.#carritos = carritosBD.map(carrito => {
+                let productos = carrito.products.map(producto => {
+                    return (
+                        {
+                            id: producto.id.toString(),
+                            quantity: producto.quantity
+                        }
+                    )
+                });
+
+                return (
+                    {
+                        id: carrito._id.toString(),
+                        products: productos
+
+
+                    }
+                )
+            })
         }
         catch (error) {
             console.error("ERROR: ", error);
@@ -69,20 +54,25 @@ class CarritoManager {
     async getProductsDeCarritoByIdAsync(idCarrito) {
         let carritoSelected; 
         let productos;
+        
 
         try {
-
-            //Cargo los carritos desde el archivo
-            this.#carritos = await this.#leerCarritosEnArchivoAsync();
-
-            carritoSelected = this.#carritos.find(carrito => carrito.id === idCarrito);
+            carritoSelected = await cartModel.findOne({_id: idCarrito});
 
             if (!carritoSelected) {
                 console.log("Not found");
-                return "Not found";
+                throw new Error("Not found");
             }
 
-            productos = carritoSelected.products;
+            //Devuelvo los productos con el formato que utilizamos
+            productos = carritoSelected.products.map(producto => {
+                return (
+                    {
+                        id: producto.id.toString(),
+                        quantity: producto.quantity
+                    }
+                )    
+            });
         }
         catch (error) {
             throw error;
@@ -94,24 +84,36 @@ class CarritoManager {
 
     async getCarritoByIdAsync(idCarrito) {
         let carritoSelected; 
+        let carritoDevuelto;
 
         try {
-
-            //Cargo los Productos de Carrito
-            this.#carritos = await this.#leerCarritosEnArchivoAsync();
-
-            carritoSelected = this.#carritos.find(carrito => carrito.id === idCarrito);
+            carritoSelected = await cartModel.findOne({_id: idCarrito});
 
             if (!carritoSelected) {
                 console.log("Not found");
-                return "Not found";
+                throw new Error("Not found");
             }
+
+            carritoDevuelto = {
+                id : carritoSelected._id.toString(),
+
+                //Devuelvo los productos con el formato que utilizamos
+                products : carritoSelected.products.map(producto => {
+                    return (
+                        {
+                            id: producto.id.toString(),
+                            quantity: producto.quantity
+                        }
+                    )    
+                })
+            }
+    
         }
         catch (error) {
             throw error;
         }
 
-        return carritoSelected;
+        return carritoDevuelto;
 
     }
 
@@ -152,25 +154,26 @@ class CarritoManager {
 
         try {
             
-            //Cargo los carritos anteriores
-            this.#carritos = await this.#leerCarritosEnArchivoAsync();
-
-            //Agrego el nuevo carrito
+            //Agrego el carrito
             newCarrito = {
-                id: this.#carritos.length === 0 ? 1 : this.#carritos[this.#carritos.length - 1].id + 1, //Esto funciona porque el array siempre está ordenado por id de menor a mayor
-                products : [] 
+                products: [] 
+            }
+
+            let resultado = await cartModel.create(newCarrito);
+
+
+            //Agrego el nuevo id a newCarrito
+            newCarrito = {
+                id: resultado._id.toString(),
+                ...newCarrito
             }
 
             this.#carritos.push(newCarrito);
 
-            //Grabo los carritos en el archivo
-            await this.#grabarCarritosEnArchivoAsync(this.#carritos);
-    
         }
         catch (error) {
             throw (error);
         }
-
 
 
         return newCarrito;
@@ -180,6 +183,7 @@ class CarritoManager {
     async addProductToCarritoAsync(idCarrito, idProducto, cantidad = 1) {
         let newCarrito;
         let newProduct;
+        let resultado;
         
         try {
             //Validaciones
@@ -210,6 +214,11 @@ class CarritoManager {
                     id: idProducto,
                     quantity : cantidad
                 }
+
+                //resultado = await cartModel.findById(idCarrito).products.push(newProduct);
+                resultado = await cartModel.findByIdAndUpdate(idCarrito, {$push : {products: newProduct}});
+
+                console.log("Resultado de agregar un producto: ", resultado);
             }
             else {
                 //El producto ya estaba en el carrito: Actualizo el producto (le sumo la cantidad)
@@ -217,30 +226,18 @@ class CarritoManager {
                     id: idProducto,
                     quantity : viejoProducto.quantity + cantidad
                 }
+
+                resultado = await cartModel.updateOne({_id: idCarrito, "products.id": idProducto}, {$set: {"products.$[product].quantity" :  newProduct.quantity}}, {arrayFilters: [{"product.id": idProducto}]});
+
+                console.log("Resultado de actualizar un producto: ", resultado);
             }
             
-            //Borro el producto de los productos actuales
-            newCarrito.products = newCarrito.products.filter(product => product.id !== newProduct.id);
-            console.log("Así quedaron los productos en addProductToCarritoAsync", newCarrito.products);
-
-            //Agrego el producto con las modificaciones
-            newCarrito.products.push(newProduct);
-
-            //Ordeno el array por idProdcuto
-            newCarrito.products.sort((a, b) => a.id - b.id);
-
-            //Borro newCarrito de carritos
-            this.#carritos = this.#carritos.filter(carrito => carrito.id !== newCarrito.id);
-            console.log("Así quedaron los carritos en addProductToCarritoAsync", this.#carritos);
+            //Obtengo newCarrito con el formato que utilizamos
+            newCarrito = await this.getCarritoByIdAsync(idCarrito);
 
             //Agrego el carrito con las modificaciones
             this.#carritos.push(newCarrito);
-
-            //Ordeno los carritos por el id
-            this.#carritos.sort((a, b) => a.id - b.id);
-
-            //Grabo los carritos en el archivo
-            await this.#grabarCarritosEnArchivoAsync(this.#carritos);
+            
         }
         catch (error) {
             throw (error);

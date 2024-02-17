@@ -71,8 +71,13 @@ class ProductManager {
     updateProduct(productoModificado) {
                 
         //Validaciones
-        if (!productoModificado.id) {
+        let idProductoModificado;
+
+        if (!(productoModificado.id && !isNaN(idProductoModificado = parseInt(productoModificado.id)))) {
             return "ERROR: id Producto inválido";
+        }
+        else {
+            productoModificado.id = idProductoModificado;    
         }
 
         //Cargo los productos anteriores
@@ -84,7 +89,7 @@ class ProductManager {
             return "ERROR: El producto con el id especificado no existe";
         }
 
-        //Me fijo que el code no exista ya en algún producto que no sea el especificado para hacer el update
+        //Me fijo que el code no exista ya en algún producto que no sea  especificado para hacer el update
         if (this.#products.find(product => ((product.code === productoModificado.code) && (product.id !== productoModificado.id)))) {
             return "ERROR: code ya existente";        
         }
@@ -112,9 +117,15 @@ class ProductManager {
 
     }
 
-    deleteProduct(idProducto) {
+    deleteProduct(idProduct) {
                 
         //Validaciones
+        let idProducto = parseInt(idProduct);
+
+        if (isNaN(idProducto)) {
+            return "ERROR: id Producto inválido";
+        }
+
         if (idProducto <= 0) {
             return "ERROR: id Producto inválido";
         }
@@ -147,10 +158,17 @@ class ProductManager {
     getProductById(idProduct) {
         let productSelected; 
 
+        let idProducto = parseInt(idProduct);
+
+        if (isNaN(idProducto)) {
+            console.log("Not found");
+            return "Not found";
+        }
+
         //Cargo los prodctos desde el archivo
         this.#products = this.#leerProductosEnArchivo();
 
-        productSelected = this.#products.find(product => product.id === idProduct);
+        productSelected = this.#products.find(product => product.id === idProducto);
 
         if (!productSelected) {
             console.log("Not found");
@@ -236,6 +254,27 @@ class ProductManager {
         return this.#products;
     }
 
+    async getProductsByLimitAsync(limite) {
+        
+        try {
+            let productos = await this.getProductsAsync();
+                
+            let prodLimitados = [...productos]; //Creo una copia del array
+            
+            prodLimitados = prodLimitados.slice(0, limite);
+            console.log("Productos limitados: ", prodLimitados);
+                    
+            this.#products = prodLimitados;
+        }
+        catch (error) {
+            console.error("ERROR: ", error);
+            throw new Error(error);
+        }
+
+
+        return this.#products;    
+    }
+
     async addProductAsync({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1, category = "", status = true}) {
         let newProduct;
 
@@ -307,10 +346,15 @@ class ProductManager {
 
         try {
             //Validaciones
-            if (!productoModificado.id) {
+            let idProductoModificado;
+
+            if (!(productoModificado.id && !isNaN(idProductoModificado = parseInt(productoModificado.id)))) {
                 throw new Error("ERROR: id Producto inválido");
             }
-
+            else {
+                productoModificado.id = idProductoModificado;    
+            }
+            
             //Cargo los productos anteriores
             this.#products = await this.#leerProductosEnArchivoAsync();
 
@@ -354,13 +398,20 @@ class ProductManager {
 
     async getProductByIdAsync(idProduct) {
         let productSelected; 
+        
+        let idProducto = parseInt(idProduct);
+
+        if (isNaN(idProducto)) {
+            console.log("Not found");
+            return "Not found";
+        }
 
         try {
 
             //Cargo los prodctos desde el archivo
             this.#products = await this.#leerProductosEnArchivoAsync();
 
-            productSelected = this.#products.find(product => product.id === idProduct);
+            productSelected = this.#products.find(product => product.id === idProducto);
 
             if (!productSelected) {
                 console.log("Not found");
@@ -375,10 +426,16 @@ class ProductManager {
 
     }
 
-    async deleteProductAsync(idProducto) {
+    async deleteProductAsync(idProduct) {
        
         try {
             //Validaciones
+            let idProducto = parseInt(idProduct);
+
+            if (isNaN(idProducto)) {
+                throw new Error("ERROR: id Producto inválido");
+            }
+
             if (idProducto <= 0) {
                 throw new Error("ERROR: id Producto inválido");
             }

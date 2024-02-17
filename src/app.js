@@ -1,12 +1,15 @@
 import express from "express";
 import handlebars from "express-handlebars";
 import {Server} from "socket.io";
+import mongoose from "mongoose";
 
 import path from "path";
 import { fileURLToPath } from 'url';
 
-import ProductManager from "./ProductManager.js";
-import CarritoManager from "./CarritoManager.js";
+import ProductManager from "./dao/ProductManagerMongo.js";
+import CarritoManager from "./dao/CarritoManagerMongo.js";
+import ChatManager from "./dao/chatManagerMongo.js";
+
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import viewsRouter from "./routes/views.router.js";
@@ -43,66 +46,50 @@ app.use("/", viewsRouter);
 
 app.get("/", (req, res) => res.send("<h1 style='color: blue; text-align: center' >Bienvenido al Server de Productos </h1>"));
 
-//Viejo codigo sin routers
-/* app.get("/products", (req, res) => {
-    let prodManager = new ProductManager("productos.json");
-
-    let productos = prodManager.getProductsAsync().then(
-        productos => {
-            //Me fijo si especificaron algún límite de cantidad de productos
-            let prodLimitados = [...productos]; //Creo una copia del array
-            let consultas = req.query;
-            let limite; 
-
-            if (consultas.limit && !isNaN(limite = parseInt(consultas.limit))) {
-                //Hay un limite especificado
-                prodLimitados = prodLimitados.slice(0, limite);
-                console.log("Productos limitados: ", prodLimitados);
-            }
-
-            console.log("Productos devueltos: ", prodLimitados);
-
-            res.send(prodLimitados);
-        }        
-    );
-
-
-});
-
-app.get("/products/:pid", (req, res) => {
-    let prodManager = new ProductManager("productos.json");
-    let idProducto;
-    
-    if (req.params.pid && !isNaN(idProducto = parseInt(req.params.pid))) {
-        prodManager.getProductByIdAsync(idProducto).then(
-            producto => {
-                console.log("Producto elegido: ", producto);
-                res.send(producto);
-            }
-        )
-        .catch(error => {
-            console.log("ERROR: ", error);
-            res.send({error});
-        })
-    }
-    else {
-        res.send({ERROR: "Debe especificar un id válido"});
-    }
-}); */
-//Fin viejo codigo sin routers
-
-
 const httpServer = app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
 
 //WebSockets
-const socketServer = new Server(httpServer);
+export const socketServer = new Server(httpServer);
+
+export const chatManager = new ChatManager(socketServer);
 
 socketServer.on("connection", socket => {
     console.log("Nuevo cliente conectado");
+
+    //Eventos del chat
+    socket.on("newUser", (username) => {
+        chatManager.nuevoUsuario(socket, username);
+    
+    })
+
+
+    //El usuario emite un mensaje
+    socket.on("chatMessage", (message) => {
+        chatManager.enviarMensaje(socket, message);
+    })
+
+    socket.on("disconnect", () => {
+        chatManager.desconectarUsuario(socket);
+    })
     
 })
 
-export default socketServer;
+
+
+//Mongoose - Base de Datos
+//La cadena de conexion habría que leerla de un archivo por seguridad
+let cadenaConexionBD = ""; //reemplazar esto con el valor de la cadena de conexion a la BD
+let cadenaConexionAtlas = "mongodb+srv://cocapablo:FKITs3H3kYgRNPSy@cluster0.u0b3vak.mongodb.net/ecommerce?retryWrites=true&w=majority";
+let cadenaConexionLocal = "mongodb://127.0.0.1:27017/ecommerce";
+cadenaConexionBD = cadenaConexionAtlas;
+
+mongoose.connect(cadenaConexionBD)
+.then(() => {
+    console.log("Conectado a la base de datos");
+})
+.catch(err => {
+    console.log("ERROR al conectarme: ", err);
+})
 
 //A partir de acá este código es solo para cargar productos y asegurarme que haya 
 
@@ -140,26 +127,55 @@ async function cargarProductosAsync(prodManagerAsync) {
     }
 }
 
-let prodManager = new ProductManager("productos.json"); 
+export const prodManager = new ProductManager("productos.json"); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
 
-cargarProductosAsync(prodManager);
+//cargarProductosAsync(prodManager);
 
 //Codigo para probar el carrito
 
 
 async function cargarCarritosAsync(carritoManagerAsync) {
     try {
-        let carrito1 = await carritoManagerAsync.addCarritoAsync();
-        console.log("Carrito 1", carrito1);
+        let carritos = await carritoManagerAsync.getCarritosAsync();
 
-        let carrito2 = await carritoManagerAsync.addCarritoAsync();
+        console.log("Carritos: ", carritos);
+
+        let carrito1 = await carritoManagerAsync.addCarritoAsync();
+        console.log("Carrito 1: ", carrito1);
+
+        //Un carrito
+        let carritoPrueba = await carritoManagerAsync.getCarritoByIdAsync(carrito1.id);
+        console.log("Carrito Prueba: ", carritoPrueba);
+
+        //Los productos del carrito
+        let productos = await carritoManagerAsync.getProductsDeCarritoByIdAsync(carrito1.id);
+        console.log("Productos del Carrito Prueba: ", productos);
+
+        //Leo un producto del carrito
+        let producto = await carritoManagerAsync.getProductDeCarritoAsync(carrito1.id , "65c8b6b3075be6d7105d12ec");
+        console.log("Producto: ", producto);
+
+    
+        //Agrego un producto existente al carrito
+        let carritoActualizado = await carritoManagerAsync.addProductToCarritoAsync(carrito1.id , "65c8b6b3075be6d7105d12e9", 50); //Agrego zapallitos
+        console.log("Carrito Actualizado: ", carritoActualizado);
+        
+        
+        //Agrego un producto existente al carrito
+        carritoActualizado = await carritoManagerAsync.addProductToCarritoAsync(carrito1.id , "65c8b6b3075be6d7105d12ec", 50);
+        console.log("Carrito Actualizado: ", carritoActualizado);
+        
+
+        /* let carrito2 = await carritoManagerAsync.addCarritoAsync();
         console.log("Carrito 2", carrito2);
 
-        //Agrego productos a los carritos
-        await carritoManagerAsync.addProductToCarritoAsync(1, 1);
+         //Agrego productos a los carritos
+        await carritoManagerAsync.addProductToCarritoAsync(carrito1.id, "65c8b6b3075be6d7105d12ec");
 
-        await carritoManagerAsync.addProductToCarritoAsync(2, 1);
+        await carritoManagerAsync.addProductToCarritoAsync(carrito2.id, "65c8b6b3075be6d7105d12ec");
 
+        
+        
         await carritoManagerAsync.addProductToCarritoAsync(1, 3);
 
         await carritoManagerAsync.addProductToCarritoAsync(2, 4);
@@ -175,7 +191,7 @@ async function cargarCarritosAsync(carritoManagerAsync) {
         //Agrego nuevos
         await carritoManagerAsync.addProductToCarritoAsync(1, 2);
 
-        await carritoManagerAsync.addProductToCarritoAsync(2, 2);
+        await carritoManagerAsync.addProductToCarritoAsync(2, 2);  */
 
     }
     catch (error) {
@@ -183,6 +199,6 @@ async function cargarCarritosAsync(carritoManagerAsync) {
     }
 }
 
-/* let carritoManager = new CarritoManager("carrito.json", prodManager);
+export const cartManager = new CarritoManager("carrito.json", prodManager); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
 
-cargarCarritosAsync(carritoManager); */
+//cargarCarritosAsync(cartManager); 

@@ -83,7 +83,7 @@ function obtenerProductoDeForm() {
     let producto = {};
 
     //Obtengo cada propiedad del producto de idProducto
-    let id = parseInt(document.getElementById("formIdProducto").value);
+    let id = document.getElementById("formIdProducto").value;
     let title = document.getElementById("formTitle").value;
     let description = document.getElementById("formDescription").value;
     let price = parseFloat(document.getElementById("formPrice").value);
@@ -202,8 +202,20 @@ function agregarProducto(producto) {
 
     fetch("/api/products", datos)
     .then(res => res.json())
-    .then(prodAgregado => alert("Producto Agregado correctamente"))
-    .catch(err => alert("ERROR: " + err.toString()));
+    .then(prodAgregado => {
+        Swal.fire({
+            icon: "success",
+            title: "Operación exitosa",
+            text: `El producto ${producto.title} se agregó correctamente`
+        })
+    })
+    .catch(err => {
+        Swal.fire({
+            icon: "warning",
+            title: "ERROR",
+            text: `Se produjo el siguiente error: ${err.toString()}`
+        })
+    });
 }
 
 function actualizarProducto(producto) {
@@ -216,8 +228,20 @@ function actualizarProducto(producto) {
 
     fetch("/api/products/" + producto.id, datos)
     .then(res => res.json())
-    .then(prodActualizado => alert("Producto Actualizado correctamente"))
-    .catch(err => alert("ERROR: " + err.toString()));
+    .then(prodActualizado => {
+        Swal.fire({
+            icon: "success",
+            title: "Operación exitosa",
+            text: `El producto ${producto.title} se actualizó correctamente`
+        })
+    })
+    .catch(err => {
+        Swal.fire({
+            icon: "warning",
+            title: "ERROR",
+            text: `Se produjo el siguiente error: ${err.toString()}`
+        })
+    });
 }
 
 function eliminarProducto(idProducto) {
@@ -230,8 +254,20 @@ function eliminarProducto(idProducto) {
 
     fetch("/api/products/" + idProducto, datos)
     .then(res => res.json())
-    .then(prodActualizado => alert("Producto Eliminado correctamente"))
-    .catch(err => alert("ERROR: " + err.toString()));
+    .then(prodActualizado => {
+        Swal.fire({
+            icon: "success",
+            title: "Operación exitosa",
+            text: `El producto se eliminó correctamente`
+        })
+    })
+    .catch(err => {
+        Swal.fire({
+            icon: "warning",
+            title: "ERROR",
+            text: `Se produjo el siguiente error: ${err.toString()}`
+        })
+    });
 }
 
 function renderizarProductos(productos) {
@@ -253,8 +289,8 @@ function renderizarProductos(productos) {
                 <p><span class="fw-bold">Categoría: </span>${producto.category}</p>
             </div>
             <div className="card-footer">
-                <button class="btn btn-primary my-3 mx-2" onclick="editarProducto(${producto.id})">Editar</a>
-                <button class="btn btn-danger my-3 mx-2" onclick="eliminarProducto(${producto.id})">Eliminar</a>
+                <button class="btn btn-primary my-3 mx-2" onclick="editarProducto('${producto.id}')">Editar</a>
+                <button class="btn btn-danger my-3 mx-2" onclick="eliminarProducto('${producto.id}')">Eliminar</a>
             </div>
         </div>
     

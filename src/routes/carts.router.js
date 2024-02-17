@@ -1,15 +1,16 @@
 import express from "express";
-import ProductManager from "../ProductManager.js";
-import CarritoManager from "../CarritoManager.js";
+import ProductManager from "../dao/ProductManager.js";
+import CarritoManager from "../dao/CarritoManager.js";
+import { cartManager } from "../app.js";
 
 const router = express.Router();
 
 
 router.get("/api/carts", (req, res) => {
-    let prodManager = new ProductManager("productos.json");
-    let cartManager = new CarritoManager("carrito.json", prodManager);
+    //let prodManager = new ProductManager("productos.json");
+    //let cartManager = new CarritoManager("carrito.json", prodManager);
 
-    let carritos = cartManager.getCarritosAsync().then(
+    cartManager.getCarritosAsync().then(
         carritos => {
             console.log("Carritos devueltos: ", carritos);
 
@@ -21,11 +22,12 @@ router.get("/api/carts", (req, res) => {
 });
 
 router.get("/api/carts/:cid", (req, res) => {
-    let prodManager = new ProductManager("productos.json");
-    let cartManager = new CarritoManager("carrito.json", prodManager);
+    //let prodManager = new ProductManager("productos.json");
+    //let cartManager = new CarritoManager("carrito.json", prodManager);
     let idCarrito;
     
-    if (req.params.cid && !isNaN(idCarrito = parseInt(req.params.cid))) {
+    if (req.params.cid) {
+        idCarrito = req.params.cid;
         cartManager.getProductsDeCarritoByIdAsync(idCarrito).then(
             productos => {
                 console.log("Productos del carrito: ", productos);
@@ -43,8 +45,8 @@ router.get("/api/carts/:cid", (req, res) => {
 });
 
 router.post("/api/carts", (req, res) => {
-    let prodManager = new ProductManager("productos.json");
-    let cartManager = new CarritoManager("carrito.json", prodManager);
+    //let prodManager = new ProductManager("productos.json");
+    //let cartManager = new CarritoManager("carrito.json", prodManager);
     
 
     cartManager.addCarritoAsync().then(carritoAgregado => {
@@ -65,12 +67,14 @@ router.post("/api/carts", (req, res) => {
 });
 
 router.post("/api/carts/:cid/product/:pid", (req, res) => {
-    let prodManager = new ProductManager("productos.json");
-    let cartManager = new CarritoManager("carrito.json", prodManager);
+    //let prodManager = new ProductManager("productos.json");
+    //let cartManager = new CarritoManager("carrito.json", prodManager);
     let idCarrito;
     let idProducto;
     
-    if (req.params.cid && !isNaN(idCarrito = parseInt(req.params.cid)) && req.params.pid && !isNaN(idProducto = parseInt(req.params.pid))) {
+    if (req.params.cid && req.params.pid) {
+        idCarrito = req.params.cid;
+        idProducto = req.params.pid;
         cartManager.addProductToCarritoAsync(idCarrito, idProducto).then(carritoAgregado => {
             res.json({
                 status: "accepted",
