@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import productModel from "./models/products.model.js";
+import mongoosePaginate from 'mongoose-paginate-v2';
 
 class ProductManager {
     #products;
@@ -243,6 +244,70 @@ class ProductManager {
         return true;
 
     }
+
+    async getProductsWithPaginationAsync(limit = 10, page = 1, query = {}, sort = "") {
+        let productosBD; 
+        let opciones;
+
+        try {
+            opciones = {
+                limit: limit,
+                page: page
+            }
+
+            if (sort) {
+                console.log("SORT: ", sort);
+
+                if (sort === "ASC") {
+                    //Ordenamiento por price de menor a mayor
+                    opciones.sort = {price: 1}
+                    console.log("Estoy acá en ASC");
+                }
+                else if (sort === "DES") {
+                    //Ordenamiento por price de mayor a menor
+                    opciones.sort = {price: -1}
+                    console.log("Estoy acá en DES");
+                }
+                else {
+                    console.log("No entré a ningún lado - SORT vacío");
+                }
+            }
+
+            productosBD = await productModel.paginate(query, opciones);
+
+            //Armo la coleccion de productos con el formato que utilizamos
+
+            this.#products = productosBD.docs.map(producto => {
+                return (
+                    {
+                        id: producto._id.toString(),
+                        title: producto.title,
+                        description: producto.description,
+                        price: producto.price,
+                        thumbnail: producto.thumbnail,
+                        code: producto.code,
+                        stock: producto.stock,
+                        category: producto.category,
+                        status: producto.status
+
+                    }
+                )
+            })
+
+            //Configuro productosBD.docs con el formato que utilizamos
+            productosBD.docs = this.#products;
+
+           
+        }
+        catch (error) {
+            console.error("ERROR: ", error);
+            throw new Error(error);
+        }
+
+
+        return productosBD;
+    }
+
 
 }
 

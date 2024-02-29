@@ -265,4 +265,6 @@ class CarritoManager {
 
 }
 
+
+
 export default CarritoManager;

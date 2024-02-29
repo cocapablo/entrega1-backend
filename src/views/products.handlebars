@@ -1,0 +1,59 @@
+<h1 class="text-center my-5">Productos</h1> 
+<div class="container my-5" id="idListaProductos">
+    <div class="row">
+        {{#each payload}}
+
+
+            <div id="idProducto{{this.id}}" class="col-3 card w-25 m-3">
+                <div class="card-body p-0 my-3">
+                    <img src={{this.thumbnail}} class="w-100" alt="Imagen del producto" />
+                    <h5 class="card-title">{{this.title}}</h5>
+                    <p>{{this.description}}</p>
+                    <p><span class="fw-bold">Precio: </span>${{this.price}}</p>
+                    <p><span class="fw-bold">Stock: </span>{{this.stock}}</p>
+                    <p><span class="fw-bold">Categoría: </span>{{this.category}}</p>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-primary my-3 mx-2" onclick="agregarProductoAlCarrito('{{this.id}}')">Agregar al Carrito</button>
+                </div>
+            </div>
+            
+            <div id="camposOcultos" style="display: none;">
+                <div  id="title{{this.id}}">{{this.title}}</div>
+                <div  id="description{{this.id}}">{{this.description}}</div>
+                <div  id="price{{this.id}}">{{this.price}}</div>
+                <div  id="thumbnail{{this.id}}">{{this.thumbnail}}</div>
+                <div  id="code{{this.id}}">{{this.code}}</div>
+                <div  id="stock{{this.id}}">{{this.stock}}</div>
+                <div  id="category{{this.id}}">{{this.category}}</div>
+                <div  id="status{{this.id}}">{{this.status}}</div>
+            </div>
+            
+            
+    
+        {{/each}}
+    
+    </div>
+
+    <div class="row">
+        <div id="botones" className="col-md-12">
+            {{#if hasPrevPage}}
+                <button class="w-15 btn btn-primary" id="btnPaginaAnterior"><a href={{prevLink}} class="link-light"> <<< Pagina Anterior</a></button>
+            {{/if}}    
+            <label class="w-1 p-2">{{page}}</label>
+            {{#if hasNextPage}}
+                <button class="w-15 btn btn-primary" id="btnPaginaSiguiente"><a href={{nextLink}} class="link-light">Pagina Siguiente >>> </a></button>
+            {{/if}} 
+        </div>
+    </div>
+    
+</div>
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/products.js"></script>

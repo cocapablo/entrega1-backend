@@ -82,6 +82,7 @@ let cadenaConexionBD = ""; //reemplazar esto con el valor de la cadena de conexi
 let cadenaConexionAtlas = "mongodb+srv://cocapablo:FKITs3H3kYgRNPSy@cluster0.u0b3vak.mongodb.net/ecommerce?retryWrites=true&w=majority";
 let cadenaConexionLocal = "mongodb://127.0.0.1:27017/ecommerce";
 cadenaConexionBD = cadenaConexionAtlas;
+//cadenaConexionBD = cadenaConexionLocal;
 
 mongoose.connect(cadenaConexionBD)
 .then(() => {
@@ -199,6 +200,104 @@ async function cargarCarritosAsync(carritoManagerAsync) {
     }
 }
 
+async function cargarCarritoConProductosAsync(carritoManagerAsync) {
+    let carritoPrueba;
+
+    try {
+        let carritos = await carritoManagerAsync.getCarritosAsync();
+
+         //Un carrito
+         if (carritos.length == 0) {
+            //Creo un carrito
+            carritoPrueba = await carritoManagerAsync.addCarritoAsync();
+        }
+        else {
+            //Obtengo el primer carrito de carritos
+            carritoPrueba = carritos[0];
+        }
+
+        console.log("Carrito antes de los cambios", carritoPrueba);
+
+        //Configuro los productos del carrito
+        let productos = [
+            {id: "65c8b6b3075be6d7105d12e6", quantity: 50},
+            {id: "65c8b6b3075be6d7105d12e9", quantity: 70},
+            {id: "65c8b6b3075be6d7105d12ec", quantity: 100},
+            {id: "65c8b6b3075be6d7105d12ef", quantity: 450}
+        ]
+
+        //Seteo los productos del carrito
+        carritoPrueba = await carritoManagerAsync.setProductsToCarritoAsync(carritoPrueba.id, productos);
+        console.log("Carrito después de los cambios : ", carritoPrueba);
+
+        //Borro todos los productos
+        carritoPrueba = await carritoManagerAsync.setProductsToCarritoAsync(carritoPrueba.id);
+        console.log("Carrito después del borrado total : ", carritoPrueba);
+        
+
+    }
+    catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
+async function borrarProductoDeCarritoAsync(carritoManagerAsync, idCarrito, idProducto) {
+    let carritoPrueba;
+
+    try {
+        
+
+        //Borro el Producto del carrito
+        carritoPrueba = await carritoManagerAsync.deleteProductDeCarrito(idCarrito,idProducto);
+        console.log("Carrito después de los cambios : ", carritoPrueba);
+
+        
+    }
+    catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
+async function setProductoDeCarritoAsync(carritoManagerAsync, idCarrito, idProducto, cantidad) {
+    let carritoPrueba;
+
+    try {
+        
+        //Seteo el Producto del carrito
+        carritoPrueba = await carritoManagerAsync.setProductToCarritoAsync(idCarrito, idProducto, cantidad);
+        console.log("Carrito después de los cambios : ", carritoPrueba);
+        
+    }
+    catch (error) {
+        console.error("ERROR", error);
+    }
+}
+
 export const cartManager = new CarritoManager("carrito.json", prodManager); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
 
 //cargarCarritosAsync(cartManager); 
+
+//cargarCarritoConProductosAsync(cartManager);
+
+/* prodManager.getProductsWithPaginationAsync(4, 1, {}, "DES").then
+(
+    resultado => {
+        let resultadoJSON = JSON.stringify(resultado,null, 4);
+        console.log("Resultado: ", resultadoJSON);
+    }
+)
+.catch
+(error => console.log("ERROR: ", error)); */
+
+//borrarProductoDeCarritoAsync(cartManager, "65ccc7ce8363cc00bfd00fb7", "65c8b6b3075be6d7105d12ec");
+
+//setProductoDeCarritoAsync(cartManager, "65ccc7ce8363cc00bfd00fb7", "65c8b6b3075be6d7105d12ef", 3000);
+
+/* let idCarrito = "65ccc7ce8363cc00bfd00fb7";
+cartManager.getCarritoWithProductsByIdAsync(idCarrito)
+.then(carrito => {
+    console.log("Carrito con Productos: ", carrito);
+})
+.catch(error => {
+    console.log("ERROR: ", error);
+}); */

@@ -289,8 +289,8 @@ function renderizarProductos(productos) {
                 <p><span class="fw-bold">Categoría: </span>${producto.category}</p>
             </div>
             <div className="card-footer">
-                <button class="btn btn-primary my-3 mx-2" onclick="editarProducto('${producto.id}')">Editar</a>
-                <button class="btn btn-danger my-3 mx-2" onclick="eliminarProducto('${producto.id}')">Eliminar</a>
+                <button class="btn btn-primary my-3 mx-2" onclick="editarProducto('${producto.id}')">Editar</button>
+                <button class="btn btn-danger my-3 mx-2" onclick="eliminarProducto('${producto.id}')">Eliminar</button>
             </div>
         </div>
     

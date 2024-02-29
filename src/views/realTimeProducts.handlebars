@@ -5,7 +5,7 @@
 
 
             <div id="idProducto{{this.id}}" class="col-3 card w-25 m-3">
-                <div className="card-body p-0 my-3">
+                <div class="card-body p-0 my-3">
                     <img src={{this.thumbnail}} class="w-100" alt="Imagen del producto" />
                     <h5 class="card-title">{{this.title}}</h5>
                     <p>{{this.description}}</p>
@@ -13,9 +13,9 @@
                     <p><span class="fw-bold">Stock: </span>{{this.stock}}</p>
                     <p><span class="fw-bold">Categoría: </span>{{this.category}}</p>
                 </div>
-                <div className="card-footer">
-                    <button class="btn btn-primary my-3 mx-2" onclick="editarProducto('{{this.id}}')">Editar</a>
-                    <button class="btn btn-danger my-3 mx-2" onclick="eliminarProducto('{{this.id}}')">Eliminar</a>
+                <div class="card-footer">
+                    <button class="btn btn-primary my-3 mx-2" onclick="editarProducto('{{this.id}}')">Editar</button>
+                    <button class="btn btn-danger my-3 mx-2" onclick="eliminarProducto('{{this.id}}')">Eliminar</button>
                 </div>
             </div>
             
@@ -113,11 +113,11 @@
     <button class="btn btn-primary m-4" id="btnAgregarProducto" onclick="agregarProductoDeForm()">Agregar Producto</button>
     <button class="btn btn-primary m-4" id="btnActualizarProducto" onclick="actualizarProductoDeForm()" style="display: none;">Actualizar Producto</button>
     <div class="row">
-    <div id="botones" className="col-md-12">
-        
-        <button class="w-15 btn btn-success" id="btnChat"><a href="/chat" class="link-light" target="_blank">Chatear</a></button>
+        <div id="botones" className="col-md-12">
+            
+            <button class="w-15 btn btn-success" id="btnChat"><a href="/chat" class="link-light" target="_blank">Chatear</a></button>
+        </div>
     </div>
-</div>
 </div>
 
 
