@@ -1,0 +1,48 @@
+{{!-- Formulario --}}
+<h1 class="text-center my-5">Registrarse</h1> 
+<form class="container my-5" method="post" action="/api/sessions/register">
+    {{#if error}}
+    <label class="form-control bg-warning text-black fw-bold" id="idError">{{mensajeError}}</label>
+    {{/if}} 
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="first_name">First Name</label>
+        <div class="col-sm-10">
+            <input type="text" id="idfirst_name" class="form-control" name="first_name" value="" ></input>
+        </div>
+    </div>
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="last_name">Last Name</label>
+        <div class="col-sm-10">
+            <input type="text" id="idlast_name" class="form-control" name="last_name" value="" ></input>
+        </div>
+    </div>
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="email">Email</label>
+        <div class="col-sm-10">
+            <input type="text" id="idemail" class="form-control" name="email" value="" ></input>
+        </div>
+    </div>
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="age">Age</label>
+        <div class="col-sm-10">
+            <input type="number" id="idage" class="form-control" name="age" value="0" ></input>
+        </div>
+    </div>
+
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="password">Password</label>
+        <div class="col-sm-10">
+            <input type="password" id="idpassword" class="form-control" name="password" value="" ></input>
+        </div>
+    </div>
+
+    <button class="btn btn-primary m-4" id="btnRegistrar" type="submit">Registrarse</button>
+   
+    
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

@@ -1,38 +1,63 @@
-import express from "express";
+import express, { request } from "express";
 //import ProductManager from "../dao/ProductManager.js";
 //import ProductManager from "../dao/ProductManagerMongo.js";
 import { prodManager } from "../app.js";
 import { cartManager } from "../app.js";
+import { usuarioLogueado, usuarioNoLogueado } from "../middlewares/sessionMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    //Obtengo un aray de los productos actuales
+router.get("/", usuarioLogueado, (req, res) => {
+    //Redirecciono a products
+    res.redirect("/products?limit=6");
     
-    prodManager.getProductsAsync().then(
+    //Obtengo un array de los productos actuales
+    
+    /* prodManager.getProductsAsync().then(
         productos => {
             res.render("home", { productos });
         }
-    )
+    ) */
 });
 
 
-router.get("/realtimeproducts", (req, res) => {
+router.get("/realtimeproducts", usuarioLogueado, (req, res) => {
+    let usuario = {};
+
+    //Obtengo el usuario de la session actual
+    req.session && req.session.user && (usuario = req.session.user);
+
+    console.log("Usuario en la Session: ", usuario);
+
     //Obtengo un aray de los productos actuales
     
     prodManager.getProductsAsync().then(
         productos => {
-            res.render("realtimeproducts", { productos });
+
+            res.render("realtimeproducts", { productos, user: usuario});
         }
     )
 });
 
-router.get("/chat", (req, res) => {
-    res.render("chat");
+router.get("/chat", usuarioLogueado, (req, res) => {
+    let usuario = {};
+
+    //Obtengo el usuario de la session actual
+    req.session && req.session.user && (usuario = req.session.user);
+
+    console.log("Usuario en la Session: ", usuario);
+
+    res.render("chat", {user: usuario});
 })
 
-router.get("/cart/:cid", (req, res) => {
+router.get("/cart/:cid", usuarioLogueado, (req, res) => {
     let idCarrito;
+    let usuario = {};
+
+    //Obtengo el usuario de la session actual
+    req.session && req.session.user && (usuario = req.session.user);
+
+    console.log("Usuario en la Session: ", usuario);
     
     if (req.params.cid) {
         idCarrito = req.params.cid;
@@ -40,7 +65,8 @@ router.get("/cart/:cid", (req, res) => {
             carrito => {
                 console.log("Carrito para la View: ", carrito);
                 res.render("cart", {id: idCarrito,
-                                    products: [...carrito.products]});
+                                    products: [...carrito.products],
+                                    user: usuario});
             }
         )
         .catch(error => {
@@ -55,7 +81,7 @@ router.get("/cart/:cid", (req, res) => {
     
 })
 
-router.get("/products", async (req, res) => {
+router.get("/products", usuarioLogueado, async (req, res) => {
     let consultas = req.query;
     let limite; 
     let pagina;
@@ -63,6 +89,7 @@ router.get("/products", async (req, res) => {
     let orden = "";
     let productos;
     let resultado;
+    let usuario = {};
 
     //Paginado
     try {
@@ -114,6 +141,11 @@ router.get("/products", async (req, res) => {
         productos.isValid= !(pagina <= 0 || pagina > productos.totalPages)
         console.log("Resultado con extras: ", productos);
 
+        //Obtengo el usuario de la session actual
+        req.session && req.session.user && (usuario = req.session.user);
+
+        console.log("Usuario en la Session: ", usuario);
+
         //Preparo el resultado a devolver
         resultado = {
             status: "success",
@@ -125,7 +157,10 @@ router.get("/products", async (req, res) => {
             hasPrevPage: productos.hasPrevPage,
             hasNextPage: productos.hasNextPage,
             prevLink: productos.prevLink,
-            nextLink: productos.nextLink
+            nextLink: productos.nextLink,
+
+            //Datos del usuario
+            user: usuario
         }
 
         res.render("products", resultado);
@@ -144,7 +179,40 @@ router.get("/products", async (req, res) => {
    
 });
 
+router.get("/login", usuarioNoLogueado, (req, res) => {
+    let error = false;
+    let mensajeError = "";
 
+    req.query && req.query.error && (error = (req.query.error === "true" ? true : false));
+    console.log("Error: ", error);
+    req.query && req.query.mensajeError && (mensajeError = req.query.mensajeError);
+    console.log("Mensaje Error: ", mensajeError);
+
+    res.render("login", {error, mensajeError});
+})
+
+router.get("/register", usuarioNoLogueado, (req, res) => {
+    let error = false;
+    let mensajeError = "";
+
+    req.query && req.query.error && (error = (req.query.error === "true" ? true : false));
+    console.log("Error: ", error);
+    req.query && req.query.mensajeError && (mensajeError = req.query.mensajeError);
+    console.log("Mensaje Error: ", mensajeError);
+
+    res.render("register", {error, mensajeError});
+})
+
+router.get("/profile", usuarioLogueado, (req, res) => {
+    let usuario = {};
+
+    //Obtengo el usuario de la session actual
+    req.session && req.session.user && (usuario = req.session.user);
+
+    console.log("Usuario en la Session: ", usuario);
+
+    res.render("profile", {user: usuario});
+})
 
 
 export default router;

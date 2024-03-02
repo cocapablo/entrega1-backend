@@ -1,0 +1,13 @@
+{{#if user}}
+<div class="container my-5 " id="idProfileUsuario">
+    <div class="card text-white bg-info mb-3" style="max-width: 80rem;">
+        <div class="card-header fs-2">Your Profile</div>
+        <div class="card-body">
+            <p class="card-text"><spam class="fw-bold">First Name:</spam> {{user.first_name}}</p>
+            <p class="card-text"><spam class="fw-bold">Last Name:</spam> {{user.last_name}}</p>
+            <p class="card-text"><spam class="fw-bold">EMail:</spam> {{user.email}}</p>
+            <p class="card-text"><spam class="fw-bold">Age:</spam> {{user.age}}</p>
+        </div>
+    </div>
+</div>
+{{/if}}

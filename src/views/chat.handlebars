@@ -5,7 +5,11 @@
             <div class="form-group row my-2">
                 <label class="col-sm-2 col-form-label" for="username">Usuario</label>
                 <div class="col-sm-10">
-                    <input type="text" id="username" class="form-control" required>
+                    <input type="text" id="username" class="form-control" required 
+                    {{#if user}}
+                        value="{{user.email}}"
+                    {{/if}}
+                    >
                 </div>
             </div>
             <button type="submit" class="btn btn-primary m-4">Unirse al chat</button>

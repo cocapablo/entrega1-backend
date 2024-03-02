@@ -1,0 +1,35 @@
+{{!-- Formulario --}}
+<h1 class="text-center my-5">Login</h1> 
+<form class="container my-5" method="post" action="/api/sessions/login">
+    {{#if error}}
+    <label class="form-control bg-warning text-black fw-bold" id="idError">{{mensajeError}}</label>
+    {{/if}} 
+       
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="email">Email</label>
+        <div class="col-sm-10">
+            <input type="text" id="idemail" class="form-control" name="email" value="" ></input>
+        </div>
+    </div>
+    
+    <div class="form-group row my-2">
+        <label class="col-sm-2 col-form-label" for="password">Password</label>
+        <div class="col-sm-10">
+            <input type="password" id="idpassword" class="form-control" name="password" value="" ></input>
+        </div>
+    </div>
+
+    <button class="btn btn-primary m-4" id="btnLogin" type="submit">Login</button>
+   
+    
+</form>
+
+<div class="container my-5">
+    <div class="row">
+        <div id="botones" className="col-md-12">
+            <button class="w-15 btn btn-danger" id="btnRegistrarse"><a href="/register" class="link-light">Registrarse</a></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

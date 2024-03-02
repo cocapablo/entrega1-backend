@@ -9,10 +9,19 @@ import { fileURLToPath } from 'url';
 import ProductManager from "./dao/ProductManagerMongo.js";
 import CarritoManager from "./dao/CarritoManagerMongo.js";
 import ChatManager from "./dao/chatManagerMongo.js";
+import UserManager from "./dao/UserManagerMongo.js";
+
 
 import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import viewsRouter from "./routes/views.router.js";
+import sessionsRouter from "./routes/sessions.router.js";
+
+import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
+
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 
 
 const port = 8080;
@@ -27,6 +36,32 @@ let __dirname = path.dirname(__filename);
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+//app.use(usuarioLogueado);
+
+const miFirmaSecreta = "pablococa";
+app.use(cookieParser(miFirmaSecreta));
+
+//Cadena de Conexion a Base de Datos
+//La cadena de conexion habría que leerla de un archivo por seguridad
+let cadenaConexionBD = ""; //reemplazar esto con el valor de la cadena de conexion a la BD
+let cadenaConexionAtlas = "mongodb+srv://cocapablo:FKITs3H3kYgRNPSy@cluster0.u0b3vak.mongodb.net/ecommerce?retryWrites=true&w=majority";
+let cadenaConexionLocal = "mongodb://127.0.0.1:27017/ecommerce";
+cadenaConexionBD = cadenaConexionAtlas;
+//cadenaConexionBD = cadenaConexionLocal;
+
+//MongoStore
+app.use(session({
+    store: MongoStore.create({
+            mongoUrl: cadenaConexionBD,
+            mongoOtions: {useNewUrlParser: true, useUnifiedTopolofy: true},
+            ttl: 1000
+            }),
+    
+    secret: miFirmaSecreta,
+    resave: false,
+    saveUninitialized: false
+    }
+))
 
 //Archivos estáticos
 app.use(express.static(path.join(__dirname, "public")));
@@ -38,6 +73,7 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "handlebars");
 
 //Routers
+app.use("/", sessionsRouter);
 app.use("/", productsRouter);
 app.use("/", cartsRouter);
 app.use("/", viewsRouter);
@@ -45,6 +81,10 @@ app.use("/", viewsRouter);
 //Endpoint
 
 app.get("/", (req, res) => res.send("<h1 style='color: blue; text-align: center' >Bienvenido al Server de Productos </h1>"));
+
+//User Manager
+export const userManager = new UserManager();
+
 
 const httpServer = app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
 
@@ -77,12 +117,6 @@ socketServer.on("connection", socket => {
 
 
 //Mongoose - Base de Datos
-//La cadena de conexion habría que leerla de un archivo por seguridad
-let cadenaConexionBD = ""; //reemplazar esto con el valor de la cadena de conexion a la BD
-let cadenaConexionAtlas = "mongodb+srv://cocapablo:FKITs3H3kYgRNPSy@cluster0.u0b3vak.mongodb.net/ecommerce?retryWrites=true&w=majority";
-let cadenaConexionLocal = "mongodb://127.0.0.1:27017/ecommerce";
-cadenaConexionBD = cadenaConexionAtlas;
-//cadenaConexionBD = cadenaConexionLocal;
 
 mongoose.connect(cadenaConexionBD)
 .then(() => {
@@ -300,4 +334,47 @@ cartManager.getCarritoWithProductsByIdAsync(idCarrito)
 })
 .catch(error => {
     console.log("ERROR: ", error);
+}); */
+
+/* let nuevoUsuario = {
+    first_name : "Pablo", 
+    last_name : "Coca", 
+    email : "cocapablo@gmail.com", 
+    age : 51, 
+    password : "pacojeta", 
+    role : "usuario"
+}
+
+let adminUsuario = {
+    first_name : "Super", 
+    last_name : "Coderhouse", 
+    email : "adminCoder@coder.com", 
+    age : 25, 
+    password : "adminCod3r123", 
+    role : "admin"
+} */
+
+/* userManager.addUserAsync(nuevoUsuario)
+.then(usuario => {
+    console.log("Nuevo Usuario: ", usuario);
+})
+.catch(error => {
+    console.log("ERROR: ", error);
+});
+
+userManager.addUserAsync(adminUsuario)
+.then(usuario => {
+    console.log("Nuevo Usuario: ", usuario);
+})
+.catch(error => {
+    console.log("ERROR: ", error);
+}); */
+
+
+/* userManager.loginAsync(adminUsuario.email, adminUsuario.password)
+.then(usuario => {
+    console.log("Usuario logueado: ", usuario);
+})
+.catch(error => {
+    console.log("ERROR: ", error.toString());
 }); */
