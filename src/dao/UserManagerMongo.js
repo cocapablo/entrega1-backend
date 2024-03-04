@@ -55,6 +55,10 @@ class UserManager {
                 ...newUser
             }
 
+            //Borro el password de newUser por ser un dato sensible
+            delete newUser.password;
+            console.log("New User sin password: ", newUser);
+
             this.#users.push(newUser);
 
         }
@@ -96,8 +100,8 @@ class UserManager {
                 last_name: resultado.last_name,
                 email : resultado.email,
                 age : resultado.age,
-                password : resultado.password,
                 role : resultado.role
+                //Omito el password por ser un dato sensible
             }
             
         }
