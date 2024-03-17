@@ -214,5 +214,17 @@ router.get("/profile", usuarioLogueado, (req, res) => {
     res.render("profile", {user: usuario});
 })
 
+router.get("/changePassword", usuarioNoLogueado, (req, res) => {
+    let error = false;
+    let mensajeError = "";
+
+    req.query && req.query.error && (error = (req.query.error === "true" ? true : false));
+    console.log("Error: ", error);
+    req.query && req.query.mensajeError && (mensajeError = req.query.mensajeError);
+    console.log("Mensaje Error: ", mensajeError);
+
+    res.render("changePassword", {error, mensajeError});
+})
+
 
 export default router;

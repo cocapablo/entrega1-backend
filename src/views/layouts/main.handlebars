@@ -10,7 +10,7 @@
     {{#if user}}
     <div class="container my-5 bg-primary" id="idDatosUsuario">
         <div class="row">
-            <div class="col-2 w-25 m-3 text-white">Usuario: {{user.email}}</div>   
+            <div class="col-2 w-25 m-3 text-white"><p>Usuario: {{user.email}}</p><p>Rol: {{user.role}}</p></div>   
             <div class="col-2 w-25 m-3 text-white text-center fs-5">¡Bienvenido {{user.first_name}} {{user.last_name}} al eCommerce de Productos!</div> 
             <button class="col-2 m-3 btn btn-success border-dark shadow" id="btnProfile"><a href="/profile" class="link-light">View Profile</a></button> 
             <button class="col-2 m-3 btn btn-danger border-dark shadow" id="btnLogout"><a href="/api/sessions/logout" class="link-light">Logout</a></button> 

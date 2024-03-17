@@ -23,6 +23,10 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 
+import initializePassport from "./config/passport.config.js";
+import passport from "passport";
+
+
 
 const port = 8080;
 
@@ -71,6 +75,12 @@ console.log("Dirname: ", __dirname);
 app.engine("handlebars", handlebars.engine());
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "handlebars");
+
+//Passport
+initializePassport();
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 //Routers
 app.use("/", sessionsRouter);
