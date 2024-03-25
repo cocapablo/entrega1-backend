@@ -138,8 +138,8 @@ router.post("/api/sessions/login", passport.authenticate("login", {failureRedire
             last_name: nuevoUsuario.last_name,
             email: nuevoUsuario.email,
             age: nuevoUsuario.age,
-            role: nuevoUsuario.role
-
+            role: nuevoUsuario.role,
+            cart: nuevoUsuario.cart
         } 
         res.redirect("/products?limit=6");
     }
@@ -160,6 +160,7 @@ router.get("/api/sessions/faillogin", (req, res) => {
 })
 
 router.get("/api/sessions/logout", (req, res) => {
+
     req.session.destroy(err => {
         if (!err) {
             //Redirecciono a login
@@ -185,6 +186,21 @@ router.get("/api/sessions/failgithub", (req, res) => {
 
     req.session.error && (mensajeError = req.session.error);
     res.redirect("/login?error=true&mensajeError=" + mensajeError);   
+})
+
+router.get("/api/sessions/current", (req, res) => {
+    let usuario = null;
+
+    //Obtengo el usuario de la session actual
+    req.session && req.session.user && (usuario = req.session.user);
+
+    if (!usuario) {
+        usuario = "No hay ningún usuario logueado en esta sesión";
+    }
+
+    console.log("Usuario en la Session: ", usuario);
+
+    res.send({user: usuario});
 })
 
 export default router;

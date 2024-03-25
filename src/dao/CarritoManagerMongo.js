@@ -480,6 +480,23 @@ class CarritoManager {
         
     }
 
+    async deleteCarritoAsync(idCarrito) {
+        let resultado;
+        let todoOk = false;
+
+        try {
+            resultado = await cartModel.deleteOne({_id: idCarrito});
+        }
+        catch (error) {
+            console.error("ERROR: ", error);
+            throw new Error(error);    
+        }
+
+        todoOk = true;
+
+        return todoOk;
+    }
+
 }
 
 

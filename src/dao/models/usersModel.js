@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { cartCollection } from "./cartsModel.js";
 
 const userCollection = "users";
 
@@ -17,6 +18,7 @@ const userSchema = new mongoose.Schema({
         type: String, 
         required: true,
         index: true,
+        unique: true,
         max: 50
     },
     age: {
@@ -32,7 +34,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
         max: 10
+    },
+    cart : {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: cartCollection,
+        required: false 
     }
+    
 })
 
 const userModel = mongoose.model(userCollection, userSchema);

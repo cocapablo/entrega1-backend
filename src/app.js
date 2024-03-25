@@ -92,10 +92,6 @@ app.use("/", viewsRouter);
 
 app.get("/", (req, res) => res.send("<h1 style='color: blue; text-align: center' >Bienvenido al Server de Productos </h1>"));
 
-//User Manager
-export const userManager = new UserManager();
-
-
 const httpServer = app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
 
 //WebSockets
@@ -318,6 +314,9 @@ async function setProductoDeCarritoAsync(carritoManagerAsync, idCarrito, idProdu
 }
 
 export const cartManager = new CarritoManager("carrito.json", prodManager); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
+
+//User Manager
+export const userManager = new UserManager(cartManager);
 
 //cargarCarritosAsync(cartManager); 
 

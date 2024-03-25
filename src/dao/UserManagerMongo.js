@@ -2,11 +2,14 @@ import mongoose from "mongoose";
 import userModel from "./models/usersModel.js";
 import bcrypt from "bcrypt";
 
+
 class UserManager {
     #users;
+    #cartManager;
 
-    constructor() {
+    constructor(cartManager) {
         this.#users = [];
+        this.#cartManager = cartManager;
     }
 
     async addUserAsync({first_name = "", last_name = "", email = "", age = -1, password = "", role = "usuario"}) {
@@ -96,6 +99,7 @@ class UserManager {
 
     async loginAsync(email = "", password = "") {
         let usuario;
+        let nuevoCarrito;
 
         try {
             //Validaciones
@@ -133,6 +137,35 @@ class UserManager {
                 throw new Error (cadenaError);
             }
 
+            //Me fijo si el Usuario ya tiene un Carrito asignado
+            if (resultado.cart) {
+                //El Usuario ya tiene un Carrito asignado: lo elimino. Hago esto porque cada carrito está asociado a una Sesion en particular
+                try {
+                    await this.#cartManager.deleteCarritoAsync(resultado.cart);     
+                }
+                catch (error) {
+                    throw (error);
+                }
+
+            }
+
+            //Creo un nuevo Carrito
+            try {
+                nuevoCarrito = await this.#cartManager.addCarritoAsync();
+                console.log("Nuevo Carrito", nuevoCarrito);
+            }
+            catch (error) {
+                throw (error);
+            }
+
+            //Seteo el nuevoCarrito en el Usuario en la Base de Datos
+            try {
+                await userModel.updateOne({_id: resultado._id}, {$set : {cart: nuevoCarrito.id}});
+            }
+            catch (error) {
+                throw (error);
+            }
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -140,8 +173,9 @@ class UserManager {
                 last_name: resultado.last_name,
                 email : resultado.email,
                 age : resultado.age,
-                role : resultado.role
+                role : resultado.role,
                 //Omito el password por ser un dato sensible
+                cart : nuevoCarrito.id
             }
             
         }
@@ -293,6 +327,7 @@ class UserManager {
 
         return usuario;    
     }
+
 }
 
 export default UserManager;
