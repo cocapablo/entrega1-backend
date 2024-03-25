@@ -134,6 +134,7 @@ router.post("/api/sessions/login", passport.authenticate("login", {failureRedire
         console.log("Nuevo usuario: ", nuevoUsuario);
 
         req.session.user = {
+            id: nuevoUsuario.id,
             first_name: nuevoUsuario.first_name,
             last_name: nuevoUsuario.last_name,
             email: nuevoUsuario.email,

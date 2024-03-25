@@ -163,7 +163,7 @@ const initializePassport = () => {
         async (req, username, password, done) => {
             try {
                 let nuevoUsuario = await userManager.loginAsync(username, password);
-        
+                
                 if (nuevoUsuario) {
                     return done(null, nuevoUsuario);
                 }

@@ -1,4 +1,10 @@
-<h1 class="text-center my-5">Carrito de ID {{id}}</h1> 
+<h1 class="text-center my-5">Carrito 
+{{#if user}}
+    de {{user.first_name}} {{user.last_name}}
+{{/if}}
+</h1> 
+
+<input type="hidden" id="idCarrito" value="{{id}}"></input>
 
 <table class="table table-striped">
     <thead class="thead-light">
@@ -26,13 +32,22 @@
                 ${{this.price}}
             </td>
             <td>
-                <img src="/images/trash3.svg" alt="Eliminar" width="24">
+                <img src="/images/trash3.svg" alt="Eliminar" width="24" onclick="eliminarProducto('{{this.id}}')">
             </td>
         </tr>
       
     {{/each}}
     </tbody>
 </table>
+
+<div class="container my-5"></div>
+    <div class="row">
+        <div id="botones" className="col-md-12">
+            <button class="w-15 btn btn-danger" id="btnProductos"><a href="/products?limit=6" class="link-light">Productos</a></button>
+            <button class="w-15 btn btn-success" id="btnChat"><a href="/chat" class="link-light" target="_blank">Chatear</a></button>
+        </div>
+    </div>
+</div>
 
 
 
