@@ -6,10 +6,10 @@ import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from 'url';
 
-import ProductManager from "./dao/ProductManagerMongo.js";
-import CarritoManager from "./dao/CarritoManagerMongo.js";
-import ChatManager from "./dao/chatManagerMongo.js";
-import UserManager from "./dao/UserManagerMongo.js";
+import ProductManager from "./dao/mongo/ProductManagerMongo.js";
+import CarritoManager from "./dao/mongo/CarritoManagerMongo.js";
+import UserManager from "./dao/mongo/UserManagerMongo.js";
+import ChatManager from "./dao/mongo/ChatManagerMongo.js";
 
 
 import productsRouter from "./routes/products.router.js";

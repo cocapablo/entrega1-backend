@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import cartModel from "./models/cartsModel.js";
+import cartModel from "../models/cartsModel.js";
 
 class CarritoManager {
     #carritos;

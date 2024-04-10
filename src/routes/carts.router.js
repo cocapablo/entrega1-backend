@@ -1,12 +1,34 @@
 import express from "express";
-import ProductManager from "../dao/ProductManager.js";
-import CarritoManager from "../dao/CarritoManager.js";
+//import ProductManager from "../dao/file/ProductManager.js";
+//import CarritoManager from "../dao/file/CarritoManager.js";
 import { cartManager } from "../app.js";
+import { CartController } from "../controllers/carts.controller.js";
+import { ProductController } from "../controllers/products.controller.js";
 
 const router = express.Router();
+const productController = new ProductController();
+const cartController = new CartController(productController);
+
+router.get("/api/carts", cartController.getCarts);
+
+router.get("/api/carts/:cid", cartController.getProductsFromCart);
+
+router.post("/api/carts", cartController.createCart);
+
+router.post("/api/carts/:cid/products/:pid", cartController.addProductToCart);
+
+router.put("/api/carts/:cid", cartController.setProductsToCart);
+
+router.delete("/api/carts/:cid", cartController.deleteAllProductsFromCart);
+
+router.delete("/api/carts/:cid/products/:pid", cartController.deleteProductFromCart);
+
+router.put("/api/carts/:cid/products/:pid", cartController.setProductQuantityFromCart);
 
 
-router.get("/api/carts", (req, res) => {
+//A partir de acá son las viejas rutas (sin controllers)
+
+/* router.get("/api/carts", (req, res) => {
     //let prodManager = new ProductManager("productos.json");
     //let cartManager = new CarritoManager("carrito.json", prodManager);
 
@@ -19,9 +41,9 @@ router.get("/api/carts", (req, res) => {
     );
 
 
-});
+}); */
 
-router.get("/api/carts/:cid", (req, res) => {
+/* router.get("/api/carts/:cid", (req, res) => {
     //let prodManager = new ProductManager("productos.json");
     //let cartManager = new CarritoManager("carrito.json", prodManager);
     let idCarrito;
@@ -42,9 +64,9 @@ router.get("/api/carts/:cid", (req, res) => {
     else {
         res.send({ERROR: "Debe especificar un id carrito válido"});
     }
-});
+}); */
 
-router.post("/api/carts", (req, res) => {
+/* router.post("/api/carts", (req, res) => {
     //let prodManager = new ProductManager("productos.json");
     //let cartManager = new CarritoManager("carrito.json", prodManager);
     
@@ -64,9 +86,9 @@ router.post("/api/carts", (req, res) => {
         })
     })
 
-});
+}); */
 
-router.post("/api/carts/:cid/products/:pid", (req, res) => {
+/* router.post("/api/carts/:cid/products/:pid", (req, res) => {
     //let prodManager = new ProductManager("productos.json");
     //let cartManager = new CarritoManager("carrito.json", prodManager);
     let idCarrito;
@@ -98,9 +120,9 @@ router.post("/api/carts/:cid/products/:pid", (req, res) => {
     }
 
 
-});
+}); */
 
-router.put("/api/carts/:cid", (req, res) => {
+/* router.put("/api/carts/:cid", (req, res) => {
     let idCarrito;
     let productos;
 
@@ -138,9 +160,9 @@ router.put("/api/carts/:cid", (req, res) => {
             error: "Debe especificar un idCarrito válido"
         })      
     }
-})
+}) */
 
-router.delete("/api/carts/:cid", (req, res) => {
+/* router.delete("/api/carts/:cid", (req, res) => {
     let idCarrito;
     let productos;
 
@@ -170,9 +192,9 @@ router.delete("/api/carts/:cid", (req, res) => {
             error: "Debe especificar un idCarrito válido"
         })      
     }
-})
+}) */
 
-router.delete("/api/carts/:cid/products/:pid", (req, res) => {
+/* router.delete("/api/carts/:cid/products/:pid", (req, res) => {
     let idCarrito;
     let idProducto;
     
@@ -200,9 +222,9 @@ router.delete("/api/carts/:cid/products/:pid", (req, res) => {
             error: "Debe especificar un idCarrito y un idProducto válidos"
         })   
     }
-})
+}) */
 
-router.put("/api/carts/:cid/products/:pid", (req, res) => {
+/* router.put("/api/carts/:cid/products/:pid", (req, res) => {
     let idCarrito;
     let idProducto;
     let cantidad;
@@ -242,7 +264,7 @@ router.put("/api/carts/:cid/products/:pid", (req, res) => {
             error: "Debe especificar un idCarrito y un idProducto válidos"
         })   
     }
-})
+}) */
 
 
 

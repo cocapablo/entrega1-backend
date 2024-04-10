@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import productModel from "./models/products.model.js";
+import productModel from "../models/products.model.js";
 import mongoosePaginate from 'mongoose-paginate-v2';
 
 class ProductManager {
