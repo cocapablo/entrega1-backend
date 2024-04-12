@@ -1,7 +1,7 @@
 import express from "express";
 //import ProductManager from "../dao/ProductManager.js";
 //import ProductManager from "../dao/ProductManagerMongo.js";
-import {socketServer, prodManager} from "../app.js";
+import {socketServer} from "../app.js";
 import { ProductController } from "../controllers/products.controller.js";
 
 const router = express.Router();

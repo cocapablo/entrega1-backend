@@ -13,6 +13,18 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 11
+    - Se implementaron los controladores CartController, ProductController y UserController
+    - Dichos controladores por el momento tienen una variable interna que apunta a sus respectivos DAOs (hasta implementar las sigientes capas).
+    - Las rutas acceden a los DAOS a través de los controladores. Se reemplazaron en todas las rutas del proyecto cualquier referencia directa a los DAOs SALVO EN EL CASO DE LAS VISTAS DE HANDLEBARS. 
+    - Con respecto a las vistas de handlebars no implementé ningún "controlador de vistas" porque según lo que interpreté del MVC las vistas SI PUEDEN acceder a los datos (a los  Models del MVC mas precisamente, que por el momento son los DAOs) SOLO PARA LECTURA
+    - Cree dos archivos .env llamados .env.cloud y .env.local. En dichos archivos lo único que cambia por ahora es el parámetro MONGO_URL (que apunta a Atlas o a la base de datos local respectivamente).
+    - Los archivos .env por ahora tienen cuatro variables: PORT, MONGO_URL, ADMIN_EMAIL y ADMIN_PASSWORD
+    - Subo al repositorio un archivo llamado .env.example sin valores para las variables. Te paso los valores por el chat de Coder
+    - Se puede configurar que modo (Local o Atlas) se utiliza al ejecutar la app en la línea de comandos a través del argumento -mongobd (cuyos valores pueden ser LOCAL o CLOUD). Si no se especifica este argumento se toma el valor por defecto que es CLOUD
+    
+
+
 - Notas de la Entrega Nro 10
     - El modelo usersModel fué actualizado incoporando el campor cart (que contiene un id de un carrito). 
     - Decidí utilizar el modelo de sesión session (en lugar de jwt).

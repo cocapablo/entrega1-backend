@@ -1,9 +1,14 @@
 import express, { request } from "express";
-//import ProductManager from "../dao/ProductManager.js";
+//import ProductManager from ""../dao/ProductManager.js";"
 //import ProductManager from "../dao/ProductManagerMongo.js";
-import { prodManager } from "../app.js";
-import { cartManager } from "../app.js";
+import ProductManager from "../dao/mongo/ProductManagerMongo.js";
+import CarritoManager from "../dao/mongo/CarritoManagerMongo.js";
+//import { prodManager } from "../app.js";
+//import { cartManager } from "../app.js";
 import { usuarioLogueado, usuarioNoLogueado } from "../middlewares/sessionMiddleware.js";
+
+const prodManager = new ProductManager("productos.json");
+const cartManager = new CarritoManager("carrito.json", prodManager);
 
 const router = express.Router();
 

@@ -26,9 +26,31 @@ import MongoStore from "connect-mongo";
 import initializePassport from "./config/passport.config.js";
 import passport from "passport";
 
+import { Command } from "commander";
+import { configurarEntorno } from "./config/config.js";
 
 
-const port = 8080;
+
+//Cargo las configuraciones del entorno
+const program = new Command();
+
+program
+    .option("-modobd <modobd>", "Define si la Base de Datos es local o está en la nube", "CLOUD");
+    
+program.parse();
+
+console.log("Program Options", program.options);
+console.log("Program opts", program.opts());
+console.log("Remaining arguments", program.args);
+
+//Config
+//console.log("Config", config);
+
+let config = configurarEntorno(program.opts());
+
+console.log("Config", config);
+
+const port = config.port || 8080;
 
 const app = express();
 
@@ -47,10 +69,10 @@ app.use(cookieParser(miFirmaSecreta));
 
 //Cadena de Conexion a Base de Datos
 //La cadena de conexion habría que leerla de un archivo por seguridad
-let cadenaConexionBD = ""; //reemplazar esto con el valor de la cadena de conexion a la BD
-let cadenaConexionAtlas = "mongodb+srv://cocapablo:FKITs3H3kYgRNPSy@cluster0.u0b3vak.mongodb.net/ecommerce?retryWrites=true&w=majority";
+let cadenaConexionBD = config.mongoUrl;
+/* let cadenaConexionAtlas = "mongodb+srv://cocapablo:FKITs3H3kYgRNPSy@cluster0.u0b3vak.mongodb.net/ecommerce?retryWrites=true&w=majority";
 let cadenaConexionLocal = "mongodb://127.0.0.1:27017/ecommerce";
-cadenaConexionBD = cadenaConexionAtlas;
+cadenaConexionBD = cadenaConexionAtlas; */
 //cadenaConexionBD = cadenaConexionLocal;
 
 //MongoStore
@@ -168,7 +190,7 @@ async function cargarProductosAsync(prodManagerAsync) {
     }
 }
 
-export const prodManager = new ProductManager("productos.json"); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
+//export const prodManager = new ProductManager("productos.json"); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
 
 //cargarProductosAsync(prodManager);
 
@@ -313,10 +335,10 @@ async function setProductoDeCarritoAsync(carritoManagerAsync, idCarrito, idProdu
     }
 }
 
-export const cartManager = new CarritoManager("carrito.json", prodManager); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
+//export const cartManager = new CarritoManager("carrito.json", prodManager); //El string enviado como parmametro del constructor por ahora no tiene utilidad. En el futuro podría cumplir algún rol en la base de datos
 
 //User Manager
-export const userManager = new UserManager(cartManager);
+//export const userManager = new UserManager(cartManager);
 
 //cargarCarritosAsync(cartManager); 
 

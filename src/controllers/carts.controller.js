@@ -18,6 +18,10 @@ export class CartController {
         this.setProductQuantityFromCart = this.setProductQuantityFromCart.bind(this);
     }
 
+    getService() {
+        return this.#cartService;
+    }
+
     async getCarts(req, res) {
         this.#cartService.getCarritosWithProductsByIdAsync().then(
             carritos => {

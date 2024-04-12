@@ -1,7 +1,7 @@
 import express from "express";
 //import ProductManager from "../dao/file/ProductManager.js";
 //import CarritoManager from "../dao/file/CarritoManager.js";
-import { cartManager } from "../app.js";
+//import { cartManager } from "../app.js";
 import { CartController } from "../controllers/carts.controller.js";
 import { ProductController } from "../controllers/products.controller.js";
 

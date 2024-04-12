@@ -1,7 +1,14 @@
 import passport from "passport";
 import local from "passport-local";
 import GitHubStrategy from "passport-github2";
-import { userManager } from "../app.js";
+//import { userManager } from "../app.js";
+import { ProductController } from "../controllers/products.controller.js";
+import { CartController } from "../controllers/carts.controller.js";
+import { UserController } from "../controllers/users.controller.js";
+
+const productController = new ProductController();
+const cartController = new CartController(productController);
+const userController = new UserController(cartController);
 
 const LocalStrategy = local.Strategy;
 
@@ -22,7 +29,7 @@ const initializePassport = () => {
                 //Paso 1: Me fijo si el usuario ya existía en la Base de Datos
                 let viejoUsuario;
                 try {
-                    viejoUsuario = await userManager.getUserAsync(profile._json.email);
+                    viejoUsuario = await userController.getService().getUserAsync(profile._json.email);
 
                     //El Usuario ya existía: no se puedo volver a registrar
                     console.log("El Usuario ya existía previemente");
@@ -46,7 +53,7 @@ const initializePassport = () => {
 
                 console.log("Usuario a Registrar: ", usuarioARegistrar);
         
-                let nuevoUsuario = await userManager.addUserAsync(usuarioARegistrar);
+                let nuevoUsuario = await userController.getService().addUserAsync(usuarioARegistrar);
                 
                 //Salió todo bien
                 return done(null, nuevoUsuario);
@@ -99,7 +106,7 @@ const initializePassport = () => {
                 //Paso 1: Me fijo si el usuario ya existía en la Base de Datos
                 let viejoUsuario;
                 try {
-                    viejoUsuario = await userManager.getUserAsync(username);
+                    viejoUsuario = await userController.getService().getUserAsync(username);
 
                     //El Usuario ya existía: no se puedo volver a registrar
                     console.log("El Usuario ya existía previemente");
@@ -123,7 +130,7 @@ const initializePassport = () => {
 
                 console.log("Usuario a Registrar: ", usuarioARegistrar);
         
-                let nuevoUsuario = await userManager.addUserAsync(usuarioARegistrar);
+                let nuevoUsuario = await userController.getService().addUserAsync(usuarioARegistrar);
                 
                 //Salió todo bien
                 return done(null, nuevoUsuario);
@@ -162,7 +169,7 @@ const initializePassport = () => {
         },
         async (req, username, password, done) => {
             try {
-                let nuevoUsuario = await userManager.loginAsync(username, password);
+                let nuevoUsuario = await userController.getService().loginAsync(username, password);
                 
                 if (nuevoUsuario) {
                     return done(null, nuevoUsuario);
@@ -217,7 +224,7 @@ const initializePassport = () => {
     })
 
     passport.deserializeUser(async (id, done) => {
-        let user = await userManager.getUserByIdAsync(id);
+        let user = await userController.getService().getUserByIdAsync(id);
         
         console.log("Estoy deserializando");
         console.log("User ID: ", id);
