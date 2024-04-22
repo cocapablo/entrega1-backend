@@ -1,5 +1,8 @@
-import UserManager from "../dao/mongo/UserManagerMongo.js"; 
+//import UserManager from "../dao/mongo/UserManagerMongo.js"; 
+import { userService } from "../repositories/index.js";
 import { CartController } from "./carts.controller.js";
+
+import UserDTO from "../dao/DTOs/user.dto.js";
 
 import passport from "passport";
 
@@ -9,7 +12,8 @@ export class UserController {
     
 
     constructor(cartController) {
-        this.#userService = new UserManager(cartController.getService());
+        //this.#userService = new UserManager(cartController.getService());
+        this.#userService = userService;
         this.#cartController = cartController;
         this.changeUserPassword = this.changeUserPassword.bind(this);
         this.userCreatedSuccessfully = this.userCreatedSuccessfully.bind(this);
@@ -139,16 +143,22 @@ export class UserController {
 
     async getCurrentUser(req, res) {
         let usuario = null;
+        let usuarioDTO = null;
 
         //Obtengo el usuario de la session actual
         req.session && req.session.user && (usuario = req.session.user);
 
         if (!usuario) {
             usuario = "No hay ningún usuario logueado en esta sesión";
+            return res.status(401).send({user: usuario});
         }
 
         console.log("Usuario en la Session: ", usuario);
 
-        res.send({user: usuario});
+        usuarioDTO = new UserDTO(usuario);
+
+        console.log("UsuarioDTO: ", usuarioDTO);
+
+        res.send({user: usuarioDTO});
     }
 }

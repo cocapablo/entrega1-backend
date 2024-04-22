@@ -26,27 +26,10 @@ import MongoStore from "connect-mongo";
 import initializePassport from "./config/passport.config.js";
 import passport from "passport";
 
-import { Command } from "commander";
-import { configurarEntorno } from "./config/config.js";
+
+import config from "./config/config.js";
 
 
-
-//Cargo las configuraciones del entorno
-const program = new Command();
-
-program
-    .option("-modobd <modobd>", "Define si la Base de Datos es local o está en la nube", "CLOUD");
-    
-program.parse();
-
-console.log("Program Options", program.options);
-console.log("Program opts", program.opts());
-console.log("Remaining arguments", program.args);
-
-//Config
-//console.log("Config", config);
-
-let config = configurarEntorno(program.opts());
 
 console.log("Config", config);
 
@@ -94,7 +77,15 @@ app.use(express.static(path.join(__dirname, "public")));
 console.log("Dirname: ", __dirname);
 
 //Configuracion para handlebars
-app.engine("handlebars", handlebars.engine());
+app.engine("handlebars", handlebars.engine({
+    //Registro funciones helpers
+    helpers: {
+        igual : function(a, b) {
+            return a === b;
+        }
+    }
+}));
+
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "handlebars");
 

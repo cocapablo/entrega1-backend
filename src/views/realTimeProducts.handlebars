@@ -112,12 +112,16 @@
 <div class="container my-5">
     <button class="btn btn-primary m-4" id="btnAgregarProducto" onclick="agregarProductoDeForm()">Agregar Producto</button>
     <button class="btn btn-primary m-4" id="btnActualizarProducto" onclick="actualizarProductoDeForm()" style="display: none;">Actualizar Producto</button>
-    <div class="row">
-        <div id="botones" className="col-md-12">
-            
-            <button class="w-15 btn btn-success" id="btnChat"><a href="/chat" class="link-light" target="_blank">Chatear</a></button>
+    {{#if user }}
+        {{#if (igual user.role "usuario")}}
+        <div class="row">
+            <div id="botones" className="col-md-12">
+                
+                <button class="w-15 btn btn-success" id="btnChat"><a href="/chat" class="link-light" target="_blank">Chatear</a></button>
+            </div>
         </div>
-    </div>
+        {{/if}}
+    {{/if}} 
 </div>
 
 

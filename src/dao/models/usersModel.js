@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { cartCollection } from "./cartsModel.js";
 
-const userCollection = "users";
+export const userCollection = "users";
 
 const userSchema = new mongoose.Schema({
     first_name: {

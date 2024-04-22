@@ -203,11 +203,23 @@ function agregarProducto(producto) {
     fetch("/api/products", datos)
     .then(res => res.json())
     .then(prodAgregado => {
-        Swal.fire({
-            icon: "success",
-            title: "Operación exitosa",
-            text: `El producto ${producto.title} se agregó correctamente`
-        })
+        let mensajeError = null;
+
+        prodAgregado.status && prodAgregado.status === "error" && (mensajeError = prodAgregado.error);
+        if (!mensajeError) {
+            Swal.fire({
+                icon: "success",
+                title: "Operación exitosa",
+                text: `El producto ${producto.title} se agregó correctamente`
+            })
+        }
+        else {
+            Swal.fire({
+                icon: "warning",
+                title: "ERROR",
+                text: `Se produjo el siguiente error: ${mensajeError}`
+            })    
+        }
     })
     .catch(err => {
         Swal.fire({
@@ -229,11 +241,24 @@ function actualizarProducto(producto) {
     fetch("/api/products/" + producto.id, datos)
     .then(res => res.json())
     .then(prodActualizado => {
-        Swal.fire({
-            icon: "success",
-            title: "Operación exitosa",
-            text: `El producto ${producto.title} se actualizó correctamente`
-        })
+        let mensajeError = null;
+
+        prodActualizado.status && prodActualizado.status === "error" && (mensajeError = prodActualizado.error);
+        if (!mensajeError) {
+            Swal.fire({
+                icon: "success",
+                title: "Operación exitosa",
+                text: `El producto ${producto.title} se actualizó correctamente`
+            })
+        }
+        else {
+            Swal.fire({
+                icon: "warning",
+                title: "ERROR",
+                text: `Se produjo el siguiente error: ${mensajeError}`
+            })    
+        }
+        
     })
     .catch(err => {
         Swal.fire({
@@ -255,11 +280,23 @@ function eliminarProducto(idProducto) {
     fetch("/api/products/" + idProducto, datos)
     .then(res => res.json())
     .then(prodActualizado => {
-        Swal.fire({
-            icon: "success",
-            title: "Operación exitosa",
-            text: `El producto se eliminó correctamente`
-        })
+        let mensajeError = null;
+
+        prodActualizado.status && prodActualizado.status === "error" && (mensajeError = prodActualizado.error);
+        if (!mensajeError) {
+            Swal.fire({
+                icon: "success",
+                title: "Operación exitosa",
+                text: `El producto se eliminó correctamente`
+            })
+        }
+        else {
+            Swal.fire({
+                icon: "warning",
+                title: "ERROR",
+                text: `Se produjo el siguiente error: ${mensajeError}`
+            })    
+        }
     })
     .catch(err => {
         Swal.fire({

@@ -497,6 +497,8 @@ class CarritoManager {
         return todoOk;
     }
 
+    
+
 }
 
 

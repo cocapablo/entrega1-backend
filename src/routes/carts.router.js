@@ -4,10 +4,18 @@ import express from "express";
 //import { cartManager } from "../app.js";
 import { CartController } from "../controllers/carts.controller.js";
 import { ProductController } from "../controllers/products.controller.js";
+import { TicketController } from "../controllers/tickets.controller.js";
+import { UserController } from "../controllers/users.controller.js";
+
+//Middlewares
+import { usuarioEsUsuario } from "../middlewares/sessionMiddleware.js";
 
 const router = express.Router();
+
 const productController = new ProductController();
 const cartController = new CartController(productController);
+const userController = new UserController(cartController);
+const ticketController = new TicketController(cartController, userController, productController);
 
 router.get("/api/carts", cartController.getCarts);
 
@@ -15,15 +23,17 @@ router.get("/api/carts/:cid", cartController.getProductsFromCart);
 
 router.post("/api/carts", cartController.createCart);
 
-router.post("/api/carts/:cid/products/:pid", cartController.addProductToCart);
+router.post("/api/carts/:cid/products/:pid", usuarioEsUsuario, cartController.addProductToCart);
 
-router.put("/api/carts/:cid", cartController.setProductsToCart);
+router.put("/api/carts/:cid", usuarioEsUsuario, cartController.setProductsToCart);
 
-router.delete("/api/carts/:cid", cartController.deleteAllProductsFromCart);
+router.delete("/api/carts/:cid", usuarioEsUsuario, cartController.deleteAllProductsFromCart);
 
-router.delete("/api/carts/:cid/products/:pid", cartController.deleteProductFromCart);
+router.delete("/api/carts/:cid/products/:pid", usuarioEsUsuario, cartController.deleteProductFromCart);
 
-router.put("/api/carts/:cid/products/:pid", cartController.setProductQuantityFromCart);
+router.put("/api/carts/:cid/products/:pid", usuarioEsUsuario, cartController.setProductQuantityFromCart);
+
+router.post("/api/carts/:cid/purchase", ticketController.createTicket);
 
 
 //A partir de acá son las viejas rutas (sin controllers)

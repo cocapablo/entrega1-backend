@@ -4,6 +4,9 @@ import express from "express";
 import {socketServer} from "../app.js";
 import { ProductController } from "../controllers/products.controller.js";
 
+//Middlewares
+import { usuarioEsAdministrador } from "../middlewares/sessionMiddleware.js";
+
 const router = express.Router();
 const productController = new ProductController();
 
@@ -18,11 +21,11 @@ router.get("/api/products", productController.getProductsPaginated);
 
 router.get("/api/products/:pid", productController.getProduct);
 
-router.post("/api/products", productController.createProduct);
+router.post("/api/products", usuarioEsAdministrador, productController.createProduct);
 
-router.put("/api/products/:pid", productController.updateProduct);
+router.put("/api/products/:pid", usuarioEsAdministrador, productController.updateProduct);
 
-router.delete("/api/products/:pid", productController.deleteProduct);
+router.delete("/api/products/:pid", usuarioEsAdministrador, productController.deleteProduct);
 
 //A partir de acá es el código anterior a crear los controllers
 

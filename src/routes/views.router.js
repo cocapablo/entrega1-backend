@@ -1,14 +1,17 @@
 import express, { request } from "express";
 //import ProductManager from ""../dao/ProductManager.js";"
 //import ProductManager from "../dao/ProductManagerMongo.js";
-import ProductManager from "../dao/mongo/ProductManagerMongo.js";
-import CarritoManager from "../dao/mongo/CarritoManagerMongo.js";
-//import { prodManager } from "../app.js";
-//import { cartManager } from "../app.js";
-import { usuarioLogueado, usuarioNoLogueado } from "../middlewares/sessionMiddleware.js";
+//import ProductManager from "../dao/mongo/ProductManagerMongo.js";
+//import CarritoManager from "../dao/mongo/CarritoManagerMongo.js";
 
-const prodManager = new ProductManager("productos.json");
-const cartManager = new CarritoManager("carrito.json", prodManager);
+import { productService } from "../repositories/index.js";
+import { cartService } from "../repositories/index.js";
+
+import { usuarioLogueado, usuarioNoLogueado, usuarioEsUsuario } from "../middlewares/sessionMiddleware.js";
+import UserDTO from "../dao/DTOs/user.dto.js";
+
+//const prodManager = new ProductManager("productos.json");
+//const cartManager = new CarritoManager("carrito.json", prodManager);
 
 const router = express.Router();
 
@@ -36,7 +39,7 @@ router.get("/realtimeproducts", usuarioLogueado, (req, res) => {
 
     //Obtengo un aray de los productos actuales
     
-    prodManager.getProductsAsync().then(
+    productService.getProductsAsync().then(
         productos => {
 
             res.render("realtimeproducts", { productos, user: usuario});
@@ -44,7 +47,7 @@ router.get("/realtimeproducts", usuarioLogueado, (req, res) => {
     )
 });
 
-router.get("/chat", usuarioLogueado, (req, res) => {
+router.get("/chat", usuarioLogueado, usuarioEsUsuario, (req, res) => {
     let usuario = {};
 
     //Obtengo el usuario de la session actual
@@ -66,7 +69,7 @@ router.get("/cart/:cid", usuarioLogueado, (req, res) => {
     
     if (req.params.cid) {
         idCarrito = req.params.cid;
-        cartManager.getCarritoWithProductsByIdAsync(idCarrito).then(
+        cartService.getCarritoWithProductsByIdAsync(idCarrito).then(
             carrito => {
                 console.log("Carrito para la View: ", carrito);
                 res.render("cart", {id: idCarrito,
@@ -115,7 +118,7 @@ router.get("/products", usuarioLogueado, async (req, res) => {
         console.log("Orden: ", orden);
 
         //orden = "DES";
-        productos = await prodManager.getProductsWithPaginationAsync(limite, pagina, consulta, orden);
+        productos = await productService.getProductsWithPaginationAsync(limite, pagina, consulta, orden);
         console.log("Resultado devuelto: ", productos);
 
         //Campos que faltan
@@ -210,13 +213,16 @@ router.get("/register", usuarioNoLogueado, (req, res) => {
 
 router.get("/profile", usuarioLogueado, (req, res) => {
     let usuario = {};
+    let usuarioDTO = null;
 
     //Obtengo el usuario de la session actual
     req.session && req.session.user && (usuario = req.session.user);
 
     console.log("Usuario en la Session: ", usuario);
 
-    res.render("profile", {user: usuario});
+    usuarioDTO = new UserDTO(usuario);
+
+    res.render("profile", {user: usuarioDTO});
 })
 
 router.get("/changePassword", usuarioNoLogueado, (req, res) => {

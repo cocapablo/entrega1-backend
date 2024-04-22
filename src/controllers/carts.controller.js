@@ -1,4 +1,6 @@
-import CarritoManager from "../dao/mongo/CarritoManagerMongo.js";
+//import CarritoManager from "../dao/mongo/CarritoManagerMongo.js";
+
+import { cartService } from "../repositories/index.js";
 import { ProductController } from "./products.controller.js";
 
 export class CartController {
@@ -7,7 +9,8 @@ export class CartController {
 
     constructor(productController) {
         this.#productController = productController;
-        this.#cartService = new CarritoManager("", productController.getService());   
+        //this.#cartService = new CarritoManager("", productController.getService()); 
+        this.#cartService = cartService;  
         this.getCarts = this.getCarts.bind(this); 
         this.getProductsFromCart = this.getProductsFromCart.bind(this);
         this.createCart = this.createCart.bind(this);

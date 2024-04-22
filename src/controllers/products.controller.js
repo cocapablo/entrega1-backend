@@ -1,4 +1,5 @@
-import ProductManager from "../dao/mongo/ProductManagerMongo.js";
+//import ProductManager from "../dao/mongo/ProductManagerMongo.js";
+import { productService } from "../repositories/index.js";
 import { socketServer } from "../app.js";
 
 
@@ -6,7 +7,8 @@ export class ProductController {
     #productService;
     
     constructor() {
-        this.#productService = new ProductManager(""); //Esto después se cambiará por lo que gestione el Factory
+        //this.#productService = new ProductManager(""); //Esto después se cambiará por lo que gestione el Factory
+        this.#productService = productService;
         this.getProductsPaginated = this.getProductsPaginated.bind(this);
         this.getProduct = this.getProduct.bind(this);
         this.createProduct = this.createProduct.bind(this);

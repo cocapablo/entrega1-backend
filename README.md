@@ -13,6 +13,37 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 12
+    - Implementación de generación de Ticket de Compra
+        - Se implementó el ticket model de Mongoose
+        - Se implementó el DAO para Mongo en la clase TicketManager (archivo TicketManagerMongo)
+        - Se implementó el controlador de arquitecua MVC en la clase TicketController. Este controlador tiene un método llamado createTicket que es el que implementa la lógica del negocio de la operación de generar el ticket
+        - Se creó (según pedía la consigna) la ruta "/api/carts/:cid/purchase" como un método post dentro del router de cart
+        - createTicket devolverá un objeto con la siguiente estructura:
+            - status: puede ser "error", "success" o (atento con esto) "partial-success"
+            - "error" se generará con cualquier error en la operaión y también cuando ninguno de los productos del cart tenga stock suficiente (por lo cual, no hay venta posible)
+            - "success" devolverá cuando la operación se genere correctamente y TODOS los productos del cart tengan stock
+            - "partial-success" se devolverá cuando al menos uno de los productos del cart NO TENGA stock y al menos uno de los productos del cart TENGA stock
+            - campo "ticket": Tendra un objeto con los detalles de la venta pedidos en la consigna
+            - campo "rejected-products": es un array con los productos cuyo stock era insuficiente y no entraron en la compra
+            - campo "products": es un array con los productos que SI entraron en la compra
+        - Al ejecutarse createTicket se actualizarán los stocks de los productos que entraron en la compra y se los retirará del cart. En el cart quedarán los productos que por falta de stock NO ENTRARON en la compra
+        - BONUS TRACK: Implementé la compra completa en el front end (en la view "cart")
+    - Implementación de la capa de Servicios
+        - Se implementaró el patrón Factory para seleccionar que persistencia a utilizar
+        - La persistencia se establece en primera instancia por el parmametro -persistence de la línea de comandos y en segunda instancia (de no indicarse en la línea de comandos) a través del campo PERSISTENCE configurado en los archivos .env
+        - Por el momento el único modelo de persistencia implementado es MONGO
+        - Se implementaron los repositorios en las clases UserManagerRepository, ProductManagarRepository, CarritoManagerRepository y TicketManagerRepository
+        - Se crearon instancias de dichos repositorios en el archivo index.js
+        - Todos los controllers reemplazaron el acceso directo a las DAOs por los services exportados en index.js
+    - Implementación de Middlewares de control de acceso
+        - Se implementararon los middlewares usuarioEsAdministrador y usuarioEsUsuario que permiten acceder a un endpoint solo si los usuarios tienen los roles de "admin" y "usuario" respectivamente
+        - Los controles sobre CRUD de productos y CRUD de carrito se efectúan solo en los endpoints (no en las vistas). Lo hice así (por ahora) para que puedas ver que cada vez que un usuario intenta realizar alguna operación para la que no tiene privilegios suficientes da un mensaje de error
+        - Los controles de acceso al chat tienen un enfoque diferente, dado que chat está implementado con websockets. Aquí los controles se realizan en el momento de renderizar las vistas, mostrando o no el botón de "chatear" en base a los resultados de una función helper que sumé a handlebars llamada "igual". Esta función chequea el rol del usuario y en base a eso muestra el botón de chatear o no
+    - Implementación de DTO de Usuario
+        - Se creó la clase UserDTO que elimina el password del usuario
+        - Se utiliza dicho DTO en los endpoints "api/sessions/current" (dentro del UserController) y en la view "/profile"
+
 - Notas de la Entrega Nro 11
     - Se implementaron los controladores CartController, ProductController y UserController
     - Dichos controladores por el momento tienen una variable interna que apunta a sus respectivos DAOs (hasta implementar las sigientes capas).

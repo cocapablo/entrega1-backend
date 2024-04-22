@@ -12,6 +12,10 @@ class UserManager {
         this.#cartManager = cartManager;
     }
 
+    getCartManager() {
+        return this.#cartManager;
+    }
+    
     async addUserAsync({first_name = "", last_name = "", email = "", age = -1, password = "", role = "usuario"}) {
         let newUser;
 
@@ -218,8 +222,9 @@ class UserManager {
                 last_name: resultado.last_name,
                 email : resultado.email,
                 age : resultado.age,
-                role : resultado.role
+                role : resultado.role,
                 //Omito el password por ser un dato sensible
+                cart : resultado.cart
             }
 
             //Cambio la contraseña del Usuario
@@ -281,8 +286,9 @@ class UserManager {
                 last_name: resultado.last_name,
                 email : resultado.email,
                 age : resultado.age,
-                role : resultado.role
+                role : resultado.role,
                 //Omito el password por ser un dato sensible
+                cart : resultado.cart
             }
             
         }
@@ -316,8 +322,44 @@ class UserManager {
                 last_name: resultado.last_name,
                 email : resultado.email,
                 age : resultado.age,
-                role : resultado.role
+                role : resultado.role,
                 //Omito el password por ser un dato sensible
+                cart : resultado.cart
+            }
+            
+        }
+        catch (error) {
+            throw (error);
+        }
+
+        return usuario;    
+    }
+
+    async getUsuarioDeCarritoAsync(idCarrito) {
+        let usuario;
+
+        try {
+            //Busco el usuario en la Base de Datos cuyo carrito tenga idCarrito
+            let resultado = await userModel.findOne({cart: idCarrito});
+            if (!resultado) {
+                //El Usuario no existe en la Base de Datos
+                let cadenaError = "No existe un Usuario con el Carrito indicado";
+
+                throw new Error (cadenaError);
+            }
+
+            console.log("Resultado: ", resultado);
+
+            //Creo usuario
+            usuario = {
+                id: resultado._id.toString(),
+                first_name : resultado.first_name,
+                last_name: resultado.last_name,
+                email : resultado.email,
+                age : resultado.age,
+                role : resultado.role,
+                //Omito el password por ser un dato sensible
+                cart : resultado.cart
             }
             
         }

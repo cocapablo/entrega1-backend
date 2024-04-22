@@ -1,21 +1,29 @@
 import dotenv from "dotenv";
-//import { MODOBD }  from "../process.js";
+import { Command } from "commander";
 
-//console.log("MODOBD", MODOBD);
 
 const MODOBD = "CLOUD";
 
-//const MODODB = program.opts().mododb || "LOCAL";
+//Cargo las configuraciones del entorno
+const program = new Command();
 
-/* dotenv.config({
-    path: MODOBD === "LOCAL" ? "./src/config/.env.local" : "./src/config/.env.cloud"
-}); */
+program
+    .option("-modobd <modobd>", "Define si la Base de Datos es local o está en la nube", "CLOUD")
+    .option("-persistence <persistence>", "Define el modelo de persistencia a utilizar", "MONGO");
+    
+program.parse();
+
+console.log("Program Options", program.options);
+console.log("Program opts", program.opts());
+console.log("Remaining arguments", program.args);
 
 export function configurarEntorno(opciones) {
     let modobd = "LOCAL";
+    let persistence = null;
     let config = {};
 
     opciones.Modobd && (modobd = opciones.Modobd);
+    opciones.Persistence && (persistence = opciones.Persistence);
 
     dotenv.config({
         path: modobd === "LOCAL" ? "./src/config/.env.local" : "./src/config/.env.cloud"
@@ -24,6 +32,7 @@ export function configurarEntorno(opciones) {
     //Configuro config
     config = {
         port: process.env.PORT,
+        persistence: persistence || process.env.PERSISTENCE,
         mongoUrl: process.env.MONGO_URL,
         adminEmail: process.env.ADMIN_EMAIL,
         adminPassword: process.env.ADMIN_PASSWORD    
@@ -33,10 +42,14 @@ export function configurarEntorno(opciones) {
 
 }
 
+//Cargo el entorno
+let config = configurarEntorno(program.opts());
+
 export default {
-    port: process.env.PORT,
-    mongoUrl: process.env.MONGO_URL,
-    adminEmail: process.env.ADMIN_EMAIL,
-    adminPassword: process.env.ADMIN_PASSWORD
+    port: config.port,
+    persistence: config.persistence,
+    mongoUrl: config.mongoUrl,
+    adminEmail: config.adminEmail,
+    adminPassword: config.adminPassword
 
 }
