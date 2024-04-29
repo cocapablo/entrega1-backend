@@ -8,6 +8,7 @@ function eliminarProducto(idProducto) {
 
     console.log("IdCarrito: ", idCarrito);
 
+    
     //Paso 2: Borro el Producto del Carrito
     let datos = {
         method: "DELETE",
@@ -39,7 +40,7 @@ function eliminarProducto(idProducto) {
             Swal.fire({
                 icon: "warning",
                 title: "ERROR",
-                text: `Se produjo el siguiente error: ${resultado.error}`
+                text: `Se produjo el siguiente error: ${resultado.message}`
             })    
         }
     })
@@ -47,7 +48,7 @@ function eliminarProducto(idProducto) {
         Swal.fire({
             icon: "warning",
             title: "ERROR",
-            text: `Se produjo el siguiente error: ${err.toString()}`
+            text: `Se produjo el siguiente error: ${err.message}`
         })
     });
 

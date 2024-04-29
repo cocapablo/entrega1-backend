@@ -25,17 +25,24 @@ export class CartController {
         return this.#cartService;
     }
 
-    async getCarts(req, res) {
+    async getCarts(req, res, next) {
+
         this.#cartService.getCarritosWithProductsByIdAsync().then(
             carritos => {
                 console.log("Carritos devueltos: ", carritos);
     
                 res.send(carritos);
             }        
-        );    
+        ).catch (error => {
+            console.log("ERROR en cartController.getCarts: ", error.message);
+            
+            next(error);  
+        }) 
+              
+           
     }
 
-    async getProductsFromCart(req, res) {
+    async getProductsFromCart(req, res, next) {
         let idCarrito;
     
         if (req.params.cid) {
@@ -47,16 +54,29 @@ export class CartController {
                 }
             )
             .catch(error => {
-                console.log("ERROR: ", error);
-                res.send({error});
+                /* console.log("ERROR: ", error);
+                res.send({error}); */
+                console.log("ERROR en cartController.getProductsFromCart: ", error.message);
+            
+                next(error);  
             })
         }
         else {
-            res.send({ERROR: "Debe especificar un id carrito válido"});
+            //res.send({ERROR: "Debe especificar un id carrito válido"});
+            try { 
+                CustomError.createError({
+                    name: "Error obteniendo Productos de un Carrito",
+                    cause: "No se especificó un id carrito válido en cartController",
+                    message: "ERROR: Debe especificar un id carrito válido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
         }
     }
 
-    async createCart(req, res) {
+    async createCart(req, res, next) {
         this.#cartService.addCarritoAsync().then(carritoAgregado => {
             res.json({
                 status: "accepted",
@@ -66,14 +86,15 @@ export class CartController {
         }
         ).catch(err => {
             console.log("ERROR: ", err);
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: err.toString()
-            })
+            }) */
+            next(err);
         })
     }
 
-    async addProductToCart(req, res) {
+    async addProductToCart(req, res, next) {
         let idCarrito;
         let idProducto;
         
@@ -89,21 +110,32 @@ export class CartController {
             }
             ).catch(err => {
                 console.log("ERROR: ", err);
-                res.status(404).json({
+                /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
-                })
+                }) */
+                next(err);
             })
         }
         else {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar un idCarrito y un idProducto válidos"
-            })   
+            })   */ 
+            try { 
+                CustomError.createError({
+                    name: "Error agregando un Producto a un Carrito",
+                    cause: "No se especificó un id carrito o un idProducto válidos en cartController",
+                    message: "Debe especificar un idCarrito y un idProducto válidos",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
         }
     }
 
-    async setProductsToCart(req, res) {
+    async setProductsToCart(req, res, next) {
         let idCarrito;
         let productos;
 
@@ -121,29 +153,50 @@ export class CartController {
                 }
                 ).catch(err => {
                     console.log("ERROR: ", err);
-                    res.status(404).json({
+                    /* res.status(404).json({
                         status: "ERROR",
                         error: err.toString()
-                    })
-                }) 
+                    }) */
+                    next(err);
+                })  
             }
             else {
-                res.status(404).json({
+                /* res.status(404).json({
                     status: "ERROR",
                     error: "Productos no especificados"
-                });
+                }); */
+                try { 
+                    CustomError.createError({
+                        name: "Error agregando Productos a un Carrito",
+                        cause: "No se especificaron Productos en cartController",
+                        message: "Productos no especificados",
+                        code: EErrors.INVALID_TYPES_ERROR
+                    })  
+                } catch (err) {
+                    next(err);
+                }
             }
 
         }
         else {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar un idCarrito válido"
-            })      
+            })   */ 
+            try { 
+                CustomError.createError({
+                    name: "Error agregando Productos a un Carrito",
+                    cause: "Debe especificar un idCarrito válido en cartController",
+                    message: "Debe especificar un idCarrito válido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }   
         }
     }
 
-    async deleteAllProductsFromCart(req, res) {
+    async deleteAllProductsFromCart(req, res, next) {
         let idCarrito;
         let productos;
 
@@ -160,22 +213,33 @@ export class CartController {
             }
             ).catch(err => {
                 console.log("ERROR: ", err);
-                res.status(404).json({
+                /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
-                })
+                }) */
+                next(err);
             }) 
             
         }
         else {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar un idCarrito válido"
-            })      
+            })   */   
+            try { 
+                CustomError.createError({
+                    name: "Error borrando Productos de un Carrito",
+                    cause: "Debe especificar un idCarrito válido en cartController",
+                    message: "Debe especificar un idCarrito válido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }   
         }
     }
 
-    async deleteProductFromCart(req, res) {
+    async deleteProductFromCart(req, res, next) {
         let idCarrito;
         let idProducto;
         
@@ -191,32 +255,53 @@ export class CartController {
             }
             ).catch(err => {
                 console.log("ERROR: ", err);
-                res.status(404).json({
+                /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
-                })
+                }) */
+                next(err);
             })
         }
         else {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar un idCarrito y un idProducto válidos"
-            })   
+            })    */
+            try { 
+                CustomError.createError({
+                    name: "Error eliminando un Producto de un Carrito",
+                    cause: "No se especificó un id carrito o un idProducto válidos en cartController",
+                    message: "Debe especificar un idCarrito y un idProducto válidos",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
         }
     }
 
-    async setProductQuantityFromCart(req, res) {
+    async setProductQuantityFromCart(req, res, next) {
         let idCarrito;
         let idProducto;
         let cantidad;
 
         if (!(req.body && req.body.quantity && !isNaN(parseInt(req.body.quantity)))) {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar una quantity del Producto válida"
             })    
             
-            return;
+            return; */
+            try { 
+                CustomError.createError({
+                    name: "Error configurando la cantidad de un Producto en un Carrito",
+                    cause: "No se especificó una quantity válida en cartController",
+                    message: "Debe especificar una quantity del Producto válida",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
         } 
 
         cantidad = parseInt(req.body.quantity);
@@ -233,17 +318,28 @@ export class CartController {
             }
             ).catch(err => {
                 console.log("ERROR: ", err);
-                res.status(404).json({
+                /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
-                })
+                }) */
+                next(err);
             })
         }
         else {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar un idCarrito y un idProducto válidos"
-            })   
+            }) */ 
+            try { 
+                CustomError.createError({
+                    name: "Error configurando la cantidad de un Producto en un Carrito",
+                    cause: "Debe especificar un idCarrito y un idProducto válidos en cartController",
+                    message: "Debe especificar un idCarrito y un idProducto válidos",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }  
         }
     }
 }

@@ -2,6 +2,13 @@
 import { productService } from "../repositories/index.js";
 import { socketServer } from "../app.js";
 
+//Mock
+import { generateProduct } from "../test/utils.js";
+
+//Custom Errors
+import CustomError from "../services/errors/CustomError.js";
+import EErrors from "../services/errors/enums.js";
+
 
 export class ProductController {
     #productService;
@@ -14,13 +21,14 @@ export class ProductController {
         this.createProduct = this.createProduct.bind(this);
         this.updateProduct = this.updateProduct.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
+        this.getMockingProducts = this.getMockingProducts.bind(this);
     }
 
     getService() {
         return this.#productService;
     }
 
-    async getProductsPaginated(req, res){
+    async getProductsPaginated(req, res, next){
         let consultas = req.query;
         let limite; 
         let pagina;
@@ -29,6 +37,7 @@ export class ProductController {
         let productos;
         let resultado;
 
+        
         //Paginado
         try {
             limite = (consultas.limit && !isNaN(parseInt(consultas.limit))) ? parseInt(consultas.limit) : 10;
@@ -95,18 +104,21 @@ export class ProductController {
             
         }
         catch (err) {
-            console.log("ERROR: ", err);
+            console.log("ERROR en productController.getProductsPaginated: ", err.message);
+            /*
             res.status(404).json({
                 status: "ERROR",
                 error: err.toString()
-            });
-        }
+            }); */
+            next(err);
+
+        } 
         
         res.send(resultado); 
     }
 
     
-    async getProduct(req, res) {
+    async getProduct(req, res, next) {
         let idProducto;
     
         if (req.params.pid) {
@@ -119,16 +131,27 @@ export class ProductController {
                 }
             )
             .catch(error => {
-                console.log("ERROR: ", error);
-                res.send({error});
+                console.log("ERROR en productController.getProduct: ", error.message);
+                //res.send({error});
+                next(error);
             })
         }
         else {
-            res.send({ERROR: "Debe especificar un id válido"});
+            //res.send({ERROR: "Debe especificar un id válido"});
+            try { 
+                CustomError.createError({
+                    name: "Error obteniendo un Producto",
+                    cause: "No se especificó un id válido en productController",
+                    message: "ERROR: Debe especificar un id válido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
         }    
     }
 
-    async createProduct(req, res) {
+    async createProduct(req, res, next) {
         let nuevoProducto;
 
         nuevoProducto = req.body;
@@ -148,15 +171,20 @@ export class ProductController {
             )
         }
         ).catch(err => {
-            console.log("ERROR: ", err);
+            console.log("ERROR en productController: ", err.message);
+            /*
             res.status(404).json({
                 status: "ERROR",
                 error: err.toString()
-            })
+            }) */
+
+            //Lanzo el Custom error
+            //throw err;
+            next(err);
         })    
     }
 
-    async updateProduct(req, res) {
+    async updateProduct(req, res, next) {
         let idProducto;
         let nuevoProducto;
 
@@ -183,22 +211,37 @@ export class ProductController {
                 )
             }
             ).catch(err => {
-                console.log("ERROR: ", err);
+                /* console.log("ERROR: ", err);
                 res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
-                })
+                }) */
+                console.log("ERROR en productController.updateProduct: ", err.message);
+                
+                next(err);
             })
         }
         else {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar un id válido"
-            })   
+                
+            })  */ 
+            try { 
+                CustomError.createError({
+                    name: "Error actualizando un Producto",
+                    cause: "No se especificó un id válido en productController",
+                    message: "ERROR: Debe especificar un id válido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
+
         }    
     }
 
-    async deleteProduct(req, res) {
+    async deleteProduct(req, res, next) {
         let idProducto;
     
 
@@ -219,19 +262,64 @@ export class ProductController {
                 )
             }
             ).catch(err => {
-                console.log("ERROR: ", err);
+                /* console.log("ERROR: ", err);
                 res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
-                })
+                }) */
+                console.log("ERROR en productController.deleteProduct: ", err.message);
+                
+                next(err);
             })
         }
         else {
-            res.status(404).json({
+            /* res.status(404).json({
                 status: "ERROR",
                 error: "Debe especificar un id válido"
-            })   
+            })  */  
+            try { 
+                CustomError.createError({
+                    name: "Error eliminando un Producto",
+                    cause: "No se especificó un id válido en productController",
+                    message: "ERROR: Debe especificar un id válido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
         }    
     }
 
+    getMockingProducts(req, res) {
+        let cantidadProductos;
+        let productos = [];
+        let resultado;
+
+        //Genero una cantidad ficticia de productos
+        cantidadProductos = 100;
+
+        for (let i = 0; i < cantidadProductos; ++i) {
+            let producto;
+
+            producto = generateProduct();
+
+            productos.push(producto);
+        }
+        
+        //Devuelvo los productos
+        resultado = {
+            status: "success",
+            payload: [...productos],
+            totalPages: 1,
+            prevPage: null,
+            nextPage: null,
+            page: 1,
+            hasPrevPage: false,
+            hasNextPage: false,
+            prevLink: "",
+            nextLink: ""
+        }
+
+        res.send(resultado);
+    }
 }

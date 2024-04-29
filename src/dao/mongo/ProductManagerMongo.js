@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 import productModel from "../models/products.model.js";
 import mongoosePaginate from 'mongoose-paginate-v2';
 
+//Errores
+import EErrors from "../../services/errors/enums.js";
+import CustomError from "../../services/errors/CustomError.js";
+import { generateProductErrorInfo } from "../../services/errors/info.js";
+import { generateDatabaseErrorInfo } from "../../services/errors/info.js";
+
 class ProductManager {
     #products;
     #path;
@@ -36,8 +42,16 @@ class ProductManager {
             })
         }
         catch (error) {
-            console.error("ERROR: ", error);
-            throw new Error(error);
+            /* console.error("ERROR: ", error);
+            throw new Error(error); */
+
+            //Creo un Custom Error
+            const miError = CustomError.createError({
+                name: "Error devolviendo Productos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
 
@@ -68,8 +82,15 @@ class ProductManager {
             })
         }
         catch (error) {
-            console.error("ERROR: ", error);
-            throw new Error(error);
+            /* console.error("ERROR: ", error);
+            throw new Error(error); */
+            //Creo un Custom Error
+            const miError = CustomError.createError({
+                name: "Error devolviendo Productos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
 
@@ -82,27 +103,65 @@ class ProductManager {
         try {
             //Validaciones
             if (title.trim().length === 0) {
-                throw new Error("ERROR: title vacío");
+                //throw new Error("ERROR: title vacío");
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: generateProductErrorInfo({title, description, price, thumbnail, code, stock, category, status}),
+                    message: "ERROR: title vacío",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
+
+                
             }
 
             if (description.trim().length === 0) {
-                throw new Error("ERROR: description vacío");
+                //throw new Error("ERROR: description vacío");
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: generateProductErrorInfo({title, description, price, thumbnail, code, stock, category, status}),
+                    message: "ERROR: description vacío",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
             if (price <=0) {
-                throw new Error("ERROR: price debe ser mayor que cero");    
+                //throw new Error("ERROR: price debe ser mayor que cero");   
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: generateProductErrorInfo({title, description, price, thumbnail, code, stock, category, status}),
+                    message: "ERROR: price debe ser mayor que cero",
+                    code: EErrors.INVALID_TYPES_ERROR
+                }) 
             }
 
             if (category.trim().length === 0) {
-                throw new Error("ERROR: category vacío");
+                //throw new Error("ERROR: category vacío");
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: generateProductErrorInfo({title, description, price, thumbnail, code, stock, category, status}),
+                    message: "ERROR: category vacío",
+                    code: EErrors.INVALID_TYPES_ERROR
+                }) 
             }
 
             if (code.trim().length === 0) {
-                throw new Error("ERROR: code vacío");
+                //throw new Error("ERROR: code vacío");
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: generateProductErrorInfo({title, description, price, thumbnail, code, stock, category, status}),
+                    message: "ERROR: code vacío",
+                    code: EErrors.INVALID_TYPES_ERROR
+                }) 
             }
 
             if (stock <=0) {
-                throw new Error("ERROR: stock debe ser mayor que cero");    
+                //throw new Error("ERROR: stock debe ser mayor que cero");   
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: generateProductErrorInfo({title, description, price, thumbnail, code, stock, category, status}),
+                    message: "ERROR: stock debe ser mayor que cero",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
             //Cargo los productos anteriores
@@ -110,7 +169,13 @@ class ProductManager {
 
             //Me fijo que el code no exista ya
             if (this.#products.find(product => product.code === code)) {
-                throw new Error("ERROR: code ya existente");        
+                //throw new Error("ERROR: code ya existente");  
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: generateProductErrorInfo({title, description, price, thumbnail, code, stock, category, status}),
+                    message: "ERROR: code ya existente",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })      
             }
 
             //Agrego el producto
@@ -140,7 +205,19 @@ class ProductManager {
                
         }
         catch (error) {
-            throw (error);
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Es Error de la Base de Datos
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error creando un Producto",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return newProduct;
@@ -153,7 +230,13 @@ class ProductManager {
         try {
             //Validaciones
             if (!productoModificado.id) {
-                throw new Error("ERROR: id Producto inválido");
+                //throw new Error("ERROR: id Producto inválido");
+                CustomError.createError({
+                    name: "Error actualizando un Producto",
+                    cause: generateProductErrorInfo(productoModificado),
+                    message: "ERROR: id Producto inválido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
                         
@@ -163,12 +246,24 @@ class ProductManager {
             let viejoProducto = await this.getProductByIdAsync(productoModificado.id);
 
             if (viejoProducto === "Not found") {
-                throw new Error("ERROR: El producto con el id especificado no existe");
+                //throw new Error("ERROR: El producto con el id especificado no existe");
+                CustomError.createError({
+                    name: "Error actualizando un Producto",
+                    cause: generateProductErrorInfo(productoModificado),
+                    message: "ERROR:  producto con el id especificado no existe",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
             //Me fijo que el code no exista ya en algún producto que no sea el especificado para hacer el update
             if (this.#products.find(product => ((product.code === productoModificado.code) && (product.id !== productoModificado.id)))) {
-                throw new Error("ERROR: code ya existente");        
+                //throw new Error("ERROR: code ya existente"); 
+                CustomError.createError({
+                    name: "Error actualizando un Producto",
+                    cause: generateProductErrorInfo(productoModificado),
+                    message: "ERROR: code ya existente",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })       
             } 
 
             //Actualizo el producto
@@ -193,7 +288,20 @@ class ProductManager {
             
         }
         catch (error) {
-            throw (error);
+            //throw (error);
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Es Error de la Base de Datos
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error actualizando un Producto",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return newProduct;
@@ -225,7 +333,13 @@ class ProductManager {
 
         }
         catch (error) {
-            throw error;
+            //throw error;
+            CustomError.createError({
+                name: "Error obteniendo un Producto",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return productSelected;
@@ -238,7 +352,14 @@ class ProductManager {
             let result = await productModel.deleteOne({_id: idProduct});
         }
         catch (error) {
-            throw error;
+            //throw error;
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error eliminando un Producto",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return true;
@@ -301,7 +422,15 @@ class ProductManager {
         }
         catch (error) {
             console.error("ERROR: ", error);
-            throw new Error(error);
+            //throw new Error(error);
+            //throw error;
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error obteniendo Productos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
 

@@ -13,6 +13,17 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 13
+    - Implementación del Mock de Productos
+        - Se implementa la función generateProduct en test/utils.js que genera un producto ficticio
+        - En el controller products.controller se implementa el método getMockingProducts que genera una respuesta con un array de 100 productos ficticios respetando el formato de consultas de productas
+        - En el router products.router.js se implementa el endpoint GET "/api/mockingproducts", que devuelve los productos ficticios creados
+    - Implementación de CustomErrors
+        - Se implementa el Middleware de control de errores en el archivo errorMiddleware.js (se exporta el middleware por default)
+        - Se implementa la clase CustomError, y el enum EErrors 
+        - En el archivo services/errors/info.js se implementan las funciones generateProductErrorInfo (para errores de parametros de productos), generateCartErrorInfo (para errores de parametros de carritos) y generateDatabaseErrorInfo (para errores de Bases de datos)
+        - Se lanzan CustomErrors (en lugar de errores comunes) en el DAO ProductManagerMongo y en el productController para el manejo de productos
+        - Se lanzan CustomErrors (en lugar de errores comunes) en el DAO CarritoManagerMongo y en el cartController para el manejo de carritos
 - Notas de la Entrega Nro 12
     - Implementación de generación de Ticket de Compra
         - Se implementó el ticket model de Mongoose

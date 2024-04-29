@@ -1,6 +1,12 @@
 import mongoose from "mongoose";
 import cartModel from "../models/cartsModel.js";
 
+import CustomError from "../../services/errors/CustomError.js";
+import EErrors from "../../services/errors/enums.js";
+
+import { generateDatabaseErrorInfo } from "../../services/errors/info.js";
+import { generateCartErrorInfo } from "../../services/errors/info.js";
+
 class CarritoManager {
     #carritos;
     #path;
@@ -43,8 +49,16 @@ class CarritoManager {
             })
         }
         catch (error) {
-            console.error("ERROR: ", error);
-            throw new Error(error);
+            /* console.error("ERROR: ", error);
+            throw new Error(error); */
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error devolviendo Carritos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        
         }
 
 
@@ -61,7 +75,13 @@ class CarritoManager {
 
             if (!carritoSelected) {
                 console.log("Not found");
-                throw new Error("Not found");
+                //throw new Error("Not found");
+                CustomError.createError({
+                    name: "Error devolviendo Productos de un Carrito",
+                    cause: generateCartErrorInfo({id: idCarrito}),
+                    message: "Not found",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
             //Devuelvo los productos con el formato que utilizamos
@@ -85,7 +105,19 @@ class CarritoManager {
             });
         }
         catch (error) {
-            throw error;
+            //throw error;
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error devolviendo Productos de Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return productos;
@@ -101,7 +133,13 @@ class CarritoManager {
 
             if (!carritoSelected) {
                 console.log("Not found");
-                throw new Error("Not found");
+                //throw new Error("Not found");
+                CustomError.createError({
+                    name: "Error devolviendo un Carrito",
+                    cause: generateCartErrorInfo({id: idCarrito}),
+                    message: "El carrito con el id especificado no existe",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
             carritoDevuelto = {
@@ -120,7 +158,19 @@ class CarritoManager {
     
         }
         catch (error) {
-            throw error;
+            //throw error;
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error devolviendo un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return carritoDevuelto;
@@ -138,7 +188,13 @@ class CarritoManager {
 
             if (!productos) {
                 console.log("Carrito Not found");
-                return "Carrito Not found";
+                //return "Carrito Not found";
+                CustomError.createError({
+                    name: "Error devolviendo un Producto de un Carrito",
+                    cause: generateCartErrorInfo({id: idCarrito}),
+                    message: "Carrito Not found",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
             //Busco el Producto dentro del carrito
@@ -146,12 +202,25 @@ class CarritoManager {
 
             if (!productSelected) {
                 console.log("Not found");
-                return "Not found";
+                //return "Not found";
+                CustomError.createError({
+                    name: "Error devolviendo un Producto de un Carrito",
+                    cause: generateCartErrorInfo({id: idCarrito}),
+                    message: "Not found",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })
             }
 
         }
         catch (error)  {
-            throw error;
+            //throw error;
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error devolviendo un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return productSelected;
@@ -182,7 +251,13 @@ class CarritoManager {
 
         }
         catch (error) {
-            throw (error);
+            //throw (error);
+            CustomError.createError({
+                name: "Error creando un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
 
@@ -216,9 +291,15 @@ class CarritoManager {
             }
 
             //Me fijo si el producto ya estaba en el carrito
-            let viejoProducto = await this.getProductDeCarritoAsync(idCarrito, idProducto);
+            let viejoProducto = null;
+            try {
+                viejoProducto = await this.getProductDeCarritoAsync(idCarrito, idProducto);
+            }
+            catch (error) {
+                viejoProducto = null;    
+            }
 
-            if (viejoProducto === "Not found") {
+            if (!viejoProducto) {
                 //El Producto no estaba en el carrito: lo agrego
                 newProduct = {
                     id: idProducto,
@@ -250,7 +331,19 @@ class CarritoManager {
             
         }
         catch (error) {
-            throw (error);
+            //throw (error);
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error devolviendo un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return newCarrito;
@@ -284,7 +377,19 @@ class CarritoManager {
                         
         }
         catch (error) {
-            throw (error);
+            //throw (error);
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error seteando los Productos de un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return newCarrito;    
@@ -322,7 +427,19 @@ class CarritoManager {
            
         }
         catch (error) {
-            throw (error);
+            //throw (error);
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error eliminando un Producto de un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return newCarrito;
@@ -379,7 +496,19 @@ class CarritoManager {
                         
         }
         catch (error) {
-            throw (error);
+            //throw (error);
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error seteando la Cantidad de Productos de un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return newCarrito;
@@ -426,7 +555,19 @@ class CarritoManager {
     
         }
         catch (error) {
-            throw error;
+            //throw error;
+            //Me fijo si el error es Custom o de la Base de Datos
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error devolviendo un Carrito con sus Productos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         return carritoDevuelto;
@@ -471,7 +612,18 @@ class CarritoManager {
         }
         catch (error) {
             console.error("ERROR: ", error);
-            throw new Error(error);
+            //throw new Error(error);
+            if (error.isCustom) {
+                throw (error);
+            }
+
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error devolviendo todos los Carrito con sus Productos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
 
@@ -489,7 +641,13 @@ class CarritoManager {
         }
         catch (error) {
             console.error("ERROR: ", error);
-            throw new Error(error);    
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error eliminando un Carrito",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
         }
 
         todoOk = true;

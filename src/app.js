@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 import path from "path";
 import { fileURLToPath } from 'url';
 
-import ProductManager from "./dao/mongo/ProductManagerMongo.js";
+//import ProductManager from "./dao/mongo/ProductManagerMongo.js";
 import CarritoManager from "./dao/mongo/CarritoManagerMongo.js";
 import UserManager from "./dao/mongo/UserManagerMongo.js";
 import ChatManager from "./dao/mongo/ChatManagerMongo.js";
@@ -18,6 +18,8 @@ import viewsRouter from "./routes/views.router.js";
 import sessionsRouter from "./routes/sessions.router.js";
 
 import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
+
+import errorMiddleware from "./middlewares/errors/errorMiddleware.js";
 
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -101,9 +103,14 @@ app.use("/", productsRouter);
 app.use("/", cartsRouter);
 app.use("/", viewsRouter);
 
+//Errors Middlewares
+app.use(errorMiddleware);
+
 //Endpoint
 
-app.get("/", (req, res) => res.send("<h1 style='color: blue; text-align: center' >Bienvenido al Server de Productos </h1>"));
+//app.get("/", (req, res) => res.send("<h1 style='color: blue; text-align: center' >Bienvenido al Server de Productos </h1>"));
+
+
 
 const httpServer = app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
 

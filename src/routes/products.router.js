@@ -27,6 +27,8 @@ router.put("/api/products/:pid", usuarioEsAdministrador, productController.updat
 
 router.delete("/api/products/:pid", usuarioEsAdministrador, productController.deleteProduct);
 
+router.get("/api/mockingproducts", productController.getMockingProducts);
+
 //A partir de acá es el código anterior a crear los controllers
 
 /* router.get("/api/products", async (req, res) => {

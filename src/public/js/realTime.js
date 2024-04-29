@@ -116,6 +116,16 @@ function agregarProductoDeForm() {
     
     let producto = obtenerProductoDeForm();
 
+    //Esto sacarlo después : solo para probar errores
+    //producto.title = "";
+    //producto.description = "";
+    //producto.price = 0;
+    
+    //producto.code = "";
+    //producto.stock = 0;
+    //producto.category = "";
+    
+
     console.log("Producto obtenido de Form: ", producto);
 
     agregarProducto(producto);
@@ -132,6 +142,9 @@ function actualizarProductoDeForm() {
 
     console.log("Producto obtenido de Form: ", producto);
 
+    //Borrar esto despues
+    //producto.id = 0;
+    
     actualizarProducto(producto);
 
     resetearForm();
@@ -205,7 +218,7 @@ function agregarProducto(producto) {
     .then(prodAgregado => {
         let mensajeError = null;
 
-        prodAgregado.status && prodAgregado.status === "error" && (mensajeError = prodAgregado.error);
+        prodAgregado.status && prodAgregado.status === "error" && (mensajeError = prodAgregado.message);
         if (!mensajeError) {
             Swal.fire({
                 icon: "success",
@@ -243,7 +256,7 @@ function actualizarProducto(producto) {
     .then(prodActualizado => {
         let mensajeError = null;
 
-        prodActualizado.status && prodActualizado.status === "error" && (mensajeError = prodActualizado.error);
+        prodActualizado.status && prodActualizado.status === "error" && (mensajeError = prodActualizado.message);
         if (!mensajeError) {
             Swal.fire({
                 icon: "success",
@@ -277,12 +290,13 @@ function eliminarProducto(idProducto) {
         body: JSON.stringify({idProducto})
     }
 
+    
     fetch("/api/products/" + idProducto, datos)
     .then(res => res.json())
     .then(prodActualizado => {
         let mensajeError = null;
 
-        prodActualizado.status && prodActualizado.status === "error" && (mensajeError = prodActualizado.error);
+        prodActualizado.status && prodActualizado.status === "error" && (mensajeError = prodActualizado.message);
         if (!mensajeError) {
             Swal.fire({
                 icon: "success",

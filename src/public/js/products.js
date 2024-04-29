@@ -22,6 +22,7 @@ function agregarProductoAlCarrito(idProducto) {
         headers: {"Content-type": "application/json; charset=UTF-8"},
     }
 
+    
     let api = `/api/carts/${idCarrito}/products/${idProducto}`;
 
     fetch(api, datos)
@@ -38,7 +39,7 @@ function agregarProductoAlCarrito(idProducto) {
             Swal.fire({
                 icon: "warning",
                 title: "ERROR",
-                text: `Se produjo el siguiente error: ${resultado.error}`
+                text: `Se produjo el siguiente error: ${resultado.message}`
             })    
         }
     })
@@ -46,7 +47,7 @@ function agregarProductoAlCarrito(idProducto) {
         Swal.fire({
             icon: "warning",
             title: "ERROR",
-            text: `Se produjo el siguiente error: ${err.toString()}`
+            text: `Se produjo el siguiente error: ${err.message}`
         })
     });
 
