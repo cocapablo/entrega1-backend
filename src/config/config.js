@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import { Command } from "commander";
 
 
+
 const MODOBD = "CLOUD";
 
 //Cargo las configuraciones del entorno
@@ -13,9 +14,9 @@ program
     
 program.parse();
 
-console.log("Program Options", program.options);
-console.log("Program opts", program.opts());
-console.log("Remaining arguments", program.args);
+//console.log("Program Options", program.options);
+//console.log("Program opts", program.opts());
+//console.log("Remaining arguments", program.args);
 
 export function configurarEntorno(opciones) {
     let modobd = "LOCAL";
@@ -35,7 +36,8 @@ export function configurarEntorno(opciones) {
         persistence: persistence || process.env.PERSISTENCE,
         mongoUrl: process.env.MONGO_URL,
         adminEmail: process.env.ADMIN_EMAIL,
-        adminPassword: process.env.ADMIN_PASSWORD    
+        adminPassword: process.env.ADMIN_PASSWORD,
+        env: process.env.ENV    
     }
 
     return config;
@@ -50,6 +52,7 @@ export default {
     persistence: config.persistence,
     mongoUrl: config.mongoUrl,
     adminEmail: config.adminEmail,
-    adminPassword: config.adminPassword
+    adminPassword: config.adminPassword,
+    env: process.env.ENV    
 
 }

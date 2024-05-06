@@ -3,6 +3,8 @@
 import { cartService } from "../repositories/index.js";
 import { ProductController } from "./products.controller.js";
 
+import logger from "../services/logs/logger.js";
+
 export class CartController {
     #cartService;
     #productController;
@@ -29,12 +31,13 @@ export class CartController {
 
         this.#cartService.getCarritosWithProductsByIdAsync().then(
             carritos => {
-                console.log("Carritos devueltos: ", carritos);
+                //console.log("Carritos devueltos: ", carritos);
+                logger.debug("Carritos devueltos: " + JSON.stringify(carritos, null, 2));
     
                 res.send(carritos);
             }        
         ).catch (error => {
-            console.log("ERROR en cartController.getCarts: ", error.message);
+            //console.log("ERROR en cartController.getCarts: ", error.message);
             
             next(error);  
         }) 
@@ -49,14 +52,15 @@ export class CartController {
             idCarrito = req.params.cid;
             this.#cartService.getProductsDeCarritoByIdAsync(idCarrito).then(
                 productos => {
-                    console.log("Productos del carrito: ", productos);
+                    //console.log("Productos del carrito: ", productos);
+                    logger.debug("Productos del carrito: ", JSON.stringify(productos, null, 2));
                     res.send(productos);
                 }
             )
             .catch(error => {
                 /* console.log("ERROR: ", error);
                 res.send({error}); */
-                console.log("ERROR en cartController.getProductsFromCart: ", error.message);
+                //console.log("ERROR en cartController.getProductsFromCart: ", error.message);
             
                 next(error);  
             })
@@ -85,7 +89,7 @@ export class CartController {
             })
         }
         ).catch(err => {
-            console.log("ERROR: ", err);
+            //console.log("ERROR: ", err);
             /* res.status(404).json({
                 status: "ERROR",
                 error: err.toString()
@@ -109,7 +113,7 @@ export class CartController {
                 })
             }
             ).catch(err => {
-                console.log("ERROR: ", err);
+                //console.log("ERROR: ", err);
                 /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
@@ -152,7 +156,7 @@ export class CartController {
                     })
                 }
                 ).catch(err => {
-                    console.log("ERROR: ", err);
+                    //console.log("ERROR: ", err);
                     /* res.status(404).json({
                         status: "ERROR",
                         error: err.toString()
@@ -212,7 +216,7 @@ export class CartController {
                 })
             }
             ).catch(err => {
-                console.log("ERROR: ", err);
+                //console.log("ERROR: ", err);
                 /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
@@ -254,7 +258,7 @@ export class CartController {
                 })
             }
             ).catch(err => {
-                console.log("ERROR: ", err);
+                //console.log("ERROR: ", err);
                 /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()
@@ -317,7 +321,7 @@ export class CartController {
                 })
             }
             ).catch(err => {
-                console.log("ERROR: ", err);
+                //console.log("ERROR: ", err);
                 /* res.status(404).json({
                     status: "ERROR",
                     error: err.toString()

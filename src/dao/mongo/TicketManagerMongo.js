@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import ticketModel from "../models/tickets.model.js";
 
+import logger from "../../services/logs/logger.js";
+
 class TicketManager {
     #tickets;
 
@@ -37,11 +39,12 @@ class TicketManager {
                 purchaser 
             }
 
-            console.log("Nuevo Ticket: ", newTicket); 
+            //console.log("Nuevo Ticket: ", newTicket); 
+            logger.debug("Nuevo ticket: " + JSON.stringify(newTicket, null, 2));
 
             let resultado = await ticketModel.create(newTicket);
 
-            console.log("Resultado Crear Ticket: ", resultado); 
+            //console.log("Resultado Crear Ticket: ", resultado); 
 
             //Agrego el nuevo id a newTicket
             newTicket = {
@@ -64,7 +67,7 @@ class TicketManager {
     
         code = Date.now().toString() + Math.floor(Math.random() * 10000 + 1).toString();
 
-        console.log("Code generado: ", code);
+        //console.log("Code generado: ", code);
 
         return code;
     }

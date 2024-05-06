@@ -5,6 +5,7 @@ import { CartController } from "./carts.controller.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
 
 import passport from "passport";
+import logger from "../services/logs/logger.js";
 
 export class UserController {
     #userService;
@@ -53,16 +54,19 @@ export class UserController {
             try {
                 oError = JSON.parse(error.message);
     
-                console.log("Error Status", oError.status);
-                console.log("Error error: ", oError.error);
+                //console.log("Error Status", oError.status);
+                //console.log("Error error: ", oError.error);
     
                 mensajeError = oError.error;
+
+                logger.error(mensajeError);
     
                 res.status(oError.status).redirect("/changePassword?error=true&mensajeError=" + mensajeError);
             }
             catch (e) {
                 //No es un JSON
                 mensajeError = error.message;
+                logger.error(mensajeError);
                 res.redirect("/changePassword?error=true&mensajeError=" + mensajeError);
             }
     
@@ -87,7 +91,8 @@ export class UserController {
         if (req.user) {
             //Agrego los datos del usuario desde req.user
             let nuevoUsuario = req.user;
-            console.log("Nuevo usuario: ", nuevoUsuario);
+            //console.log("Nuevo usuario: ", nuevoUsuario);
+            //logger.debug("Nuevo usuario: " + JSON.parse(nuevoUsuario, null, 2));
     
             req.session.user = {
                 id: nuevoUsuario.id,
@@ -104,6 +109,7 @@ export class UserController {
             let mensajeError = "Usuario o contraseña incorrectos";
     
             req.session.error && (mensajeError = req.session.error);
+
             res.redirect("/login?error=true&mensajeError=" + mensajeError);
         }
      
@@ -153,11 +159,13 @@ export class UserController {
             return res.status(401).send({user: usuario});
         }
 
-        console.log("Usuario en la Session: ", usuario);
+        //console.log("Usuario en la Session: ", usuario);
+        logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
 
         usuarioDTO = new UserDTO(usuario);
 
-        console.log("UsuarioDTO: ", usuarioDTO);
+        //console.log("UsuarioDTO: ", usuarioDTO);
+        logger.debug("UsuarioDTO: " + JSON.stringify(usuarioDTO, null, 2));
 
         res.send({user: usuarioDTO});
     }

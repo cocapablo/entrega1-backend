@@ -10,6 +10,8 @@ import { cartService } from "../repositories/index.js";
 import { usuarioLogueado, usuarioNoLogueado, usuarioEsUsuario } from "../middlewares/sessionMiddleware.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
 
+import logger from "../services/logs/logger.js";
+
 //const prodManager = new ProductManager("productos.json");
 //const cartManager = new CarritoManager("carrito.json", prodManager);
 
@@ -35,7 +37,8 @@ router.get("/realtimeproducts", usuarioLogueado, (req, res) => {
     //Obtengo el usuario de la session actual
     req.session && req.session.user && (usuario = req.session.user);
 
-    console.log("Usuario en la Session: ", usuario);
+    //console.log("Usuario en la Session: ", usuario);
+    logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
 
     //Obtengo un aray de los productos actuales
     
@@ -53,7 +56,8 @@ router.get("/chat", usuarioLogueado, usuarioEsUsuario, (req, res) => {
     //Obtengo el usuario de la session actual
     req.session && req.session.user && (usuario = req.session.user);
 
-    console.log("Usuario en la Session: ", usuario);
+    //console.log("Usuario en la Session: ", usuario);
+    logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
 
     res.render("chat", {user: usuario});
 })
@@ -65,20 +69,22 @@ router.get("/cart/:cid", usuarioLogueado, (req, res) => {
     //Obtengo el usuario de la session actual
     req.session && req.session.user && (usuario = req.session.user);
 
-    console.log("Usuario en la Session: ", usuario);
+    //console.log("Usuario en la Session: ", usuario);
+    logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
     
     if (req.params.cid) {
         idCarrito = req.params.cid;
         cartService.getCarritoWithProductsByIdAsync(idCarrito).then(
             carrito => {
-                console.log("Carrito para la View: ", carrito);
+                //console.log("Carrito para la View: ", carrito);
+                logger.debug("Carrito para la View: " + JSON.stringify(carrito, null, 2));
                 res.render("cart", {id: idCarrito,
                                     products: [...carrito.products],
                                     user: usuario});
             }
         )
         .catch(error => {
-            console.log("ERROR: ", error);
+            //console.log("ERROR: ", error);
             res.send({error});
         })
     }
@@ -112,14 +118,14 @@ router.get("/products", usuarioLogueado, async (req, res) => {
             }
         }
         //consulta = consultas.query && JSON.parse(consultas.query);
-        console.log("Consulta: ", consulta);
-        console.log("Consultas.sort: ", consultas.sort);
+        //console.log("Consulta: ", consulta);
+        //console.log("Consultas.sort: ", consultas.sort);
         orden = consultas.sort ? ((consultas.sort === "ASC" || consultas.sort === "DES") ? consultas.sort : "") : "";
-        console.log("Orden: ", orden);
+        //console.log("Orden: ", orden);
 
         //orden = "DES";
         productos = await productService.getProductsWithPaginationAsync(limite, pagina, consulta, orden);
-        console.log("Resultado devuelto: ", productos);
+        //console.log("Resultado devuelto: ", productos);
 
         //Campos que faltan
         let baseQuery = "http://localhost:8080/products?";
@@ -131,7 +137,7 @@ router.get("/products", usuarioLogueado, async (req, res) => {
             }
             //Pongo toda la query con comillas simples para evitar problemas en las URLs
             let consultaSimple = consultas.query.replaceAll('"', "'");
-            console.log("Consulta Simple: ", consultaSimple);
+            //console.log("Consulta Simple: ", consultaSimple);
             prevQuery = prevQuery + "query=" + consultaSimple;
         }
         if (orden) {
@@ -147,12 +153,13 @@ router.get("/products", usuarioLogueado, async (req, res) => {
         productos.prevLink = productos.hasPrevPage?`${prevQuery}&page=${productos.prevPage}` : '';
         productos.nextLink = productos.hasNextPage?`${nextQuery}&page=${productos.nextPage}`: '';
         productos.isValid= !(pagina <= 0 || pagina > productos.totalPages)
-        console.log("Resultado con extras: ", productos);
+        //console.log("Resultado con extras: ", productos);
 
         //Obtengo el usuario de la session actual
         req.session && req.session.user && (usuario = req.session.user);
 
-        console.log("Usuario en la Session: ", usuario);
+        //console.log("Usuario en la Session: ", usuario);
+        logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
 
         //Preparo el resultado a devolver
         resultado = {
@@ -175,7 +182,7 @@ router.get("/products", usuarioLogueado, async (req, res) => {
         
     }
     catch (err) {
-        console.log("ERROR: ", err);
+        //console.log("ERROR: ", err);
         res.status(404).json({
             status: "ERROR",
             error: err.toString()
@@ -192,9 +199,9 @@ router.get("/login", usuarioNoLogueado, (req, res) => {
     let mensajeError = "";
 
     req.query && req.query.error && (error = (req.query.error === "true" ? true : false));
-    console.log("Error: ", error);
+    //console.log("Error: ", error);
     req.query && req.query.mensajeError && (mensajeError = req.query.mensajeError);
-    console.log("Mensaje Error: ", mensajeError);
+    //console.log("Mensaje Error: ", mensajeError);
 
     res.render("login", {error, mensajeError});
 })
@@ -204,9 +211,11 @@ router.get("/register", usuarioNoLogueado, (req, res) => {
     let mensajeError = "";
 
     req.query && req.query.error && (error = (req.query.error === "true" ? true : false));
-    console.log("Error: ", error);
+    //console.log("Error: ", error);
+    
     req.query && req.query.mensajeError && (mensajeError = req.query.mensajeError);
-    console.log("Mensaje Error: ", mensajeError);
+    //console.log("Mensaje Error: ", mensajeError);
+    logger.warning(mensajeError);
 
     res.render("register", {error, mensajeError});
 })
@@ -218,7 +227,8 @@ router.get("/profile", usuarioLogueado, (req, res) => {
     //Obtengo el usuario de la session actual
     req.session && req.session.user && (usuario = req.session.user);
 
-    console.log("Usuario en la Session: ", usuario);
+    //console.log("Usuario en la Session: ", usuario);
+    logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
 
     usuarioDTO = new UserDTO(usuario);
 
@@ -230,9 +240,10 @@ router.get("/changePassword", usuarioNoLogueado, (req, res) => {
     let mensajeError = "";
 
     req.query && req.query.error && (error = (req.query.error === "true" ? true : false));
-    console.log("Error: ", error);
+    //console.log("Error: ", error);
     req.query && req.query.mensajeError && (mensajeError = req.query.mensajeError);
-    console.log("Mensaje Error: ", mensajeError);
+    //console.log("Mensaje Error: ", mensajeError);
+    logger.warning(mensajeError);
 
     res.render("changePassword", {error, mensajeError});
 })

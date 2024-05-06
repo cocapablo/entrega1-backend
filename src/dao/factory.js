@@ -1,5 +1,6 @@
 import { chatManager } from "../app.js";
 import config from "../config/config.js";
+import logger from "../services/logs/logger.js";
 
 export let UserManager;
 export let ProductManager;
@@ -7,7 +8,7 @@ export let CarritoManager;
 export let TicketManager;
 export let ChatManager;
 
-console.log("Estoy acá");
+//console.log("Estoy acá");
 
 switch (config.persistence) {
     case "MONGO":
@@ -23,7 +24,7 @@ switch (config.persistence) {
         //CarritoManager
         const {default: CarritoManagerMongo} = await import("../dao/mongo/CarritoManagerMongo.js");
         CarritoManager = CarritoManagerMongo;
-        console.log("CarritoManager: ", CarritoManager);
+        //console.log("CarritoManager: ", CarritoManager);
 
         //TicketManager
         const {default: TicketManagerMongo} = await import("../dao/mongo/TicketManagerMongo.js");
@@ -71,7 +72,8 @@ const DAO = {
     chatManager : ChatManager
 };
 
-console.log("DAO", DAO);
+//console.log("DAO", DAO);
+//logger.debug("DAO: "  + JSON.stringify(DAO));
 
 export default DAO;
 

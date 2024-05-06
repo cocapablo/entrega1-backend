@@ -16,10 +16,12 @@ import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import viewsRouter from "./routes/views.router.js";
 import sessionsRouter from "./routes/sessions.router.js";
+import logsRouter from "./routes/logs.router.js";
 
 import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
 
 import errorMiddleware from "./middlewares/errors/errorMiddleware.js";
+import { addLogger } from "./services/logs/logger.js";
 
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -31,9 +33,12 @@ import passport from "passport";
 
 import config from "./config/config.js";
 
+import logger from "./services/logs/logger.js";
 
 
-console.log("Config", config);
+
+//console.log("Config", config);
+logger.debug("Config: " + JSON.stringify(config, null, 2));
 
 const port = config.port || 8080;
 
@@ -41,10 +46,14 @@ const app = express();
 
 //Directorios
 const __filename = fileURLToPath(import.meta.url);
-console.log("Filename: ", __filename);
+//console.log("Filename: ", __filename);
+logger.debug("Filename: " + __filename);
 let __dirname = path.dirname(__filename); 
 
 //Middlewares
+//Logger Middleware
+app.use(addLogger);
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 //app.use(usuarioLogueado);
@@ -76,7 +85,8 @@ app.use(session({
 
 //Archivos estáticos
 app.use(express.static(path.join(__dirname, "public")));
-console.log("Dirname: ", __dirname);
+//console.log("Dirname: ", __dirname);
+logger.debug("Dirname: " +  __dirname);
 
 //Configuracion para handlebars
 app.engine("handlebars", handlebars.engine({
@@ -97,11 +107,14 @@ initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+
 //Routers
 app.use("/", sessionsRouter);
 app.use("/", productsRouter);
 app.use("/", cartsRouter);
 app.use("/", viewsRouter);
+app.use("/", logsRouter);
 
 //Errors Middlewares
 app.use(errorMiddleware);
@@ -112,7 +125,8 @@ app.use(errorMiddleware);
 
 
 
-const httpServer = app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
+//const httpServer = app.listen(port, () => console.log("Conectado al server en port " + port + " con Express"));
+const httpServer = app.listen(port, () => logger.info("Conectado al server en port " + port + " con Express"));
 
 //WebSockets
 export const socketServer = new Server(httpServer);
@@ -120,7 +134,8 @@ export const socketServer = new Server(httpServer);
 export const chatManager = new ChatManager(socketServer);
 
 socketServer.on("connection", socket => {
-    console.log("Nuevo cliente conectado");
+    //console.log("Nuevo cliente conectado");
+    logger.debug("Nuevo cliente conectado");
 
     //Eventos del chat
     socket.on("newUser", (username) => {
@@ -146,10 +161,12 @@ socketServer.on("connection", socket => {
 
 mongoose.connect(cadenaConexionBD)
 .then(() => {
-    console.log("Conectado a la base de datos");
+    //console.log("Conectado a la base de datos");
+    logger.info("Conectado a la base de datos");
 })
 .catch(err => {
-    console.log("ERROR al conectarme: ", err);
+    //console.log("ERROR al conectarme: ", err);
+    logger.error("ERROR al conectarme: " + err.toString());
 })
 
 //A partir de acá este código es solo para cargar productos y asegurarme que haya 
@@ -178,13 +195,15 @@ async function cargarProductosAsync(prodManagerAsync) {
 
         let productos = await prodManagerAsync.getProductsAsync()
 
-        console.log("Nuevos Productos asincrónicos: ", productos);
+        //console.log("Nuevos Productos asincrónicos: ", productos);
+        logger.debug("Nuevos Productos asincrónicos: " + JSON.stringify(productos, null, 2));
 
                
         
     }
     catch (error) {
-        console.error("ERROR", error);
+        //console.error("ERROR", error);
+        logger.error("ERROR: " + error.toString());
     }
 }
 
@@ -199,32 +218,37 @@ async function cargarCarritosAsync(carritoManagerAsync) {
     try {
         let carritos = await carritoManagerAsync.getCarritosAsync();
 
-        console.log("Carritos: ", carritos);
+        //console.log("Carritos: ", carritos);
+        logger.debug("Carritos: " + JSON.stringify(carritos, null, 2));
 
         let carrito1 = await carritoManagerAsync.addCarritoAsync();
-        console.log("Carrito 1: ", carrito1);
+        //console.log("Carrito 1: ", carrito1);
+        logger.debug("Carrito 1: " + JSON.stringify(carrito1, null, 2));
 
         //Un carrito
         let carritoPrueba = await carritoManagerAsync.getCarritoByIdAsync(carrito1.id);
-        console.log("Carrito Prueba: ", carritoPrueba);
-
+        //console.log("Carrito Prueba: ", carritoPrueba);
+        logger.debug("Carrito Prueba: " + JSON.stringify(carritoPrueba, null, 2));
         //Los productos del carrito
         let productos = await carritoManagerAsync.getProductsDeCarritoByIdAsync(carrito1.id);
-        console.log("Productos del Carrito Prueba: ", productos);
+        //console.log("Productos del Carrito Prueba: ", productos);
+        logger.debug("Productos del Carrito Prueba: " + JSON.stringify(productos, null, 2));
 
         //Leo un producto del carrito
         let producto = await carritoManagerAsync.getProductDeCarritoAsync(carrito1.id , "65c8b6b3075be6d7105d12ec");
-        console.log("Producto: ", producto);
+        //console.log("Producto: ", producto);
+        logger.debug("Producto: " + JSON.stringify(producto, null, 2));
 
     
         //Agrego un producto existente al carrito
         let carritoActualizado = await carritoManagerAsync.addProductToCarritoAsync(carrito1.id , "65c8b6b3075be6d7105d12e9", 50); //Agrego zapallitos
-        console.log("Carrito Actualizado: ", carritoActualizado);
-        
+        //console.log("Carrito Actualizado: ", carritoActualizado);
+        logger.debug("Carrito actualizado: " + JSON.stringify(carritoActualizado, null, 2));
         
         //Agrego un producto existente al carrito
         carritoActualizado = await carritoManagerAsync.addProductToCarritoAsync(carrito1.id , "65c8b6b3075be6d7105d12ec", 50);
-        console.log("Carrito Actualizado: ", carritoActualizado);
+        //console.log("Carrito Actualizado: ", carritoActualizado);
+        logger.debug("Carrito actualizado: " + JSON.stringify(carritoActualizado, null, 2));
         
 
         /* let carrito2 = await carritoManagerAsync.addCarritoAsync();
@@ -256,7 +280,8 @@ async function cargarCarritosAsync(carritoManagerAsync) {
 
     }
     catch (error) {
-        console.error("ERROR", error);
+        //console.error("ERROR", error);
+        logger.error("ERROR: " + error.tostring());
     }
 }
 
@@ -276,7 +301,8 @@ async function cargarCarritoConProductosAsync(carritoManagerAsync) {
             carritoPrueba = carritos[0];
         }
 
-        console.log("Carrito antes de los cambios", carritoPrueba);
+        //console.log("Carrito antes de los cambios", carritoPrueba);
+        logger.debug("Carrito antes de los cambios: " + JSON.stringify(carritoPrueba, null, 2));
 
         //Configuro los productos del carrito
         let productos = [
@@ -288,16 +314,18 @@ async function cargarCarritoConProductosAsync(carritoManagerAsync) {
 
         //Seteo los productos del carrito
         carritoPrueba = await carritoManagerAsync.setProductsToCarritoAsync(carritoPrueba.id, productos);
-        console.log("Carrito después de los cambios : ", carritoPrueba);
+        //console.log("Carrito después de los cambios : ", carritoPrueba);
+        logger.debug("Carrito después de los cambios : ", JSON.stringify(carritoPrueba, null, 2));
 
         //Borro todos los productos
         carritoPrueba = await carritoManagerAsync.setProductsToCarritoAsync(carritoPrueba.id);
-        console.log("Carrito después del borrado total : ", carritoPrueba);
-        
+        //console.log("Carrito después del borrado total : ", carritoPrueba);
+        logger.debug("Carrito después del borrado total : ", JSON.stringify(carritoPrueba, null, 2));
 
     }
     catch (error) {
-        console.error("ERROR", error);
+        //console.error("ERROR", error);
+        logger.error("ERROR: " + error.toString());
     }
 }
 
@@ -309,12 +337,14 @@ async function borrarProductoDeCarritoAsync(carritoManagerAsync, idCarrito, idPr
 
         //Borro el Producto del carrito
         carritoPrueba = await carritoManagerAsync.deleteProductDeCarrito(idCarrito,idProducto);
-        console.log("Carrito después de los cambios : ", carritoPrueba);
+        //console.log("Carrito después de los cambios : ", carritoPrueba);
+        logger.debug("Carrito después de los cambios : " + JSON.stringify(carritoPrueba, null, 2));
 
         
     }
     catch (error) {
-        console.error("ERROR", error);
+        //console.error("ERROR", error);
+        logger.error("ERROR: " + error.toString());
     }
 }
 
@@ -325,11 +355,13 @@ async function setProductoDeCarritoAsync(carritoManagerAsync, idCarrito, idProdu
         
         //Seteo el Producto del carrito
         carritoPrueba = await carritoManagerAsync.setProductToCarritoAsync(idCarrito, idProducto, cantidad);
-        console.log("Carrito después de los cambios : ", carritoPrueba);
+        //console.log("Carrito después de los cambios : ", carritoPrueba);
+        logger.debug("Carrito después de los cambios : " + JSON.stringify(carritoPrueba, null, 2));
         
     }
     catch (error) {
-        console.error("ERROR", error);
+        //console.error("ERROR", error);
+        logger.error("ERROR: " + error.toString());
     }
 }
 

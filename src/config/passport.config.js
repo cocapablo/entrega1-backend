@@ -6,6 +6,8 @@ import { ProductController } from "../controllers/products.controller.js";
 import { CartController } from "../controllers/carts.controller.js";
 import { UserController } from "../controllers/users.controller.js";
 
+import logger from "../services/logs/logger.js";
+
 const productController = new ProductController();
 const cartController = new CartController(productController);
 const userController = new UserController(cartController);
@@ -24,7 +26,8 @@ const initializePassport = () => {
         },
         async (req, accessToken, refreshToken, profile, done) => {
             try {
-                console.log("Profile GitHub: ", profile);
+                //console.log("Profile GitHub: ", profile);
+                logger.debug("Profile GitHub: " + JSON.stringify(profile, null, 2));
 
                 //Paso 1: Me fijo si el usuario ya existía en la Base de Datos
                 let viejoUsuario;
@@ -32,7 +35,8 @@ const initializePassport = () => {
                     viejoUsuario = await userController.getService().getUserAsync(profile._json.email);
 
                     //El Usuario ya existía: no se puedo volver a registrar
-                    console.log("El Usuario ya existía previemente");
+                    //console.log("El Usuario ya existía previemente");
+                    logger.error("El Usuario ya existía previemente");
 
                     req.session.error = "El Usuario ya existía previamente";
 
@@ -40,7 +44,8 @@ const initializePassport = () => {
                 }
                 catch (error) {
                     //El Usuario no existía
-                    console.log("El Usuario no existía previamente")
+                    //console.log("El Usuario no existía previamente")
+                    logger.debug("El Usuario no existía previamente");
                 }
 
                 const usuarioARegistrar = {
@@ -51,7 +56,8 @@ const initializePassport = () => {
                     password : "123456", //Dato ficticio
                 }
 
-                console.log("Usuario a Registrar: ", usuarioARegistrar);
+                //console.log("Usuario a Registrar: ", usuarioARegistrar);
+                logger.debug("Usuario a Registrar: " + JSON.stringify(usuarioARegistrar, null, 2));
         
                 let nuevoUsuario = await userController.getService().addUserAsync(usuarioARegistrar);
                 
@@ -68,8 +74,8 @@ const initializePassport = () => {
                 try {
                     oError = JSON.parse(error.message);
 
-                    console.log("Error Status", oError.status);
-                    console.log("Error error: ", oError.error);
+                    //console.log("Error Status", oError.status);
+                    //console.log("Error error: ", oError.error);
 
                     mensajeError = oError.error;
                }
@@ -95,10 +101,10 @@ const initializePassport = () => {
         async (req, username, password, done) => {
             try {
                 if (req.body) {
-                    console.log(req.body);
+                    //console.log(req.body);
                 }
                 else {
-                    console.log("No hay req.body");
+                    //console.log("No hay req.body");
                 }
 
                 const {first_name, last_name, email, age} = req.body;
@@ -109,7 +115,7 @@ const initializePassport = () => {
                     viejoUsuario = await userController.getService().getUserAsync(username);
 
                     //El Usuario ya existía: no se puedo volver a registrar
-                    console.log("El Usuario ya existía previemente");
+                    //console.log("El Usuario ya existía previemente");
 
                     req.session.error = "El Usuario ya existía previemente";
 
@@ -117,7 +123,8 @@ const initializePassport = () => {
                 }
                 catch (error) {
                     //El Usuario no existía
-                    console.log("El Usuario no existía previamente")
+                    //console.log("El Usuario no existía previamente")
+                    logger.debug("El Usuario no existía previamente");
                 }
 
                 const usuarioARegistrar = {
@@ -128,7 +135,7 @@ const initializePassport = () => {
                     password,
                 }
 
-                console.log("Usuario a Registrar: ", usuarioARegistrar);
+                //console.log("Usuario a Registrar: ", usuarioARegistrar);
         
                 let nuevoUsuario = await userController.getService().addUserAsync(usuarioARegistrar);
                 
@@ -143,8 +150,8 @@ const initializePassport = () => {
                 try {
                     oError = JSON.parse(error.message);
 
-                    console.log("Error Status", oError.status);
-                    console.log("Error error: ", oError.error);
+                    //console.log("Error Status", oError.status);
+                    //console.log("Error error: ", oError.error);
 
                     mensajeError = oError.error;
                }
@@ -190,8 +197,8 @@ const initializePassport = () => {
                 try {
                     oError = JSON.parse(error.message);
         
-                    console.log("Error Status", oError.status);
-                    console.log("Error error: ", oError.error);
+                    //console.log("Error Status", oError.status);
+                    //console.log("Error error: ", oError.error);
         
                     mensajeError = oError.error;
         
@@ -219,16 +226,16 @@ const initializePassport = () => {
 
     //Colocamos las estrategias de serializacion y deserializacion fuera de la estrategia local
     passport.serializeUser((user, done) => {
-        console.log("Estoy serializando");
+        //console.log("Estoy serializando");
         done(null, user.id);
     })
 
     passport.deserializeUser(async (id, done) => {
         let user = await userController.getService().getUserByIdAsync(id);
         
-        console.log("Estoy deserializando");
-        console.log("User ID: ", id);
-        console.log("User: ", user);
+        //console.log("Estoy deserializando");
+        //console.log("User ID: ", id);
+        //console.log("User: ", user);
 
         done(null, user);
     })

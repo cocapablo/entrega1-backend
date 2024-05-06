@@ -13,6 +13,13 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 14
+    - En el archivo logger.js se implementan los loggers de desarrollo y producción de acuerdo a las especificaciones de la consigna
+    - Se crea la variable de entorno ENV (que se lee de los archivos .env.cloud o .env.local según corresponda) que podrá tener los valores "DEV" o "PROD", si el entorno es de desarrollo o producción
+    - También en este archivo se implementa el middleware addLogger que se suma a la app el cual loguea cada request http (esto se realiza solo en entorno de desarrollo. No se crea un transport para level http en logger de producción)
+    - Se eliminan los console.log del server (no del frontend) y se reemplazan por sus correspondientes loggers (con diferentes niveles de logueo según el caso).
+    - En el middleware de errores errorMiddleware se realiza un logger.error con la descripción del error
+    - Se implementa el endpoint GET "/loggerTest" (en el router logs.router.js) que permite probar todos los errores
 - Notas de la Entrega Nro 13
     - Implementación del Mock de Productos
         - Se implementa la función generateProduct en test/utils.js que genera un producto ficticio

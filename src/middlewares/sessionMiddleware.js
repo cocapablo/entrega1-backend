@@ -1,5 +1,6 @@
 import express from "express";
 import session from "express-session";
+import logger from "../services/logs/logger.js";
 
 export function usuarioLogueado(req, res, next) {
     let usuario = null;
@@ -40,9 +41,11 @@ export function usuarioEsAdministrador(req, res, next) {
     req.session && req.session.user && (usuario = req.session.user);
     
     if (!usuario) {
+        logger.warning("El usuario no está logueado");
         return res.status(401).send({
             status: "error",
-            error: "El usuario no está logueado"
+            error: "El usuario no está logueado",
+            message: "El usuario no está logueado"
         })
     }
 
@@ -50,16 +53,20 @@ export function usuarioEsAdministrador(req, res, next) {
     usuario.role && (rolUsuario = usuario.role);
 
     if (!rolUsuario) {
+        logger.warning("El usuario no tiene privilegios para realizar la operación");
         return res.status(403).send({
             status: "error",
-            error: "El usuario no tiene privilegios para realizar la operación"
+            error: "El usuario no tiene privilegios para realizar la operación",
+            message: "El usuario no tiene privilegios para realizar la operación"
         })
     }
 
     if (rolUsuario !== "admin") {
+        logger.warning("El usuario no tiene privilegios para realizar la operación");
         return res.status(403).send({
             status: "error",
-            error: "El usuario no tiene privilegios para realizar la operación"
+            error: "El usuario no tiene privilegios para realizar la operación",
+            message: "El usuario no tiene privilegios para realizar la operación"
         })
     }
 
@@ -74,9 +81,11 @@ export function usuarioEsUsuario(req, res, next) {
     req.session && req.session.user && (usuario = req.session.user);
     
     if (!usuario) {
+        logger.warning("El usuario no está logueado");
         return res.status(401).send({
             status: "error",
-            error: "El usuario no está logueado"
+            error: "El usuario no está logueado",
+            message: "El usuario no está logueado"
         })
     }
 
@@ -84,16 +93,20 @@ export function usuarioEsUsuario(req, res, next) {
     usuario.role && (rolUsuario = usuario.role);
 
     if (!rolUsuario) {
+        logger.warning("El usuario no tiene privilegios para realizar la operación");
         return res.status(403).send({
             status: "error",
-            error: "El usuario no tiene privilegios para realizar la operación"
+            error: "El usuario no tiene privilegios para realizar la operación",
+            message: "El usuario no tiene privilegios para realizar la operación"
         })
     }
 
     if (rolUsuario !== "usuario") {
+        logger.warning("El usuario no tiene privilegios para realizar la operación");
         return res.status(403).send({
             status: "error",
-            error: "El usuario no tiene privilegios para realizar la operación"
+            error: "El usuario no tiene privilegios para realizar la operación",
+            message: "El usuario no tiene privilegios para realizar la operación"
         })
     }
 

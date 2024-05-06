@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import userModel from "../models/usersModel.js";
 import bcrypt from "bcrypt";
 
+import logger from "../../services/logs/logger.js";
+
 
 class UserManager {
     #users;
@@ -52,12 +54,16 @@ class UserManager {
             }
             catch (error) {
                 //Si el Usuario no existía lanza el error así que lo capturo y sigo
-                console.log("Estamos bien. el Usuario no existía en la Base de Datos")
+                //console.log("Estamos bien. el Usuario no existía en la Base de Datos")
+                logger.debug("Estamos bien. el Usuario no existía en la Base de Datos");
+
             }
 
             if (viejoUsuario) {
                 //El Usuario ya existía en la Base De datos
+                logger.error("El Usuario de mail " + email + " ya existe en la Base de Datos");
                 throw new Error("El Usuario de mail " + email + " ya existe en la Base de Datos");
+
             }
 
             
@@ -65,7 +71,7 @@ class UserManager {
             //Agrego el usuario a la Base de Datos
             let passwordEncriptada = this.#createHash(password);
 
-            console.log("Password encriptada: ", passwordEncriptada);
+            //console.log("Password encriptada: ", passwordEncriptada);
 
             newUser = {
                 first_name,
@@ -87,7 +93,7 @@ class UserManager {
 
             //Borro el password de newUser por ser un dato sensible
             delete newUser.password;
-            console.log("New User sin password: ", newUser);
+            //console.log("New User sin password: ", newUser);
 
             this.#users.push(newUser);
 
@@ -156,7 +162,7 @@ class UserManager {
             //Creo un nuevo Carrito
             try {
                 nuevoCarrito = await this.#cartManager.addCarritoAsync();
-                console.log("Nuevo Carrito", nuevoCarrito);
+                //console.log("Nuevo Carrito", nuevoCarrito);
             }
             catch (error) {
                 throw (error);
@@ -245,7 +251,7 @@ class UserManager {
     
         passwordEncriptada = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
     
-        console.log("Password Encriptado: ", passwordEncriptada);
+        //console.log("Password Encriptado: ", passwordEncriptada);
     
         return passwordEncriptada
     }
@@ -348,7 +354,7 @@ class UserManager {
                 throw new Error (cadenaError);
             }
 
-            console.log("Resultado: ", resultado);
+            //console.log("Resultado: ", resultado);
 
             //Creo usuario
             usuario = {

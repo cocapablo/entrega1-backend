@@ -315,7 +315,7 @@ class ProductManager {
         try {
 
             let producto = await productModel.findOne({_id: idProduct});
-            console.log("Producto encontrado: ", producto);
+            //console.log("Producto encontrado: ", producto);
 
             //Cargo el producto
             productSelected = {
@@ -377,20 +377,20 @@ class ProductManager {
             }
 
             if (sort) {
-                console.log("SORT: ", sort);
+                //console.log("SORT: ", sort);
 
                 if (sort === "ASC") {
                     //Ordenamiento por price de menor a mayor
                     opciones.sort = {price: 1}
-                    console.log("Estoy acá en ASC");
+                    //console.log("Estoy acá en ASC");
                 }
                 else if (sort === "DES") {
                     //Ordenamiento por price de mayor a menor
                     opciones.sort = {price: -1}
-                    console.log("Estoy acá en DES");
+                    //console.log("Estoy acá en DES");
                 }
                 else {
-                    console.log("No entré a ningún lado - SORT vacío");
+                    //console.log("No entré a ningún lado - SORT vacío");
                 }
             }
 
@@ -421,7 +421,7 @@ class ProductManager {
            
         }
         catch (error) {
-            console.error("ERROR: ", error);
+            //console.error("ERROR: ", error);
             //throw new Error(error);
             //throw error;
             //Creo un Custom Error

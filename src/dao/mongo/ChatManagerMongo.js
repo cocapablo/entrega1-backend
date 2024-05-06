@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import chatModel from "../models/chatModel.js";
 
+import logger from "../../services/logs/logger.js";
+
 
 class ChatManager {
     #ioServer;
@@ -26,11 +28,12 @@ class ChatManager {
 
             //Grabo el mensaje en la Base de Datos
             let resultado = await chatModel.create({user: username, message: message});
-            console.log("Resultado nuevo mensaje: ", resultado);
+            //console.log("Resultado nuevo mensaje: ", resultado);
             this.#ioServer.emit("message", { username, message })
         }
         catch (error) {
-            console.log("ERROR: ", error);
+            //console.log("ERROR: ", error);
+            logger.error("ERROR: " + error.toString());
             this.#ioServer.emit("error", error);
         }
     }
@@ -45,13 +48,14 @@ class ChatManager {
             delete this.#users[socket.id];
 
             let resultado = await chatModel.deleteMany({user: username});
-            console.log("Resultado de desconectar al usuario: ", resultado);
+            //console.log("Resultado de desconectar al usuario: ", resultado);
 
             this.#ioServer.emit("userDisconnected", username);    
       
         }
         catch (error) {
-            console.log("ERROR: ", error);
+            //console.log("ERROR: ", error);
+            logger.error("ERROR: " + error.toString());
             this.#ioServer.emit("error", error);
         }
     }

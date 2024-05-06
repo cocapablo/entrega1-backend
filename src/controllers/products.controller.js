@@ -51,14 +51,14 @@ export class ProductController {
                 }
             }
             //consulta = consultas.query && JSON.parse(consultas.query);
-            console.log("Consulta: ", consulta);
-            console.log("Consultas.sort: ", consultas.sort);
+            //console.log("Consulta: ", consulta);
+            //console.log("Consultas.sort: ", consultas.sort);
             orden = consultas.sort ? ((consultas.sort === "ASC" || consultas.sort === "DES") ? consultas.sort : "") : "";
-            console.log("Orden: ", orden);
+            //console.log("Orden: ", orden);
 
             //orden = "DES";
             productos = await this.#productService.getProductsWithPaginationAsync(limite, pagina, consulta, orden);
-            console.log("Resultado devuelto: ", productos);
+            //console.log("Resultado devuelto: ", productos);
 
             //Campos que faltan
             let baseQuery = "http://localhost:8080/api/productsPaginated?";
@@ -70,7 +70,7 @@ export class ProductController {
                 }
                 //Pongo toda la query con comillas simples para evitar problemas en las URLs
                 let consultaSimple = consultas.query.replaceAll('"', "'");
-                console.log("Consulta Simple: ", consultaSimple);
+                //console.log("Consulta Simple: ", consultaSimple);
                 prevQuery = prevQuery + "query=" + consultaSimple;
             }
             if (orden) {
@@ -86,7 +86,7 @@ export class ProductController {
             productos.prevLink = productos.hasPrevPage?`${prevQuery}&page=${productos.prevPage}` : '';
             productos.nextLink = productos.hasNextPage?`${nextQuery}&page=${productos.nextPage}`: '';
             productos.isValid= !(pagina <= 0 || pagina > productos.totalPages)
-            console.log("Resultado con extras: ", productos);
+            //console.log("Resultado con extras: ", productos);
 
             //Preparo el resultado a devolver
             resultado = {
@@ -104,7 +104,7 @@ export class ProductController {
             
         }
         catch (err) {
-            console.log("ERROR en productController.getProductsPaginated: ", err.message);
+            //console.log("ERROR en productController.getProductsPaginated: ", err.message);
             /*
             res.status(404).json({
                 status: "ERROR",
@@ -123,15 +123,15 @@ export class ProductController {
     
         if (req.params.pid) {
             idProducto = req.params.pid;
-            console.log("idelegido: ", idProducto);
+            //console.log("idelegido: ", idProducto);
             this.#productService.getProductByIdAsync(idProducto).then(
                 producto => {
-                    console.log("Producto elegido: ", producto);
+                    //console.log("Producto elegido: ", producto);
                     res.send(producto);
                 }
             )
             .catch(error => {
-                console.log("ERROR en productController.getProduct: ", error.message);
+                //console.log("ERROR en productController.getProduct: ", error.message);
                 //res.send({error});
                 next(error);
             })
@@ -171,7 +171,7 @@ export class ProductController {
             )
         }
         ).catch(err => {
-            console.log("ERROR en productController: ", err.message);
+            //console.log("ERROR en productController: ", err.message);
             /*
             res.status(404).json({
                 status: "ERROR",
@@ -216,7 +216,7 @@ export class ProductController {
                     status: "ERROR",
                     error: err.toString()
                 }) */
-                console.log("ERROR en productController.updateProduct: ", err.message);
+                //console.log("ERROR en productController.updateProduct: ", err.message);
                 
                 next(err);
             })
@@ -267,7 +267,7 @@ export class ProductController {
                     status: "ERROR",
                     error: err.toString()
                 }) */
-                console.log("ERROR en productController.deleteProduct: ", err.message);
+                //console.log("ERROR en productController.deleteProduct: ", err.message);
                 
                 next(err);
             })

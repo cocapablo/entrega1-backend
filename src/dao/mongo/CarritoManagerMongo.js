@@ -7,6 +7,8 @@ import EErrors from "../../services/errors/enums.js";
 import { generateDatabaseErrorInfo } from "../../services/errors/info.js";
 import { generateCartErrorInfo } from "../../services/errors/info.js";
 
+import logger from "../../services/logs/logger.js";
+
 class CarritoManager {
     #carritos;
     #path;
@@ -26,7 +28,7 @@ class CarritoManager {
         try {
             let carritosBD = await cartModel.find();
             //Armo el carrito con el formato que utilizamos
-            console.log("carritosBd: ", carritosBD);
+            //console.log("carritosBd: ", carritosBD);
             
             this.#carritos = carritosBD.map(carrito => {
                 let productos = carrito.products.map(producto => {
@@ -74,7 +76,7 @@ class CarritoManager {
             carritoSelected = await cartModel.findOne({_id: idCarrito}).populate("products.id");
 
             if (!carritoSelected) {
-                console.log("Not found");
+                //console.log("Not found");
                 //throw new Error("Not found");
                 CustomError.createError({
                     name: "Error devolviendo Productos de un Carrito",
@@ -132,7 +134,7 @@ class CarritoManager {
             carritoSelected = await cartModel.findOne({_id: idCarrito});
 
             if (!carritoSelected) {
-                console.log("Not found");
+                //console.log("Not found");
                 //throw new Error("Not found");
                 CustomError.createError({
                     name: "Error devolviendo un Carrito",
@@ -201,7 +203,7 @@ class CarritoManager {
             productSelected = productos.find(producto => producto.id === idProducto);
 
             if (!productSelected) {
-                console.log("Not found");
+                //console.log("Not found");
                 //return "Not found";
                 CustomError.createError({
                     name: "Error devolviendo un Producto de un Carrito",
@@ -309,7 +311,7 @@ class CarritoManager {
                 //resultado = await cartModel.findById(idCarrito).products.push(newProduct);
                 resultado = await cartModel.findByIdAndUpdate(idCarrito, {$push : {products: newProduct}});
 
-                console.log("Resultado de agregar un producto: ", resultado);
+                //console.log("Resultado de agregar un producto: ", resultado);
             }
             else {
                 //El producto ya estaba en el carrito: Actualizo el producto (le sumo la cantidad)
@@ -320,7 +322,7 @@ class CarritoManager {
 
                 resultado = await cartModel.updateOne({_id: idCarrito, "products.id": idProducto}, {$set: {"products.$[product].quantity" :  newProduct.quantity}}, {arrayFilters: [{"product.id": idProducto}]});
 
-                console.log("Resultado de actualizar un producto: ", resultado);
+                //console.log("Resultado de actualizar un producto: ", resultado);
             }
             
             //Obtengo newCarrito con el formato que utilizamos
@@ -368,7 +370,7 @@ class CarritoManager {
             //resultado = await cartModel.findById(idCarrito).products.push(newProduct);
             resultado = await cartModel.findByIdAndUpdate(idCarrito, {$set : {products: productos}});
 
-            console.log("Resultado de agregar los productos: ", resultado);
+            //console.log("Resultado de agregar los productos: ", resultado);
             
                         
             //Obtengo newCarrito con las modificaciones
@@ -419,7 +421,7 @@ class CarritoManager {
             //Borro el producto del Carrito
             resultado = await cartModel.findByIdAndUpdate(idCarrito, {$pull: {products: {id: idProducto}}});
 
-            console.log("Resultado de eliminar un producto: ", resultado);
+            //console.log("Resultado de eliminar un producto: ", resultado);
             
             
             //Obtengo newCarrito con el formato que utilizamos
@@ -481,14 +483,14 @@ class CarritoManager {
                
                 resultado = await cartModel.findByIdAndUpdate(idCarrito, {$push : {products: newProduct}});
 
-                console.log("Resultado de agregar un producto: ", resultado);
+                //console.log("Resultado de agregar un producto: ", resultado);
             }
             else {
                 //El producto ya estaba en el carrito: Actualizo el producto (con la cantidad pasaod como parmámetro)
                 
                 resultado = await cartModel.updateOne({_id: idCarrito, "products.id": idProducto}, {$set: {"products.$[product].quantity" :  newProduct.quantity}}, {arrayFilters: [{"product.id": idProducto}]});
 
-                console.log("Resultado de actualizar un producto: ", resultado);
+                //console.log("Resultado de actualizar un producto: ", resultado);
             }
             
             //Obtengo newCarrito con el formato que utilizamos
@@ -523,11 +525,12 @@ class CarritoManager {
             carritoSelected = await cartModel.findOne({_id: idCarrito}).populate("products.id");
 
             if (!carritoSelected) {
-                console.log("Not found");
+                //console.log("Not found");
                 throw new Error("Not found");
             }
 
-            console.log("Carrito populated: ", carritoSelected);
+            //console.log("Carrito populated: ", carritoSelected);
+            logger.debug("Carrito populated: ", JSON.stringify(carritoSelected, null, 2));
 
             carritoDevuelto = {
                 id : carritoSelected._id.toString(),
@@ -580,7 +583,7 @@ class CarritoManager {
             let carritosBD = await cartModel.find().populate("products.id");
 
             //Armo el carrito con el formato que utilizamos
-            console.log("carritosBd: ", carritosBD);
+            //console.log("carritosBd: ", carritosBD);
             
             this.#carritos = carritosBD.map(carrito => {
                 let productos = carrito.products.map(producto => {
@@ -611,7 +614,7 @@ class CarritoManager {
             })
         }
         catch (error) {
-            console.error("ERROR: ", error);
+            //console.error("ERROR: ", error);
             //throw new Error(error);
             if (error.isCustom) {
                 throw (error);
@@ -640,7 +643,7 @@ class CarritoManager {
             resultado = await cartModel.deleteOne({_id: idCarrito});
         }
         catch (error) {
-            console.error("ERROR: ", error);
+            //console.error("ERROR: ", error);
             //Creo un Custom Error
             CustomError.createError({
                 name: "Error eliminando un Carrito",

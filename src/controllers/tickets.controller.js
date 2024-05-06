@@ -1,5 +1,6 @@
 //import TicketManager from "../dao/mongo/TicketManagerMongo.js"; 
 import { ticketService } from "../repositories/index.js";
+import logger from "../services/logs/logger.js";
 
 export class TicketController {
     #ticketService;
@@ -71,8 +72,8 @@ export class TicketController {
 
                 productoCompleto = todosProductos.find(prod => prod.id === producto.id);
 
-                console.log("Producto: ", producto);
-                console.log("Producto completo: ", productoCompleto);
+                //console.log("Producto: ", producto);
+                //console.log("Producto completo: ", productoCompleto);
 
                 if (productoCompleto.stock >= producto.quantity) {
                     //Hay Stock del producto
@@ -93,7 +94,8 @@ export class TicketController {
             })
 
             
-            console.log("Productos aceptados: ", productosAceptados);
+            //console.log("Productos aceptados: ", productosAceptados);
+            logger.debug("Productos aceptados: " + JSON.stringify(productosAceptados, null, 2));
 
             if (productosAceptados.length <= 0) {
                 //Ningún producto del carrito tiene stock: Rechazo la compra
@@ -110,12 +112,14 @@ export class TicketController {
                 return suma;
             }, 0);
 
-            console.log("Monto Total Compra: ", montoTotalCompra);
+            //console.log("Monto Total Compra: ", montoTotalCompra);
+            logger.debug("Monto Total Compra: " + montoTotalCompra);
 
             //Paso 5 : Obtengo el mail del usuario
             usuario = await this.#userService.getUsuarioDeCarritoAsync(idCarrito);
 
-            console.log("Usuario del Carrito: ", usuario);
+            //console.log("Usuario del Carrito: ", usuario);
+            logger.debug("Usuario del Carrito: " + JSON.stringify(usuario, null, 2));
 
             mailUsuario = usuario.email;
 
