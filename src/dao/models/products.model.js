@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
 import mongoosePaginate from 'mongoose-paginate-v2';
 
+//import { userCollection } from "./usersModel.js";
+
 export const productCollection = "products";
+
+let userCollection = "users";
 
 const productSchema = new mongoose.Schema({
     title: {
@@ -40,6 +44,11 @@ const productSchema = new mongoose.Schema({
     status: {
         type: Boolean , 
         required: true,
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: userCollection,
+        required: false, 
     }
 
 

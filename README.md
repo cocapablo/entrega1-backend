@@ -13,6 +13,22 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 15
+    - Recuperación de Contraseña
+        - El proceso comienza en la vista de login al presionar el botón "Recuperar Contraseña"
+        - Se implementa la ruta de tipo POST "/api/sessions/reset-password", que recibe a través del body el email del usuario cuya contraseña hay que recuperar
+        - En la clase UserController se implementa el método resetUserPassword que obtiene el mail del usuario del body del request, luego obtiene el usuario de ese mail, luego genera un token a través de JWT con fecha de expiración de 1 hora, y finalmente crea y envía un email con un link a la URL http://localhost:8080/api/sessions/reset-password/${token} (donde token es el token generado con los datos del usuario).
+        - Al hacer click en el link de recuperación, el end point /api/sessions/reset-password/${token} verifica que el token sea válido. Si es inválido redirige a login para realizar todo el proceso de nuevo. Si es válido crea una cookie con el token (con los datos del usuario) y redirige a la vista changePassword que también enviará la cookie con el token al usuario por seguridad
+        - Al cambiar la contraseña se llama a la ruta "/api/sessions/changePassword" que a su vez llama al método UserController.changeUserPassword quien extraerá los datos del usuario de la cookie y el password del body. Se verificará que la nueva contraseña sea distinta a la actual. Si el cambio de contraseña es exitoso se redirige a login
+    - Usuario "premium"
+        - Se modificó el model de products para incluir el campo owner, que es un ObjectId de un usuario
+        - Al devolver en producto si no tiene owner el campo owner se devuelve con el string "admin"
+        - Se implementó el middleware applyp
+        Policies que recibe como parámetro un array de strings con roles de usuario habilitados para realizar una operación
+        - Las operaciones de creación de productos pueden ser realizados por usuarios admin y premium. Este control se realiza con el middleware applyPolicies
+        - Las operaciones de actualización y eliminación de productos pueden ser realizadas por usuarios admin. Los usuarios premium solo pueden realizar estas operaciones sobre productos que sean owner. Estos últimos controles se realizan en la clase ProductController
+        - Se implementó que un usuario premium no pueda agregar un producto del que es owner a un carrito (este control se realiza en CartController)
+        - Se implementó la ruta con el método PUT "/api/users/premium/:uid" que cambia el role de un usuario de "usuario" a "premium" y viceversa. Si el usuario es "admin" devuelve error
 - Notas de la Entrega Nro 14
     - En el archivo logger.js se implementan los loggers de desarrollo y producción de acuerdo a las especificaciones de la consigna
     - Se crea la variable de entorno ENV (que se lee de los archivos .env.cloud o .env.local según corresponda) que podrá tener los valores "DEV" o "PROD", si el entorno es de desarrollo o producción

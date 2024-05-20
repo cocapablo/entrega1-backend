@@ -37,7 +37,14 @@ export function configurarEntorno(opciones) {
         mongoUrl: process.env.MONGO_URL,
         adminEmail: process.env.ADMIN_EMAIL,
         adminPassword: process.env.ADMIN_PASSWORD,
-        env: process.env.ENV    
+        env: process.env.ENV,    
+        mailingUser : process.env.MAILING_USER,
+        mailingPassword: process.env.MAILING_PASSWORD,
+        mailingHost: process.env.MAILING_HOST,
+        mailingService: process.env.MAILING_SERVICE,
+        jwtCookie: process.env.JWT_COOKIE,
+        jwtSecret: process.env.JWT_SECRET
+
     }
 
     return config;
@@ -53,6 +60,12 @@ export default {
     mongoUrl: config.mongoUrl,
     adminEmail: config.adminEmail,
     adminPassword: config.adminPassword,
-    env: process.env.ENV    
+    env: config.env, 
+    mailingUser : config.mailingUser,
+    mailingPassword: config.mailingPassword,
+    mailingHost: config.mailingHost,
+    mailingService: config.mailingService,
+    jwtCookie: config.jwtCookie,
+    jwtSecret: config.jwtSecret
 
 }

@@ -221,6 +221,16 @@ class UserManager {
 
             }
 
+            //Me fijo que la nueva contraseña sea distinta de la actual
+            let esPasswordValido;
+
+            esPasswordValido = this.#isValidPassword(nuevoPassword, resultado.password);
+
+            if (esPasswordValido === true) {
+                //Es la misma contraseña que la actual
+                throw new Error("ERROR: El Password ingresado es igual al password actual");
+            }
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -374,6 +384,52 @@ class UserManager {
         }
 
         return usuario;    
+    }
+
+    async intercambiarPremiumYUsuario(idUsuario) {
+        let usuario;
+        let nuevoRole = "usuario";
+        let roleUsuario;
+        let nuevoUsuario = null;
+
+        try {
+            usuario = await this.getUserByIdAsync(idUsuario);
+
+            roleUsuario = usuario.role;
+
+            if (roleUsuario === "usuario" || roleUsuario === "premium") {
+                if (roleUsuario === "usuario") {
+                    nuevoRole = "premium";
+                }
+                else {
+                    nuevoRole = "usuario";
+                }
+
+                let cambios = {role: nuevoRole};
+
+                //Cambio el role
+                let resultado = await userModel.updateOne({_id: idUsuario}, cambios);
+
+                if (!resultado) {
+                    throw new Error("Error al actualizar el role del usuario en la Base de Datos");
+                }
+
+                //Creo el nuevoUsuario
+                nuevoUsuario = {
+                    ...usuario,
+                    role: nuevoRole
+                }
+            }
+            else {
+                throw new Error("El rol del usuario no es premium ni usuario");
+            }
+            
+        }
+        catch (error) {
+            throw (error);
+        }
+
+        return nuevoUsuario;
     }
 
 }

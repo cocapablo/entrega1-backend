@@ -3,6 +3,8 @@
 <form class="container my-5" method="post" action="/api/sessions/login">
     {{#if error}}
     <label class="form-control bg-warning text-black fw-bold" id="idError">{{mensajeError}}</label>
+    {{else}}
+    <label class="form-control bg-warning text-black fw-bold" id="idError" style="display: none;"></label>
     {{/if}} 
        
     <div class="form-group row my-2">
@@ -29,9 +31,11 @@
         <div id="botones" className="col-md-12">
             <button class="w-15 btn btn-danger" id="btnRegistrarse"><a href="/register" class="link-light">Registrarse</a></button>
             <button class="w-15 btn btn-danger" id="btnRegistrarseGitHub"><a href="/api/sessions/github" class="link-light">Registrarse con GitHub</a></button>
-            <button class="w-15 btn btn-success" id="btnChangePassword"><a href="/changePassword" class="link-light">Restaurar Contraseña</a></button>
+            {{!-- <button class="w-15 btn btn-success" id="btnChangePassword"><a href="/changePassword" class="link-light">Restaurar Contraseña</a></button> --}}
+            <button class="w-15 btn btn-success" id="btnChangePassword" onclick="restaurarPasswordDeForm()">Restaurar Contraseña</a></button>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/login.js"></script>

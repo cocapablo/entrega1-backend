@@ -3,6 +3,11 @@
 import { cartService } from "../repositories/index.js";
 import { ProductController } from "./products.controller.js";
 
+//Custom Errors
+import CustomError from "../services/errors/CustomError.js";
+import EErrors from "../services/errors/enums.js";
+
+
 import logger from "../services/logs/logger.js";
 
 export class CartController {
@@ -101,10 +106,62 @@ export class CartController {
     async addProductToCart(req, res, next) {
         let idCarrito;
         let idProducto;
+        let usuario = null;
+
+        //Obtengo el usuario de la session actual
+        req.session && req.session.user && (usuario = req.session.user);
+
+        if (!usuario) {
+            try { 
+                CustomError.createError({
+                    name: "Error agregando un Producto a el Carrito",
+                    cause: "No hay ningún usuario logueado en la sesión",
+                    message: "ERROR: No hay ningún usuario logueado en la sesión",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                return next(err);
+            }
+        }
         
         if (req.params.cid && req.params.pid) {
             idCarrito = req.params.cid;
             idProducto = req.params.pid;
+
+            //Me fijo si el usuario está autorizado para agregar el producto al carrito
+            if (usuario.role === "premium") {
+                //Me fijo si el usuario es el owner del producto
+                try {
+                    let productoActual = await this.#productController.getService().getProductByIdAsync(idProducto);
+
+                    if (productoActual.owner === usuario.id) {
+                        try { 
+                            CustomError.createError({
+                                name: "Error agregando un Producto a el Carrito",
+                                cause: "El usuario es el owner del producto y no puede agregarlo al carrito",
+                                message: "ERROR: El usuario es el owner del producto y no puede agregarlo al carrito",
+                                code: EErrors.INVALID_TYPES_ERROR
+                            })  
+                        } catch (err) {
+                            return next(err);
+                        }                    
+                    }
+                }
+                catch (error) {
+                    try { 
+                        CustomError.createError({
+                            name: "Error agregando un Producto a el Carrito",
+                            cause: "Error en la Base de Datos",
+                            message: "ERROR: " + error.message,
+                            code: EErrors.DATABASE_ERROR
+                        })  
+                    } catch (err) {
+                        return next(err);
+                    } 
+                    
+                }
+            }
+
             this.#cartService.addProductToCarritoAsync(idCarrito, idProducto).then(carritoAgregado => {
                 res.json({
                     status: "accepted",

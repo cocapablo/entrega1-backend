@@ -35,7 +35,8 @@ class ProductManager {
                         code: producto.code,
                         stock: producto.stock,
                         category: producto.category,
-                        status: producto.status
+                        status: producto.status,
+                        owner: producto.owner ? producto.owner.toString() : "admin"
 
                     }
                 )
@@ -75,7 +76,8 @@ class ProductManager {
                         code: producto.code,
                         stock: producto.stock,
                         category: producto.category,
-                        status: producto.status
+                        status: producto.status,
+                        owner: producto.owner ? producto.owner.toString() : "admin"
 
                     }
                 )
@@ -97,7 +99,7 @@ class ProductManager {
         return this.#products;
     }
 
-    async addProductAsync({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1, category = "", status = true}) {
+    async addProductAsync({title = "", description = "", price = -1, thumbnail = "", code = "", stock = -1, category = "", status = true, owner}) {
         let newProduct;
 
         try {
@@ -188,7 +190,8 @@ class ProductManager {
                 code,
                 stock,
                 category,
-                status  
+                status,
+                owner  
             }
 
             let resultado = await productModel.create(newProduct);
@@ -277,6 +280,7 @@ class ProductManager {
             productoModificado.stock && (cambiosProducto.stock = productoModificado.stock);
             productoModificado.category && (cambiosProducto.category = productoModificado.category);
             productoModificado.status && (cambiosProducto.status = productoModificado.status);
+            productoModificado.owner && (productoModificado.owner !== "admin") && (cambiosProducto.owner = productoModificado.owner); 
             
             let resultado = await productModel.updateOne({_id: productoModificado.id}, cambiosProducto);
 
@@ -327,7 +331,8 @@ class ProductManager {
                 code: producto.code,
                 stock: producto.stock,
                 category: producto.category,
-                status: producto.status
+                status: producto.status,
+                owner: producto.owner ? producto.owner.toString() : "admin"
 
             }
 
@@ -409,7 +414,8 @@ class ProductManager {
                         code: producto.code,
                         stock: producto.stock,
                         category: producto.category,
-                        status: producto.status
+                        status: producto.status,
+                        owner: producto.owner ? producto.owner.toString() : "admin"
 
                     }
                 )

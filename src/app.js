@@ -16,6 +16,7 @@ import productsRouter from "./routes/products.router.js";
 import cartsRouter from "./routes/carts.router.js";
 import viewsRouter from "./routes/views.router.js";
 import sessionsRouter from "./routes/sessions.router.js";
+import usersRouter from "./routes/users.router.js";
 import logsRouter from "./routes/logs.router.js";
 
 import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
@@ -113,6 +114,7 @@ app.use(passport.session());
 app.use("/", sessionsRouter);
 app.use("/", productsRouter);
 app.use("/", cartsRouter);
+app.use("/", usersRouter);
 app.use("/", viewsRouter);
 app.use("/", logsRouter);
 

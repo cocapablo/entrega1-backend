@@ -114,3 +114,85 @@ export function usuarioEsUsuario(req, res, next) {
     return next();
 }
 
+export function usuarioEsPremium(req, res, next) {
+    let usuario = null;
+    let rolUsuario = null;
+    
+    req.session && req.session.user && (usuario = req.session.user);
+    
+    if (!usuario) {
+        logger.warning("El usuario no está logueado");
+        return res.status(401).send({
+            status: "error",
+            error: "El usuario no está logueado",
+            message: "El usuario no está logueado"
+        })
+    }
+
+    //El usuario está logueado: Me fijo si es premium
+    usuario.role && (rolUsuario = usuario.role);
+
+    if (!rolUsuario) {
+        logger.warning("El usuario no tiene privilegios para realizar la operación");
+        return res.status(403).send({
+            status: "error",
+            error: "El usuario no tiene privilegios para realizar la operación",
+            message: "El usuario no tiene privilegios para realizar la operación"
+        })
+    }
+
+    if (rolUsuario !== "premium") {
+        logger.warning("El usuario no tiene privilegios para realizar la operación");
+        return res.status(403).send({
+            status: "error",
+            error: "El usuario no tiene privilegios para realizar la operación",
+            message: "El usuario no tiene privilegios para realizar la operación"
+        })
+    }
+
+    //Es premium: Lo dejo seguir
+    return next();
+}
+
+export function applyPolicies(roles) {
+    return (req, res, next) => {
+        let usuario = null;
+        let rolUsuario = null;
+        
+        req.session && req.session.user && (usuario = req.session.user);
+        
+        if (!usuario) {
+            logger.warning("El usuario no está logueado");
+            return res.status(401).send({
+                status: "error",
+                error: "El usuario no está logueado",
+                message: "El usuario no está logueado"
+            })
+        }
+
+        //El usuario está logueado: Me fijo si tiene alguno de los roles especificados en el array roles
+        usuario.role && (rolUsuario = usuario.role);
+
+        if (!rolUsuario) {
+            logger.warning("El usuario no tiene privilegios para realizar la operación");
+            return res.status(403).send({
+                status: "error",
+                error: "El usuario no tiene privilegios para realizar la operación",
+                message: "El usuario no tiene privilegios para realizar la operación"
+            })
+        }
+
+        if (!roles.includes(rolUsuario)) {
+            logger.warning("El usuario no tiene privilegios para realizar la operación");
+            return res.status(403).send({
+                status: "error",
+                error: "El usuario no tiene privilegios para realizar la operación",
+                message: "El usuario no tiene privilegios para realizar la operación"
+            })
+        }
+        
+        //El role del usuario está incluído en los roles permitidos: lo dejo seguir
+        return next();
+    }
+}
+

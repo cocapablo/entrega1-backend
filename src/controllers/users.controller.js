@@ -7,6 +7,10 @@ import UserDTO from "../dao/DTOs/user.dto.js";
 import passport from "passport";
 import logger from "../services/logs/logger.js";
 
+import { generateToken, validateToken } from "../services/jwt/jwtUtils.js";
+import MailingService from "../services/mailing/mailing.js";
+import config from "../config/config.js";
+
 export class UserController {
     #userService;
     #cartController;   
@@ -23,6 +27,10 @@ export class UserController {
         this.userGitHubSuccesfully = this.userGitHubSuccesfully.bind(this);
         this.userGitHubFailure = this.userGitHubFailure.bind(this);
         this.getCurrentUser = this.getCurrentUser.bind(this);
+        this.resetUserPassword = this.resetUserPassword.bind(this);
+        this.resetUserPasswordToken = this.resetUserPasswordToken.bind(this);
+        this.intercambiarPremiumYUsuario = this.intercambiarPremiumYUsuario.bind(this);
+        
     }
 
     getService() {
@@ -30,9 +38,41 @@ export class UserController {
     }
 
     async changeUserPassword(req, res) {
-    
+        let token = null;
+        let decodedToken = null;
+        let email;
+
+        //Obtengo los datos del usuario del token
+        req.cookies && req.cookies[config.jwtCookie] && (token = req.cookies[config.jwtCookie]);
+        if (!token) {
+            let mensajeError = "No se proporcionaron correctamente los datos del usuario. Debe realizar el proceso nuevamente"; 
+            return res.redirect("/login?error=true&mensajeError=" + mensajeError); 
+        }
+
         try {
-            const {email, password} = req.body;
+            decodedToken = validateToken(token);
+        
+            if (!decodedToken) {
+                let mensajeError = "Error al recuperar contraseña. Debe realizar el proceso nuevamente"; 
+                return res.redirect("/login?error=true&mensajeError=" + mensajeError); 
+            }
+        }
+        catch (error) {
+            logger.error("Error en User: " + error.toString());
+            let mensajeError = "El tiempo de recuperación de contraseña ha expirado. Debe realizar el proceso nuevamente"; 
+            return res.redirect("/login?error=true&mensajeError=" + mensajeError);     
+        }
+
+        //Obtengo el email del usuario
+        
+        decodedToken.email && (email = decodedToken.email);
+        if (!email) {
+            let mensajeError = "No se proporcionaron correctamente los datos del usuario. Debe realizar el proceso nuevamente"; 
+            return res.redirect("/login?error=true&mensajeError=" + mensajeError); 
+        }
+
+        try {
+            const {password} = req.body;
     
             let nuevoUsuario = await this.#userService.changePasswordAsync(email, password);
     
@@ -168,5 +208,148 @@ export class UserController {
         logger.debug("UsuarioDTO: " + JSON.stringify(usuarioDTO, null, 2));
 
         res.send({user: usuarioDTO});
+    }
+
+    //Recupero de contraseña
+    async resetUserPassword(req, res) {
+        let email = null;
+        let usuario = null;
+
+        //Paso 1: cheque que me hayan enviado un email
+        req.body && req.body && req.body.email && (email = req.body.email);
+
+        if (!email) {
+            let mensajeError = "Debe ingresar un email";
+
+            return res.redirect("/login?error=true&mensajeError=" + mensajeError); 
+        }
+    
+        
+        try {
+            //Paso 2: Obtengo el usuario por su email
+            usuario = await this.#userService.getUserAsync(email);
+
+            //Paso 3: Genrro el token con los datos del usuario
+            const token = generateToken(usuario);
+
+            logger.debug("Token generado: " + token);
+
+            //Generar el mail de recuperacion
+            const correoOptions = {
+                from : "SuperStore",
+                to: usuario.email,
+                subject: "Recuperación de Contraseña",
+                html: `<head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+                            <title>Productos Pablo Coca</title>
+                        </head>
+                        <body>
+                            <h1 style="text-align: center;"> SuperStore - Recuperar Contraseña </h1>
+                            <p> Haga click en el siguiente enlace para recuperar la contraseña: </p>
+                            <button class="w-15 btn btn-success">
+                            <a href="http://localhost:8080/api/sessions/reset-password/${token}" 
+                            Recuperar Contraseña 
+                            </a>
+                            Recuperar Contraseña 
+                            </button>
+
+                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+                        </body>
+                        `
+                }
+
+            const mailer = new MailingService();    
+        
+            await mailer.sendSimpleMail(correoOptions);
+        
+        }
+        catch (error) {
+            //Me fijo que tipo de error me devolvieron
+            let oError;
+            let mensajeError = "ERROR";
+    
+            try {
+                oError = JSON.parse(error.message);
+    
+                mensajeError = oError.error;
+
+                logger.error(mensajeError);
+    
+                res.status(oError.status).redirect("/login?error=true&mensajeError=" + mensajeError);
+            }
+            catch (e) {
+                //No es un JSON
+                mensajeError = error.message;
+                logger.error(mensajeError);
+                res.redirect("/login?error=true&mensajeError=" + mensajeError);
+            }
+    
+            
+        }
+    
+        res.status(200).send({ status: "success", payload: "Mail de recuperar Contraseña enviado" });
+    
+    }
+  
+    async resetUserPasswordToken(req, res) {
+        const token = req.params.token;
+        let decodedToken = null;
+        
+        try {
+            decodedToken = validateToken(token);
+        
+            if (!decodedToken) {
+                let mensajeError = "Error al recuperar contraseña. Debe realizar el proceso nuevamente"; 
+                return res.redirect("/login?error=true&mensajeError=" + mensajeError); 
+            }
+        }
+        catch (error) {
+            logger.error("Error en resetUserPasswordToken: " + error.toString());
+            let mensajeError = "El tiempo de recuperación de contraseña ha expirado. Debe realizar el proceso nuevamente"; 
+            return res.redirect("/login?error=true&mensajeError=" + mensajeError);     
+        }
+    
+    
+        //Token valido: redirigir a un lugar donde resetear la contraseña
+        //console.log("decodedtoken: ", decodedToken);
+
+
+        //Redirecciono a pagina de cambio de contraseña
+        
+        res.cookie(config.jwtCookie, token, {maxAge: 60 * 60 * 1000, httpOnly: true}).redirect("/changePassword");
+        
+    }
+  
+    async intercambiarPremiumYUsuario(req, res, next) {
+        let nuevoUsuario;
+        let idUsuario;
+
+        //Obtengo el idUsuario
+        req.params && req.params.uid && (idUsuario = req.params.uid)
+
+        if (!idUsuario) {
+            let mensaje = "No se especificó un idUsuario";
+            return res.status(401).send({status: "error", error: mensaje});
+        }
+
+        //Cambio el role del usuario
+        try {
+            nuevoUsuario = await this.#userService.intercambiarPremiumYUsuario(idUsuario);
+        }
+        catch (error) {
+            return res.status(401).send({status: "error", message: error.toString()});  
+        }
+
+               
+        res.send(
+            {
+                status: "success",
+                message: "El role del usuario fué modificado con éxito",
+                payload: nuevoUsuario
+            }
+        )
+
     }
 }

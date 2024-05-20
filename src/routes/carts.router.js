@@ -8,7 +8,7 @@ import { TicketController } from "../controllers/tickets.controller.js";
 import { UserController } from "../controllers/users.controller.js";
 
 //Middlewares
-import { usuarioEsUsuario } from "../middlewares/sessionMiddleware.js";
+import { usuarioEsUsuario, applyPolicies } from "../middlewares/sessionMiddleware.js";
 
 const router = express.Router();
 
@@ -23,15 +23,15 @@ router.get("/api/carts/:cid", cartController.getProductsFromCart);
 
 router.post("/api/carts", cartController.createCart);
 
-router.post("/api/carts/:cid/products/:pid", usuarioEsUsuario, cartController.addProductToCart);
+router.post("/api/carts/:cid/products/:pid", applyPolicies(["usuario", "premium"]), cartController.addProductToCart);
 
-router.put("/api/carts/:cid", usuarioEsUsuario, cartController.setProductsToCart);
+router.put("/api/carts/:cid", applyPolicies(["usuario", "premium"]), cartController.setProductsToCart);
 
-router.delete("/api/carts/:cid", usuarioEsUsuario, cartController.deleteAllProductsFromCart);
+router.delete("/api/carts/:cid", applyPolicies(["usuario", "premium"]), cartController.deleteAllProductsFromCart);
 
-router.delete("/api/carts/:cid/products/:pid", usuarioEsUsuario, cartController.deleteProductFromCart);
+router.delete("/api/carts/:cid/products/:pid", applyPolicies(["usuario", "premium"]), cartController.deleteProductFromCart);
 
-router.put("/api/carts/:cid/products/:pid", usuarioEsUsuario, cartController.setProductQuantityFromCart);
+router.put("/api/carts/:cid/products/:pid", applyPolicies(["usuario", "premium"]), cartController.setProductQuantityFromCart);
 
 router.post("/api/carts/:cid/purchase", ticketController.createTicket);
 

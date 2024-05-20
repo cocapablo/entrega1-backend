@@ -6,6 +6,8 @@ import { ProductController } from "../controllers/products.controller.js";
 
 //Middlewares
 import { usuarioEsAdministrador } from "../middlewares/sessionMiddleware.js";
+import { applyPolicies } from "../middlewares/sessionMiddleware.js";
+
 
 const router = express.Router();
 const productController = new ProductController();
@@ -21,11 +23,11 @@ router.get("/api/products", productController.getProductsPaginated);
 
 router.get("/api/products/:pid", productController.getProduct);
 
-router.post("/api/products", usuarioEsAdministrador, productController.createProduct);
+router.post("/api/products", applyPolicies(["premium", "admin"]), productController.createProduct);
 
-router.put("/api/products/:pid", usuarioEsAdministrador, productController.updateProduct);
+router.put("/api/products/:pid", applyPolicies(["premium", "admin"]), productController.updateProduct);
 
-router.delete("/api/products/:pid", usuarioEsAdministrador, productController.deleteProduct);
+router.delete("/api/products/:pid", applyPolicies(["premium", "admin"]), productController.deleteProduct);
 
 router.get("/api/mockingproducts", productController.getMockingProducts);
 

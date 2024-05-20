@@ -12,6 +12,9 @@ import UserDTO from "../dao/DTOs/user.dto.js";
 
 import logger from "../services/logs/logger.js";
 
+import config from "../config/config.js";
+import { validateToken } from "../services/jwt/jwtUtils.js";
+
 //const prodManager = new ProductManager("productos.json");
 //const cartManager = new CarritoManager("carrito.json", prodManager);
 
@@ -238,6 +241,11 @@ router.get("/profile", usuarioLogueado, (req, res) => {
 router.get("/changePassword", usuarioNoLogueado, (req, res) => {
     let error = false;
     let mensajeError = "";
+    let emailUsuario = "";
+    let token = null;
+    let decodedToken = null;
+        
+        
 
     req.query && req.query.error && (error = (req.query.error === "true" ? true : false));
     //console.log("Error: ", error);
@@ -245,7 +253,32 @@ router.get("/changePassword", usuarioNoLogueado, (req, res) => {
     //console.log("Mensaje Error: ", mensajeError);
     logger.warning(mensajeError);
 
-    res.render("changePassword", {error, mensajeError});
+    //Obtengo los datos del usuario del token
+    req.cookies && req.cookies[config.jwtCookie] && (token = req.cookies[config.jwtCookie]);
+    if (!token) {
+        let mensajeError = "No se proporcionaron correctamente los datos del usuario. Debe realizar el proceso nuevamente"; 
+        return res.redirect("/login?error=true&mensajeError=" + mensajeError); 
+    }
+
+    try {
+        decodedToken = validateToken(token);
+    
+        if (!decodedToken) {
+            let mensajeError = "Error al recuperar contraseña. Debe realizar el proceso nuevamente"; 
+            return res.redirect("/login?error=true&mensajeError=" + mensajeError); 
+        }
+    }
+    catch (error) {
+        logger.error("Error en changePassword: " + error.toString());
+        let mensajeError = "El tiempo de recuperación de contraseña ha expirado. Debe realizar el proceso nuevamente"; 
+        return res.redirect("/login?error=true&mensajeError=" + mensajeError);     
+    }
+
+    //Obtengo el email del usuario
+    //req.query && req.query.email && (emailUsuario = req.query.email);
+    decodedToken.email && (emailUsuario = decodedToken.email);
+
+    res.cookie(config.jwtCookie, token, {maxAge: 60 * 60 * 1000, httpOnly: true}).render("changePassword", {error, mensajeError, email: emailUsuario});
 })
 
 

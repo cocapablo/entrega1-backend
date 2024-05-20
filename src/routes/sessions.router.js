@@ -29,6 +29,14 @@ router.get("/api/sessions/failgithub", userController.userGitHubFailure);
 
 router.get("/api/sessions/current", userController.getCurrentUser);
 
+//Rutas para recuperar la contraseña
+router.post("/api/sessions/reset-password", userController.resetUserPassword);
+
+router.get("/api/sessions/reset-password/:token", userController.resetUserPasswordToken);
+
+
+
+
 //Endpoints sin Passport
 /* router.post("/api/sessions/register", async (req, res) => {
     try {

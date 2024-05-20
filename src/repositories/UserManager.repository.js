@@ -11,6 +11,7 @@ class UserManagerRepository {
         this.getUserAsync = this.getUserAsync.bind(this);
         this.getUserByIdAsync = this.getUserByIdAsync.bind(this);
         this.getUsuarioDeCarritoAsync = this.getUsuarioDeCarritoAsync.bind(this);
+        this.intercambiarPremiumYUsuario = this.intercambiarPremiumYUsuario.bind(this);
     }
 
     //Metodos
@@ -41,6 +42,10 @@ class UserManagerRepository {
 
     async getUsuarioDeCarritoAsync(idCarrito) {
         return await this.#userManagerDAO.getUsuarioDeCarritoAsync(idCarrito);   
+    }
+
+    async intercambiarPremiumYUsuario(idUsuario) {
+        return await this.#userManagerDAO.intercambiarPremiumYUsuario(idUsuario);
     }
 }
 
