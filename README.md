@@ -19,6 +19,7 @@ Pablo Coca
     - Se crean los archivos carts.yaml , products.yaml y ticket.yaml
     - En cada archivo yaml se describe y documenta cada api de su respectiva entidad
     - En ticket.yaml se documenta la entidad ticket y se describe la api /api/carts/{cid}/purchase. Esta Api aparece sin embargo bajo el tag Cart (no tag Ticket) porque la ruta pertenece al router de carts
+    - Se crea la ruta /api/docs donde se visualiza Swagger
 - Notas de la Entrega Nro 15
     - Recuperación de Contraseña
         - El proceso comienza en la vista de login al presionar el botón "Recuperar Contraseña"
