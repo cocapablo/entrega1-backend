@@ -1,0 +1,215 @@
+paths:
+  /api/products/:
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Todos los productos obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#components/schemas/Product'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    post:
+      summary: Crea un nuevo producto. Se necesitan permisos de admin o premium
+      tags:
+        - Products
+      responses:
+        "200":
+          description: El producto fué creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                  payload:   
+                    $ref: '#components/schemas/Product'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+
+  /api/products/{pid}:
+    get:
+      summary: Obtiene el producto de _id = pid
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se desea solicitar
+          schema: 
+            $type: string
+      responses:
+        "200":
+          description: El producto fué obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Product'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    put:
+      summary: Actualizar el producto de _id = uid
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se desea actualizar
+          schema: 
+            $type: string
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#components/requestBodies/updateProduct'
+      responses:
+        "200":
+          "200":
+          description: El producto fué actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/Product'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    delete:
+      summary: Borrar el producto de _id = uid
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se desea eliminar
+          schema: 
+            $type: string
+      responses:
+        "200":
+          description: El producto fué eliminado correctamente
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+  /api/mockingproducts/:
+    get:
+      summary: Obtiene productos de un mock
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Todos los productos obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#components/schemas/Product'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id: 
+          type: ObjectId
+          description: Id del producto generado por la base de datos
+        title:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number float
+          description: Precio del producto
+        thumbnail:
+          type: string
+          description: URL de la imagen del producto
+        code:
+          type: string
+          description: código del producto
+        stock:
+          type: integer
+          description: Stock del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Status del producto
+        owner:
+          type: ObjectId
+          description: Id del dueño del producto 
+      example:
+        id: ObjectId('662f27812900734f8eeba930')
+        title: Anacondas
+        description: Largas y de mal caracter
+        price: 1200
+        thumbnail: https://www.lifeder.com/wp-content/uploads/2019/11/ejemplar-de-Boa-constrictor-foto-min-1024x684.jpg
+        code: ANAC 
+        stock: 3
+        category: Mascotas 
+        status: true 
+        owner: ObjectId('6618c3bbd85edbc649514a85')
+  requestBodies:
+    updateProduct:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number float
+          description: Precio del producto
+        thumbnail:
+          type: string
+          description: URL de la imagen del producto
+        code:
+          type: string
+          description: código del producto
+        stock:
+          type: integer
+          description: Stock del producto
+        category:
+          type: string
+          description: Categoría del producto
+        status:
+          type: boolean
+          description: Status del producto
+        owner:
+          type: ObjectId
+          description: Id del dueño del producto 
+      example:
+        title: Anacondas
+        description: Largas y de mal caracter
+        price: 1200
+        thumbnail: https://www.lifeder.com/wp-content/uploads/2019/11/ejemplar-de-Boa-constrictor-foto-min-1024x684.jpg
+        code: ANAC 
+        stock: 3
+        category: Mascotas 
+        status: true 
+        owner: ObjectId('6618c3bbd85edbc649514a85')

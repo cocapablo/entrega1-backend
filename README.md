@@ -13,6 +13,12 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 16
+    - Se implementa documentación de las apis de products y carts utilizando Swagger
+    - Se crea la carpeta src/docs con las subcarpetas carts, products y tickets
+    - Se crean los archivos carts.yaml , products.yaml y ticket.yaml
+    - En cada archivo yaml se describe y documenta cada api de su respectiva entidad
+    - En ticket.yaml se documenta la entidad ticket y se describe la api /api/carts/{cid}/purchase. Esta Api aparece sin embargo bajo el tag Cart (no tag Ticket) porque la ruta pertenece al router de carts
 - Notas de la Entrega Nro 15
     - Recuperación de Contraseña
         - El proceso comienza en la vista de login al presionar el botón "Recuperar Contraseña"

@@ -121,6 +121,8 @@ export class TicketController {
             //console.log("Usuario del Carrito: ", usuario);
             logger.debug("Usuario del Carrito: " + JSON.stringify(usuario, null, 2));
 
+            //Nota: ¿Debería chequear que el usuario del carrito sea el mismo que está logueado? (para que un usuario no pueda generar un ticket de ningún carrito que no sea el suyo)
+
             mailUsuario = usuario.email;
 
             //Paso 6: Realizo la compra

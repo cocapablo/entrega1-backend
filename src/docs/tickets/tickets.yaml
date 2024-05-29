@@ -1,0 +1,100 @@
+paths:
+  /api/carts/{cid}/purchase:
+    post:
+      summary: Genera un nuevo ticket con el carrito de _id = cid
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito sobre el que se generará el ticket
+          $type: string
+      responses:
+        "200":
+          description: El ticket se generó correctamente, eso significa que al menos un producto del carrito puedo ser comprado
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: string
+                    description: Si este campo puede tener dos valores. "success" (significa que todos los productos del carrito pudieron ser comprados). "partial-success" significa que al menos un producto pudo ser comprado y que al menos un producto no pudo ser comprado
+                  ticket:
+                    $ref: '#components/schemas/Ticket'
+                  products:
+                    type: array
+                    description: un array de los productos que pudieron ser comprados
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: ObjectId
+                          description: Id del producto
+                        title: 
+                          type: string
+                          description: title del producto
+                        quantity:
+                          type: integer
+                          description: Cantidad del producto en el carrito
+                        price:
+                          type: number float
+                          description: el precio del producto con el que fué vendido
+                  rejectedProducts:
+                    type: array
+                    description: un array de los productos que no pudieron ser comprados
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: ObjectId
+                          description: Id del producto
+                        title: 
+                          type: string
+                          description: title del producto
+                        quantity:
+                          type: integer
+                          description: Cantidad del producto en el carrito
+                        
+
+        "401":
+          description: Error por falta de permisos
+        "404":
+          status: 
+            type: string
+            description: debe contener el texto "ERROR"
+          error: 
+            type: string
+            description: descripción del error 
+        "500":
+          description: Error interno del servidor
+
+
+components:
+  schemas:
+    Ticket:
+      type: object
+      properties:
+        id: 
+          type: ObjectId
+          description: Id del ticket
+        code: 
+          type: string 
+          description: código del ticket
+        purchase_datetime:
+          type: string 
+          format: date-time
+          description: Fecha y hora de creación del ticket
+        amount: 
+          type: number float
+          description: importe total del ticket
+        purchaser: 
+            type: string
+            description: email del cliente que generó el ticket
+      example:
+        id: ObjectId('65ccc7ce8363cc00bfd00fb7')
+        code: 1713601914237
+        purchase_datetime: 2024-04-20T08:31:47.700+00:00
+        amount: 371868
+        purchaser: cocapablo@gmail.com 

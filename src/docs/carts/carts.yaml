@@ -1,0 +1,321 @@
+paths:
+  /api/carts/:
+    get:
+      summary: Obtiene todos los carritos
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: Todos los carritos obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#components/schemas/Cart'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    post:
+      summary: Crea un nuevo carrito. 
+      tags:
+        - Carts
+      responses:
+        "200":
+          description: El carrito fué creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: string
+                    description: Si este campo devuelve "accepted" significa que el carrito se creó correctamente
+                  message:
+                    type: string
+                    description: Mensaje informando el estado de creación del nuevo carrito
+                  nuevoCarrito:
+                    $ref: '#components/schemas/Cart'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+
+  /api/carts/{cid}:
+    get:
+      summary: Obtiene los productos del carrito de _id = cid
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se desea solicitar
+          schema: 
+            $type: string
+      responses:
+        "200":
+          description: La consulta se realizó exitosamente. Devuelve los productos del carrito 
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Product'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    put:
+      summary: Establece los productos del carrito de _id = cid
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito que se desea actualizar
+          schema: 
+            $type: string
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#components/requestBodies/updateProducts'
+      responses:
+        "200":
+          description: Los productos del carrito fueron actualizados correctamente
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: string
+                    description: Si este campo devuelve "accepted" significa que el carrito se actualizó correctamente
+                  message:
+                    type: string
+                    description: Mensaje informando el estado de actualización del nuevo carrito
+                  nuevoCarrito:
+                    $ref: '#components/schemas/Cart'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    delete:
+      summary: Borrar todos los productos del carrito de _id = uid
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito cuyos productos se desean eliminar
+          schema: 
+            $type: string
+      responses:
+        "200":
+          description: Los productos del carrito fueron actualizados correctamente
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: string
+                    description: Si este campo devuelve "accepted" significa que los productos del carrito fueron eliminados correctamente
+                  message:
+                    type: string
+                    description: Mensaje informando el estado de actualización del carrito
+                  nuevoCarrito:
+                    $ref: '#components/schemas/Cart'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+
+  /api/carts/{cid}/products/{pid}:
+    post:
+      summary: Agrega el producto de id = pid al carrito de id = cid
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito al que agregar el producto
+          schema: 
+            $type: string
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se va a agregar
+          schema:
+            $type: string
+      responses:
+        "200":
+          description: El producto fué agregado al carrito correctamente
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: string
+                    description: Si este campo devuelve "accepted" significa que el producto fué agregado al carrito correctamente
+                  message:
+                    type: string
+                    description: Mensaje informando el estado de actualización del carrito
+                  nuevoCarrito:
+                    $ref: '#components/schemas/Cart'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    put:
+      summary: Establece la cantidad del producto de id = pid en el carrito de id = cid
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito al que configurar la cantidad del producto
+          schema: 
+            $type: string
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se va a configurar la cantidad
+          schema:
+            $type: string
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#components/requestBodies/quantityOfProduct'
+      responses:
+        "200":
+          description: La cantidad del producto del carrito fueron actualizados correctamente
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: string
+                    description: Si este campo devuelve "accepted" significa que el carrito se actualizó correctamente
+                  message:
+                    type: string
+                    description: Mensaje informando el estado de actualización del nuevo carrito
+                  nuevoCarrito:
+                    $ref: '#components/schemas/Cart'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+    delete:
+      summary: Borra el producto de id = pid del carrito de id = cid
+      tags:
+        - Carts
+      parameters:
+        - name: cid
+          in: path
+          required: true
+          description: id del carrito del que eliminar el producto
+          schema: 
+            $type: string
+        - name: pid
+          in: path
+          required: true
+          description: id del producto que se va a eliminar del carrito
+          schema:
+            $type: string
+      responses:
+        "200":
+          description: El producto fué eliminado del carrito correctamente
+          content:
+            application/json:
+              schema:
+                type: object 
+                properties:
+                  status:
+                    type: string
+                    description: Si este campo devuelve "accepted" significa que el prodcuto fué eliminado del carrito correctamente
+                  message:
+                    type: string
+                    description: Mensaje informando el estado de actualización del carrito
+                  nuevoCarrito:
+                    $ref: '#components/schemas/Cart'
+        "401":
+          description: Error por falta de permisos
+        "500":
+          description: Error interno del servidor
+  
+components:
+  schemas:
+    ProductFromCart:
+      type: object
+      properties:
+        id: 
+          type: ObjectId
+          description: Id del producto
+        quantity:
+          type: integer
+          description: Cantidad del producto en el carrito
+
+    Cart:
+      type: object
+      properties:
+        id: 
+          type: ObjectId
+          description: Id del carrito generado por la base de datos
+        products: 
+          type: array
+          description: Array de productos y sus cantidades en el carrito
+          items:
+            type: object
+            properties:
+              _id:
+                type: ObjectId
+                description: Id generado por la base de datos
+              id: 
+                type: ObjectId
+                description: Id del producto
+              quantity:
+                type: integer
+                description: Cantidad del producto en el carrito
+      example:
+        id: ObjectId('65ccc7ce8363cc00bfd00fb7')
+        products: 
+          -  _id: ObjectId('65ddeb2f7e893f5782fcd4be')   
+             id: ObjectId('65c8b6b3075be6d7105d12e6')
+             quantity: 50
+          -  _id: ObjectId('65ddeb2f7e893f5782fcd4c2')   
+             id: ObjectId('65d2ae867315cb3a8ae724fb')
+             quantity: 1000   
+ 
+  requestBodies:
+    updateProducts:
+      schema:
+        type: array
+        items:
+          $ref: '#components/schemas/ProductFromCart'
+      example:
+      -   id: 65c8b6b3075be6d7105d12e6
+          quantity: 50
+      -   id: 65ddeb2f7e893f5782fcd4c2 
+          quantity: 456
+
+    quantityOfProduct:
+      schema:
+        type: object
+        properties:
+          quantity:
+          type: integer
+          description: Cantidad del producto a agregar al carrito
+      example:
+        quantity: 500   

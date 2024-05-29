@@ -36,6 +36,11 @@ import config from "./config/config.js";
 
 import logger from "./services/logs/logger.js";
 
+import  __dirname  from "./services/path/pathUtils.js";
+
+import { swaggerEspec } from "./config/docConfig.js";
+import swaggerUi from "swagger-ui-express";
+
 
 
 //console.log("Config", config);
@@ -46,10 +51,11 @@ const port = config.port || 8080;
 const app = express();
 
 //Directorios
-const __filename = fileURLToPath(import.meta.url);
+//const __filename = fileURLToPath(import.meta.url);
 //console.log("Filename: ", __filename);
-logger.debug("Filename: " + __filename);
-let __dirname = path.dirname(__filename); 
+//logger.debug("Filename: " + __filename);
+
+//let __dirname = path.dirname(__filename); 
 
 //Middlewares
 //Logger Middleware
@@ -117,6 +123,8 @@ app.use("/", cartsRouter);
 app.use("/", usersRouter);
 app.use("/", viewsRouter);
 app.use("/", logsRouter);
+//Definir api para ver documentación
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerEspec));
 
 //Errors Middlewares
 app.use(errorMiddleware);
