@@ -12,4 +12,8 @@ const router = express.Router();
 
 router.put("/api/users/premium/:uid", userController.intercambiarPremiumYUsuario);
 
+router.delete("/api/users/:uid", userController.deleteUser);
+
+router.delete("/api/users", userController.deleteUserByEmail);
+
 export default router;

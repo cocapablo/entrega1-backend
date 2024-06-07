@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import userModel from "../models/usersModel.js";
 import bcrypt from "bcrypt";
+import CustomError from "../../services/errors/CustomError.js";
+import EErrors from "../../services/errors/enums.js";
 
 import logger from "../../services/logs/logger.js";
 
@@ -104,6 +106,135 @@ class UserManager {
 
         return newUser;
 
+
+    }
+
+    async loginAsync(email = "", password = "") {
+        let usuario;
+        let nuevoCarrito;
+
+        try {
+            //Validaciones
+            if (email.trim().length === 0) {
+                throw new Error("ERROR: email vacío");
+            }
+
+            if (password.trim().length === 0) {
+                throw new Error("ERROR: Password vacío");
+            }
+
+            //Busco el usuario en la Base de Datos
+            let resultado = await userModel.findOne({email: email});
+            if (!resultado) {
+                //El Usuario no existe en la Base de Datos
+                let oError = {status: 400,
+                    error: "Usuario inexistente"};
+                let cadenaError = JSON.stringify(oError);
+
+                throw new Error (cadenaError);
+
+            }
+
+            //Me fijo la contraseña
+            let esPasswordValido;
+
+            esPasswordValido = this.#isValidPassword(password, resultado.password);
+            
+            if (esPasswordValido === false) {
+                //Contraseña inválida
+                let oError = {status: 403,
+                error: "Contraseña inválida"};
+                let cadenaError = JSON.stringify(oError);
+
+                throw new Error (cadenaError);
+            }
+
+            //Me fijo si el Usuario ya tiene un Carrito asignado
+            if (resultado.cart) {
+                //El Usuario ya tiene un Carrito asignado: lo elimino. Hago esto porque cada carrito está asociado a una Sesion en particular
+                try {
+                    await this.#cartManager.deleteCarritoAsync(resultado.cart);     
+                }
+                catch (error) {
+                    throw (error);
+                }
+
+            }
+
+            //Creo un nuevo Carrito
+            try {
+                nuevoCarrito = await this.#cartManager.addCarritoAsync();
+                //console.log("Nuevo Carrito", nuevoCarrito);
+            }
+            catch (error) {
+                throw (error);
+            }
+
+            //Seteo el nuevoCarrito en el Usuario en la Base de Datos
+            try {
+                await userModel.updateOne({_id: resultado._id}, {$set : {cart: nuevoCarrito.id}});
+            }
+            catch (error) {
+                throw (error);
+            }
+
+            //Creo usuario
+            usuario = {
+                id: resultado._id.toString(),
+                first_name : resultado.first_name,
+                last_name: resultado.last_name,
+                email : resultado.email,
+                age : resultado.age,
+                role : resultado.role,
+                //Omito el password por ser un dato sensible
+                cart : nuevoCarrito.id
+            }
+            
+        }
+        catch (error) {
+            throw (error);
+        }
+
+        return usuario;
+    }
+
+    async deleteUserAsync(idUsuario) {
+        let resultado;
+
+        try {
+            resultado = await userModel.deleteOne({_id: idUsuario});
+        }
+        catch (error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error eliminando un usuario un Usuario",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        return true;
+
+    }
+
+    async deleteUserByEmailAsync(email) {
+        let resultado;
+
+        try {
+            resultado = await userModel.deleteOne({email: email});
+        }
+        catch (error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error eliminando un usuario un Usuario",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        return true;
 
     }
 

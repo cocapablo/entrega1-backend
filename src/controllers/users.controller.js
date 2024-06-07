@@ -11,6 +11,9 @@ import { generateToken, validateToken } from "../services/jwt/jwtUtils.js";
 import MailingService from "../services/mailing/mailing.js";
 import config from "../config/config.js";
 
+import CustomError from "../services/errors/CustomError.js";
+import EErrors from "../services/errors/enums.js";
+
 export class UserController {
     #userService;
     #cartController;   
@@ -30,6 +33,8 @@ export class UserController {
         this.resetUserPassword = this.resetUserPassword.bind(this);
         this.resetUserPasswordToken = this.resetUserPasswordToken.bind(this);
         this.intercambiarPremiumYUsuario = this.intercambiarPremiumYUsuario.bind(this);
+        this.deleteUser = this.deleteUser.bind(this);
+        this.deleteUserByEmail = this.deleteUserByEmail.bind(this);
         
     }
 
@@ -348,6 +353,76 @@ export class UserController {
                 status: "success",
                 message: "El role del usuario fué modificado con éxito",
                 payload: nuevoUsuario
+            }
+        )
+
+    }
+
+    async deleteUser(req, res, next) {
+        let idUsuario = null;
+        let resultado;
+
+        //Obtengo el idUsuario
+        req.params && req.params.uid && (idUsuario = req.params.uid)
+
+        if (!idUsuario) {
+            CustomError.createError({
+                name: "Error eliminando un Usuario",
+                cause: generateProductErrorInfo(productoModificado),
+                message: "ERROR: idUsuario inválido",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+
+        //Elimino el Usuario
+        try {
+            resultado = await this.#userService.deleteUserAsync(idUsuario);
+        }
+        catch (error) {
+            //Devuelve un Custom Error, así que llamo al Middleware de Errores con error
+            return next(error);
+        }
+
+        //El Usuario se eliminó con éxito       
+        res.send(
+            {
+                status: "success",
+                message: "El usuario fué eliminado con éxito",
+            }
+        )
+
+    }
+
+    async deleteUserByEmail(req, res, next) {
+        let emailUsuario = null;
+        let resultado;
+
+        //Obtengo el email del Usuario
+        req.body && req.body.email && (emailUsuario = req.body.email);
+
+        if (!emailUsuario) {
+            CustomError.createError({
+                name: "Error eliminando un Usuario",
+                cause: generateProductErrorInfo(productoModificado),
+                message: "ERROR: email del usuario inválido",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+
+        //Elimino el Usuario
+        try {
+            resultado = await this.#userService.deleteUserByEmailAsync(emailUsuario);
+        }
+        catch (error) {
+            //Devuelve un Custom Error, así que llamo al Middleware de Errores con error
+            return next(error);
+        }
+
+        //El Usuario se eliminó con éxito       
+        res.send(
+            {
+                status: "success",
+                message: "El usuario fué eliminado con éxito",
             }
         )
 

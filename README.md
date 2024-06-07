@@ -13,6 +13,34 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 17
+    - Se implementan los endpoints DELETE /api/users/:uid (elimina un usuario por su id) y DELETE /api/users (elimina a un usuario por su email, que se pasa en el body).
+    - Testeos con supertest
+        - Se crea el archivo test/supertest.test.js que es donde se ejecutan los testeos
+        - Consideraciones generales:
+            - Se crearán dos ususarios de testeo. Uno con role premium (para crear y actualizar un producto) y otro con role usuario (para operaciones en el carrito con el producto creado previamente)
+            - Se creará un producto de prueba
+            - Como la aplicación utiliza sessions en lugar de jwt, una vez logueados los usuarios se guardarán las cookies de sesion en dos variables
+            - En cada prueba con endpoints que necesiten tener usuarios logueados se enviarán las cookies de sesión (la que corresponda en cada caso)
+            - Al iniciar los testeos se eliminan de la base de datos los usuarios de prueba
+            - Al finalizar los testeos se elimina el producto de prueba y se hace un logout de los usuarios de prueba
+            - MUY IMPORTANTE: para que las pruebas no fallen se extendió el timeout que tienen los testeso de mocha por default. Se estableció un tiempo límite de 20000ms (en lugar de 2000ms que es el tiempo por default). Ese cambio se configuro en package.json en la sección de scripts ("supertest": "mocha test/supertest.test.js --timeout 20000").
+            - El script de testeo se ejecuta con el comando npm run supertest
+        - Testeos implementados
+            - Sessions
+                - POST /api/sessions/register
+                - POST /api/sessions/login
+                - GET /api/sessions/current
+                - PUT /api/users/premium/:uid
+            - Products
+                - POST /api/products
+                - PUT /api/products/:pid
+                - GET /api/products/:pid
+            - Carts
+                - POST /api/carts/:cid/products/:pid
+                - PUT /api/carts/:cid/products/:pid
+                - DELETE /api/carts/:cid/products/:pid
+
 - Notas de la Entrega Nro 16
     - Se implementa documentación de las apis de products y carts utilizando Swagger
     - Se crea la carpeta src/docs con las subcarpetas carts, products y tickets

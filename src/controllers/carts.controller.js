@@ -373,7 +373,7 @@ export class CartController {
             this.#cartService.setProductToCarritoAsync(idCarrito, idProducto, cantidad).then(carritoAgregado => {
                 res.json({
                     status: "accepted",
-                    message: "Producto actalizado en el Carrito correctamente",
+                    message: "Producto actualizado en el Carrito correctamente",
                     nuevoCarrito: carritoAgregado
                 })
             }

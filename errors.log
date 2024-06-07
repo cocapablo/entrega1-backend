@@ -26,3 +26,20 @@ error: Error agregando un Producto a el Carrito: ERROR: El usuario es el owner d
 error: Error agregando un Producto a el Carrito: ERROR: El usuario es el owner del producto y no puede agregarlo al carrito - Dia: 20/5/2024 - Hora: 03:25:40
 error: ERROR: El Password ingresado es igual al password actual - Dia: 20/5/2024 - Hora: 04:55:23
 error: Error en resetUserPasswordToken: TokenExpiredError: jwt expired - Dia: 20/5/2024 - Hora: 04:55:43
+error: TypeError: this[#userService].deleteUserByEmailAsync is not a function - Dia: 6/6/2024 - Hora: 14:46:07
+error: TypeError: this[#userService].deleteUserByEmailAsync is not a function - Dia: 6/6/2024 - Hora: 14:46:51
+error: Error creando un Producto: ERROR: code ya existente - Dia: 6/6/2024 - Hora: 16:23:09
+error: Error creando un Producto: ERROR: code ya existente - Dia: 6/6/2024 - Hora: 16:36:15
+error: Error creando un Producto: ERROR: code ya existente - Dia: 6/6/2024 - Hora: 16:41:02
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:08:44
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:10:37
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:11:14
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:14:50
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:16:23
+error: Error agregando un Producto a el Carrito: ERROR: El usuario es el owner del producto y no puede agregarlo al carrito - Dia: 7/6/2024 - Hora: 01:18:05
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:34:47
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:56:43
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:58:54
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 01:59:54
+error: Error creando un Producto: ERROR: code ya existente - Dia: 7/6/2024 - Hora: 02:04:20
+error: Error devolviendo un Carrito: Not found - Dia: 7/6/2024 - Hora: 02:25:29
