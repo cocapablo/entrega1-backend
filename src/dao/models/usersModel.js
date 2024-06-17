@@ -39,7 +39,18 @@ const userSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: cartCollection,
         required: false 
+    },
+    documents : {
+        type: Array,
+        required: false,
+        default: [],
+        items: {
+            name: String,
+            reference: String
+        }
     }
+
+
     
 })
 

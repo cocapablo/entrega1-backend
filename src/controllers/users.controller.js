@@ -138,7 +138,11 @@ export class UserController {
             let nuevoUsuario = req.user;
             //console.log("Nuevo usuario: ", nuevoUsuario);
             //logger.debug("Nuevo usuario: " + JSON.parse(nuevoUsuario, null, 2));
-    
+            
+            let documentos = [];
+
+            nuevoUsuario.documents && (documentos = nuevoUsuario.documents);
+
             req.session.user = {
                 id: nuevoUsuario.id,
                 first_name: nuevoUsuario.first_name,
@@ -146,7 +150,8 @@ export class UserController {
                 email: nuevoUsuario.email,
                 age: nuevoUsuario.age,
                 role: nuevoUsuario.role,
-                cart: nuevoUsuario.cart
+                cart: nuevoUsuario.cart,
+                documents: documentos
             } 
             res.redirect("/products?limit=6");
         }
@@ -368,7 +373,7 @@ export class UserController {
         if (!idUsuario) {
             CustomError.createError({
                 name: "Error eliminando un Usuario",
-                cause: generateProductErrorInfo(productoModificado),
+                cause: "idUsuario inválido",
                 message: "ERROR: idUsuario inválido",
                 code: EErrors.INVALID_TYPES_ERROR
             });
@@ -403,7 +408,7 @@ export class UserController {
         if (!emailUsuario) {
             CustomError.createError({
                 name: "Error eliminando un Usuario",
-                cause: generateProductErrorInfo(productoModificado),
+                cause: "email del usuario inválido",
                 message: "ERROR: email del usuario inválido",
                 code: EErrors.INVALID_TYPES_ERROR
             });
@@ -423,6 +428,75 @@ export class UserController {
             {
                 status: "success",
                 message: "El usuario fué eliminado con éxito",
+            }
+        )
+
+    }
+
+    async setDocumentsOfUser(req, res, next) {
+        let archivos;
+        let usuario;
+        let idUsuario;
+        let profileFile = null;;
+        let URLarchivo;
+        let pathArchivo;
+        let nombreArchivo;
+        let nuevoUsuario;
+
+        //Obtengo el Usuario
+        req.session && req.session.user && (usuario = req.session.user);
+
+        if (!usuario) {
+            CustomError.createError({
+                name: "Error configurando los documentos de un Usuario",
+                cause: "No hay un Usuario en la Sesion actual",
+                message: "ERROR: No hay un Usuario en la Sesión actual",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+
+        req.files && (archivos = req.files);
+
+        if (!archivos) {
+            CustomError.createError({
+                name: "Error configurando los documentos de un Usuario",
+                cause: "No hay documentos para configurar",
+                message: "ERROR: No hay documentos para configurar",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+
+
+        //Actualizo los documentos
+        try {
+            //Extraigo el Profile y lo preoceso de una manera distinta al resto de los documentos
+            profileFile = archivos.find(archivo => archivo.fieldname === "profile");
+
+            //Proceso el profile, si existe
+            if (profileFile) {
+                //Obtengo el path del archivo (ver si esto lo convierto a una URL o no o como)
+                nombreArchivo = profileFile.filename;
+                pathArchivo = profileFile.path;
+                URLarchivo = "/profiles/" + nombreArchivo;
+
+                console.log("nombreArchivo", nombreArchivo);
+                console.log("pathArchivo", pathArchivo);
+                console.log("URLarchivo", URLarchivo);
+
+                //Configuro el profile en el usuario
+                nuevoUsuario = await this.#userService.setProfileDeUsuarioAsync(idUsuario, URLarchivo); //Por ahora lo dejo con la URL
+            }
+        }
+        catch (error) {
+            //Devuelve un Custom Error, así que llamo al Middleware de Errores con error
+            return next(error);    
+        }
+
+        //El Usuario se actualizó con éxito       
+        res.send(
+            {
+                status: "success",
+                payload: nuevoUsuario
             }
         )
 

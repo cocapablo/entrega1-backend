@@ -3,6 +3,9 @@ import userModel from "../models/usersModel.js";
 import bcrypt from "bcrypt";
 import CustomError from "../../services/errors/CustomError.js";
 import EErrors from "../../services/errors/enums.js";
+import { generateDatabaseErrorInfo } from "../../services/errors/info.js";
+
+
 
 import logger from "../../services/logs/logger.js";
 
@@ -178,6 +181,10 @@ class UserManager {
                 throw (error);
             }
 
+            let documentos = [];
+
+            resultado.documents && (documentos = [...resultado.documents]);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -187,7 +194,9 @@ class UserManager {
                 age : resultado.age,
                 role : resultado.role,
                 //Omito el password por ser un dato sensible
-                cart : nuevoCarrito.id
+                cart : nuevoCarrito.id,
+                //Documents
+                documents : documentos
             }
             
         }
@@ -307,6 +316,10 @@ class UserManager {
                 throw (error);
             }
 
+            let documentos = [];
+
+            resultado.documents && (documentos = [...resultado.documents]);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -316,7 +329,9 @@ class UserManager {
                 age : resultado.age,
                 role : resultado.role,
                 //Omito el password por ser un dato sensible
-                cart : nuevoCarrito.id
+                cart : nuevoCarrito.id,
+                //Documentos
+                documents : documentos
             }
             
         }
@@ -362,6 +377,10 @@ class UserManager {
                 throw new Error("ERROR: El Password ingresado es igual al password actual");
             }
 
+            let documentos = [];
+
+            resultado.documents && (documentos = [...resultado.documents]);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -371,7 +390,9 @@ class UserManager {
                 age : resultado.age,
                 role : resultado.role,
                 //Omito el password por ser un dato sensible
-                cart : resultado.cart
+                cart : resultado.cart,
+                //Documents
+                documents: documentos
             }
 
             //Cambio la contraseña del Usuario
@@ -426,6 +447,10 @@ class UserManager {
 
             }
 
+            let documentos = [];
+
+            resultado.documents && (documentos = [...resultado.documents]);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -435,7 +460,9 @@ class UserManager {
                 age : resultado.age,
                 role : resultado.role,
                 //Omito el password por ser un dato sensible
-                cart : resultado.cart
+                cart : resultado.cart,
+                //Documents
+                documents : documentos
             }
             
         }
@@ -462,6 +489,10 @@ class UserManager {
 
             }
 
+            let documentos = [];
+
+            resultado.documents && (documentos = [...resultado.documents]);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -471,7 +502,9 @@ class UserManager {
                 age : resultado.age,
                 role : resultado.role,
                 //Omito el password por ser un dato sensible
-                cart : resultado.cart
+                cart : resultado.cart,
+                //Documents
+                documents: documentos
             }
             
         }
@@ -497,6 +530,10 @@ class UserManager {
 
             //console.log("Resultado: ", resultado);
 
+            let documentos = [];
+
+            resultado.documents && (documentos = [...resultado.documents]);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -506,7 +543,9 @@ class UserManager {
                 age : resultado.age,
                 role : resultado.role,
                 //Omito el password por ser un dato sensible
-                cart : resultado.cart
+                cart : resultado.cart,
+                //Documents
+                documents : documentos
             }
             
         }
@@ -561,6 +600,56 @@ class UserManager {
         }
 
         return nuevoUsuario;
+    }
+
+    async setProfileDeUsuarioAsync(idUsuario, sURLArchivo) {
+        let usuario;
+        let nuevoUsuario;
+        let documentosActuales = [];
+        let nuevosDocumentos = [];
+        let profile;
+
+        try{
+            usuario = await this.getUserByIdAsync(idUsuario);
+            
+            //Obtengo los documentos actuales del usuario
+            usuario.documents && (documentosActuales = usuario.documents);
+
+            //Saco el profile actual de los documentos actuales (si hay alguno)
+            nuevosDocumentos = documentosActuales.map(documento => documento.name !== "Profile");
+
+            //Creo el nuevo Profile
+            profile = {
+                name: "Profile",
+                reference: sURLArchivo
+            }
+
+            //Agrego el nuevo Profile a nuevosDocumentos
+            nuevosDocumentos.push(profile);
+
+            //Actualizo el usuario en la base de datos
+            let resultado = await userModel.updateOne({_id: idUsuario}, {$set: {documents: nuevosDocumentos}});
+            
+            //Creo el nuevo usuario con los documents actaulizados
+            nuevoUsuario = {
+                ...usuario,
+                documents: nuevosDocumentos
+            }
+            
+        } 
+        catch (error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error actualizando el Profile de un Usuario",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        //Devuelvo el nuevo usuario
+        return nuevoUsuario;
+
     }
 
 }

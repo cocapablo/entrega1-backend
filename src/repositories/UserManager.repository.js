@@ -14,6 +14,7 @@ class UserManagerRepository {
         this.intercambiarPremiumYUsuario = this.intercambiarPremiumYUsuario.bind(this);
         this.deleteUserAsync = this.deleteUserAsync.bind(this);
         this.deleteUserByEmailAsync = this.deleteUserByEmailAsync.bind(this);
+        this.setProfileDeUsuarioAsync = this.setProfileDeUsuarioAsync.bind(this);
     }
 
     //Metodos
@@ -56,6 +57,10 @@ class UserManagerRepository {
 
     async deleteUserByEmailAsync(email) {
         return await this.#userManagerDAO.deleteUserByEmailAsync(email);
+    }
+
+    async setProfileDeUsuarioAsync(idUsuario, sURLArchivo) {
+        return await this.#userManagerDAO.setProfileDeUsuarioAsync(idUsuario, sURLArchivo);
     }
 }
 
