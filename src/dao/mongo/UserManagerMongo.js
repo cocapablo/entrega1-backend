@@ -616,7 +616,7 @@ class UserManager {
             usuario.documents && (documentosActuales = usuario.documents);
 
             //Saco el profile actual de los documentos actuales (si hay alguno)
-            nuevosDocumentos = documentosActuales.map(documento => documento.name !== "Profile");
+            nuevosDocumentos = documentosActuales.filter(documento => documento.name !== "Profile");
 
             //Creo el nuevo Profile
             profile = {

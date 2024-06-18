@@ -16,28 +16,32 @@ const storage = multer.diskStorage({
                 cb(null,`${__dirname}/public/profiles`);  
                 break;  
             default:
-                cb(null,`${__dirname}/../public/img`); //Cambiar esto. Customizarlo de acuerdo al caso o lanzar un error
+                //cb(null,`${__dirname}/../public/img`); //Cambiar esto. Customizarlo de acuerdo al caso o lanzar un error
+                cb(new Error("ERROR en multer: Tipo de Archivo a subir inválido")); //Lanzo un error
                 break;
         }
         
     },
     filename: function(req,file,cb) {
         let tipoArchivo;
-        let usuario = null;
-        let idUsuario = " ";
+        let nombreArchivo;
+        let idUsuario = "desconocido";
 
         tipoArchivo = file.fieldname;
+        nombreArchivo = file.filename;
+
+        console.log("nombre de Archivo original: ", nombreArchivo);
         
-        req.session && req.session.user && (usuario = req.session.user) && (idUsuario = usuario.id);
+        req.params && req.params.uid && (idUsuario = req.params.uid);
     
         switch (tipoArchivo) {
             case "profile":
                 //Foto de perfil del usuario
-                cb(null,`${idUsuario}-profile`);  
+                cb(null, `${idUsuario}-profile.jpg`);  
                 break;  
             default:    
-                cb(null,`${Date.now()}-${file.originalname}`);
-                break
+                cb(new Error("ERROR en multer: Tipo de Archivo a subir inválido")); //Lanzo un error
+                break;
         }
     }
 })

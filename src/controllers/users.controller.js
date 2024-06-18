@@ -35,6 +35,7 @@ export class UserController {
         this.intercambiarPremiumYUsuario = this.intercambiarPremiumYUsuario.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
         this.deleteUserByEmail = this.deleteUserByEmail.bind(this);
+        this.setDocumentsOfUser = this.setDocumentsOfUser.bind(this);
         
     }
 
@@ -435,27 +436,26 @@ export class UserController {
 
     async setDocumentsOfUser(req, res, next) {
         let archivos;
-        let usuario;
         let idUsuario;
-        let profileFile = null;;
+        let profileFile = null;
         let URLarchivo;
         let pathArchivo;
         let nombreArchivo;
         let nuevoUsuario;
 
-        //Obtengo el Usuario
-        req.session && req.session.user && (usuario = req.session.user);
+        //Obtengo el idUsuario
+        req.params && req.params.uid && (idUsuario = req.params.uid);
 
-        if (!usuario) {
+        if (!idUsuario) {
             CustomError.createError({
                 name: "Error configurando los documentos de un Usuario",
-                cause: "No hay un Usuario en la Sesion actual",
-                message: "ERROR: No hay un Usuario en la Sesión actual",
+                cause: "No se pasó un idUsuario como parámetro",
+                message: "ERROR: No se pasó un idUsuario como parámetro",
                 code: EErrors.INVALID_TYPES_ERROR
             });
         }
 
-        req.files && (archivos = req.files);
+        req.files && req.files && (archivos = req.files);
 
         if (!archivos) {
             CustomError.createError({
@@ -470,7 +470,7 @@ export class UserController {
         //Actualizo los documentos
         try {
             //Extraigo el Profile y lo preoceso de una manera distinta al resto de los documentos
-            profileFile = archivos.find(archivo => archivo.fieldname === "profile");
+            archivos["profile"] && archivos["profile"][0] && (profileFile = archivos["profile"][0]);
 
             //Proceso el profile, si existe
             if (profileFile) {
