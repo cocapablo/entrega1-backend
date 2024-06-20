@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
             name: String,
             reference: String
         }
+    },
+    last_connection: {
+        type: Date,
+        required: false    
     }
 
 

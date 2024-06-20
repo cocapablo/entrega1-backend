@@ -35,7 +35,8 @@ export class UserController {
         this.intercambiarPremiumYUsuario = this.intercambiarPremiumYUsuario.bind(this);
         this.deleteUser = this.deleteUser.bind(this);
         this.deleteUserByEmail = this.deleteUserByEmail.bind(this);
-        this.setDocumentsOfUser = this.setDocumentsOfUser.bind(this);
+        this.addDocumentsToUser = this.addDocumentsToUser.bind(this);
+        this.logoutUser = this.logoutUser.bind(this);
         
     }
 
@@ -144,6 +145,8 @@ export class UserController {
 
             nuevoUsuario.documents && (documentos = nuevoUsuario.documents);
 
+            let ultimaConexion = new Date();
+
             req.session.user = {
                 id: nuevoUsuario.id,
                 first_name: nuevoUsuario.first_name,
@@ -152,8 +155,10 @@ export class UserController {
                 age: nuevoUsuario.age,
                 role: nuevoUsuario.role,
                 cart: nuevoUsuario.cart,
-                documents: documentos
+                documents: documentos,
+                last_connection: ultimaConexion
             } 
+            
             res.redirect("/products?limit=6");
         }
         else {
@@ -174,6 +179,27 @@ export class UserController {
     }
 
     async logoutUser(req, res) {
+        let bTodoOk;
+        let usuario = null;
+        let idUsuario;
+
+        req.session && req.session.user && (usuario = req.session.user);
+
+        if (!usuario) {
+            usuario = "No hay ningún usuario logueado en esta sesión";
+            return res.send({user: usuario});
+        }
+
+        idUsuario = usuario.id;
+
+        try {
+            bTodoOk = await this.#userService.logOutAsync(idUsuario);
+        }
+        catch (err) {
+            res.send("Error: no se pudo finalizar la sesión: " + err.toString());
+        }
+
+
         req.session.destroy(err => {
             if (!err) {
                 //Redirecciono a login
@@ -434,14 +460,16 @@ export class UserController {
 
     }
 
-    async setDocumentsOfUser(req, res, next) {
+    async addDocumentsToUser(req, res, next) {
         let archivos;
+        let archivo = null;
         let idUsuario;
-        let profileFile = null;
         let URLarchivo;
         let pathArchivo;
         let nombreArchivo;
         let nuevoUsuario;
+        let documentos = [];
+        let documento;
 
         //Obtengo el idUsuario
         req.params && req.params.uid && (idUsuario = req.params.uid);
@@ -469,23 +497,36 @@ export class UserController {
 
         //Actualizo los documentos
         try {
-            //Extraigo el Profile y lo preoceso de una manera distinta al resto de los documentos
-            archivos["profile"] && archivos["profile"][0] && (profileFile = archivos["profile"][0]);
-
-            //Proceso el profile, si existe
-            if (profileFile) {
+            //Recorro los archivos
+            for (let tipoArchivo in archivos) {
+                archivo = archivos[tipoArchivo][0];
+                
                 //Obtengo el path del archivo (ver si esto lo convierto a una URL o no o como)
-                nombreArchivo = profileFile.filename;
-                pathArchivo = profileFile.path;
-                URLarchivo = "/profiles/" + nombreArchivo;
+                nombreArchivo = archivo.filename;
+                pathArchivo = archivo.path;
 
-                console.log("nombreArchivo", nombreArchivo);
-                console.log("pathArchivo", pathArchivo);
-                console.log("URLarchivo", URLarchivo);
+                if (tipoArchivo === "profile") {
+                    URLarchivo = "/profiles/" + nombreArchivo;
+                }
+                else {
+                    URLarchivo = "/documents/" + nombreArchivo;    
+                }
 
-                //Configuro el profile en el usuario
-                nuevoUsuario = await this.#userService.setProfileDeUsuarioAsync(idUsuario, URLarchivo); //Por ahora lo dejo con la URL
+                //console.log("nombreArchivo", nombreArchivo);
+                //console.log("pathArchivo", pathArchivo);
+                //console.log("URLarchivo", URLarchivo);
+
+                //Creo el documento y lo agrego a la lista de documentos
+                documento = {
+                    name: tipoArchivo,
+                    reference: URLarchivo
+                }
+
+                documentos.push(documento);
             }
+
+            //Agrego los documentos al usuario
+            nuevoUsuario = await this.#userService.addDocumentosDeUsuarioAsync(idUsuario, documentos);
         }
         catch (error) {
             //Devuelve un Custom Error, así que llamo al Middleware de Errores con error

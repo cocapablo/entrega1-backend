@@ -13,6 +13,24 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Nro 18
+    - Subida de archivos
+        - Se modificó el model de User incorporando el array documents
+        - Cada objeto del array documents tendrá el formato:
+            - name: este campo identifica el tipo de archivo. Los tipos posibles son:
+                - profile: foto de perfil (jpg)
+                - identificacion: foto de identificacion del usuario (jpg)
+                - domicilio: documentación del domicilio (PDF) 
+                - estadodecuenta: informe sobre el estado de cuenta del cliente (PDF)
+            - reference: URL del archivo 
+        - Se modificó el middleware de multer para que acepte 5 tipos de archivos: profile, identificacion, domicilio, estadodecuenta y thumbnailimage (imagen de un producto). 
+        - Los archivos profile irán en la ruta /profiles. Los archivos thumbnailimage en la ruta /products y los restantes en la ruta /documents
+        - Se crearon los metodos en los DAOs y controllers para manejar los documentos del usuario
+        - En users.router.js se agregó la ruta POST "/api/users/:uid/documents" para agregar documentos a un usuario
+    - Se modificó la API de cambiar de un usuario de tipo usuario a premium para que solo permita el paso de tipo usuario a premium si se el usuario subió los tres documentos requeridos.
+    - Se sumó al model de users el campo last_connection que tiene un campo Date que se graba con la fecha y hora actual cada vez que el usuario hace un login y un logout
+    - En el router de productos se agregaron dos nuevas rutas: POST "/api/products/withimage" (crea un producto con un archivo subido como imagen de producto) y PUT "/api/products/:pid/withimage" (actualiza un producto subiendo un archivo con su imagen). También se crearon los métodos en el controller de productos para manejar estos dos nuevos endpoints
+    - BONUS TRACK: Modifiqué la vista realTimeProducts para permitir subida de imagenes de producto en el CRUD de productos (podés probarlo directamente desde ahí)
 - Notas de la Entrega Nro 17
     - Se implementan los endpoints DELETE /api/users/:uid (elimina un usuario por su id) y DELETE /api/users (elimina a un usuario por su email, que se pasa en el body).
     - Testeos con supertest

@@ -43,6 +43,7 @@ function cargarProductoEnForm(producto) {
     document.getElementById("formDescription").value = producto.description;
     document.getElementById("formPrice").value = producto.price;
     document.getElementById("formThumbnail").value = producto.thumbnail;
+    document.getElementById("formThumbnailImage").value = null;
     document.getElementById("formCode").value = producto.code;
     document.getElementById("formStock").value = producto.stock;
     document.getElementById("formCategory").value = producto.category;
@@ -69,6 +70,7 @@ function resetearForm() {
     document.getElementById("formDescription").value = "";
     document.getElementById("formPrice").value = 0;
     document.getElementById("formThumbnail").value = "";
+    document.getElementById("formThumbnailImage").value = null;
     document.getElementById("formCode").value = "";
     document.getElementById("formStock").value = 0;
     document.getElementById("formCategory").value = "";
@@ -113,22 +115,27 @@ function agregarProductoDeForm() {
     let datosOk = validarDatosForm();
 
     if (datosOk === false) return;
-    
-    let producto = obtenerProductoDeForm();
 
-    //Esto sacarlo después : solo para probar errores
-    //producto.title = "";
-    //producto.description = "";
-    //producto.price = 0;
-    
-    //producto.code = "";
-    //producto.stock = 0;
-    //producto.category = "";
-    
+    //Me fijo si se quiere subir una imagen de producto
+    if (document.getElementById("formThumbnailImage").value) {
+        //Hay subido un archivo
+        let productoDataForm = obtenerProductoDeFormWithImage();
 
-    console.log("Producto obtenido de Form: ", producto);
+        console.log("Producto obtenido de Form: ", productoDataForm);
 
-    agregarProducto(producto);
+        agregarProductoWithImage(productoDataForm);
+        
+
+    }
+    else {
+        let producto = obtenerProductoDeForm();
+
+        console.log("Producto obtenido de Form: ", producto);
+
+        agregarProducto(producto);
+
+    }
+    
 
     resetearForm();
 }
@@ -138,15 +145,28 @@ function actualizarProductoDeForm() {
 
     if (datosOk === false) return;
 
-    let producto = obtenerProductoDeForm();
-
-    console.log("Producto obtenido de Form: ", producto);
-
-    //Borrar esto despues
-    //producto.id = 0;
     
-    actualizarProducto(producto);
+    //Me fijo si se quiere subir una imagen de producto
+    if (document.getElementById("formThumbnailImage").value) {
+        //Hay subido un archivo
+        let productoDataForm = obtenerProductoDeFormWithImage();
 
+        console.log("Producto obtenido de Form: ", productoDataForm);
+
+        actualizarProductoWithImage(productoDataForm);
+        
+
+    }
+    else {
+        let producto = obtenerProductoDeForm();
+
+        console.log("Producto obtenido de Form: ", producto);
+
+        actualizarProducto(producto);
+
+    }
+    
+    
     resetearForm();
 }
 
@@ -362,6 +382,115 @@ function renderizarProductos(productos) {
 
     divProductos.innerHTML = contenidoHTML;
 
+}
+
+function agregarProductoWithImage(formDataProducto) {
+
+    let datos = {
+        method: "POST",
+        //headers: {"Content-type": "multipart/form-data;"},
+        body: formDataProducto
+    }
+
+    fetch("/api/products/withimage", datos)
+    .then(res => res.json())
+    .then(prodAgregado => {
+        let mensajeError = null;
+
+        prodAgregado.status && prodAgregado.status === "error" && (mensajeError = prodAgregado.message);
+        if (!mensajeError) {
+            Swal.fire({
+                icon: "success",
+                title: "Operación exitosa",
+                text: `El producto ${formDataProducto.get("title")} se agregó correctamente`
+            })
+        }
+        else {
+            Swal.fire({
+                icon: "warning",
+                title: "ERROR",
+                text: `Se produjo el siguiente error: ${mensajeError}`
+            })    
+        }
+    })
+    .catch(err => {
+        Swal.fire({
+            icon: "warning",
+            title: "ERROR",
+            text: `Se produjo el siguiente error: ${err.toString()}`
+        })
+    });
+}
+
+function actualizarProductoWithImage(formDataProducto) {
+
+    let datos = {
+        method: "PUT",
+        //headers: {"Content-type": "multipart/form-data;"},
+        body: formDataProducto
+    }
+
+    fetch("/api/products/" + formDataProducto.get("id") + "/withimage", datos)
+    .then(res => res.json())
+    .then(prodActualizado => {
+        let mensajeError = null;
+
+        prodActualizado.status && prodActualizado.status === "error" && (mensajeError = prodActualizado.message);
+        if (!mensajeError) {
+            Swal.fire({
+                icon: "success",
+                title: "Operación exitosa",
+                text: `El producto ${formDataProducto.get("title")} se actuaizó correctamente`
+            })
+        }
+        else {
+            Swal.fire({
+                icon: "warning",
+                title: "ERROR",
+                text: `Se produjo el siguiente error: ${mensajeError}`
+            })    
+        }
+    })
+    .catch(err => {
+        Swal.fire({
+            icon: "warning",
+            title: "ERROR",
+            text: `Se produjo el siguiente error: ${err.toString()}`
+        })
+    });
+}
+
+
+function obtenerProductoDeFormWithImage() {
+    let producto = new FormData();
+
+    //Obtengo cada propiedad del producto de idProducto
+    let id = document.getElementById("formIdProducto").value;
+    let title = document.getElementById("formTitle").value;
+    let description = document.getElementById("formDescription").value;
+    let price = parseFloat(document.getElementById("formPrice").value);
+    let thumbnail = document.getElementById("formThumbnail").value;
+    let thumbnailimage = document.getElementById("formThumbnailImage").files[0];
+    let code = document.getElementById("formCode").value;
+    let stock = parseInt(document.getElementById("formStock").value);
+    let category = document.getElementById("formCategory").value;
+    let status = document.getElementById("formStatus").value == "true" ? true : false;
+
+    //Armo el objeto producto
+    producto.append("id", id);
+    producto.append("title", title);
+    producto.append("description", description);
+    producto.append("price", price);
+    producto.append("thumbnailimage", thumbnailimage, thumbnailimage.name);
+    producto.append("code", code);
+    producto.append("stock", stock);
+    producto.append("category", category);
+    producto.append("status", status);
+
+    console.log("thumbnailimage", thumbnailimage);
+        
+
+    return producto;    
 }
 
 

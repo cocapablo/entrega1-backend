@@ -185,6 +185,9 @@ class UserManager {
 
             resultado.documents && (documentos = [...resultado.documents]);
 
+            //Configuro la útlima conexión
+            let ultimaConexion = this.setUltimaConexionDeUsuario(resultado._id.toString());
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -196,7 +199,8 @@ class UserManager {
                 //Omito el password por ser un dato sensible
                 cart : nuevoCarrito.id,
                 //Documents
-                documents : documentos
+                documents : documentos,
+                last_connection: ultimaConexion
             }
             
         }
@@ -247,101 +251,7 @@ class UserManager {
 
     }
 
-    async loginAsync(email = "", password = "") {
-        let usuario;
-        let nuevoCarrito;
-
-        try {
-            //Validaciones
-            if (email.trim().length === 0) {
-                throw new Error("ERROR: email vacío");
-            }
-
-            if (password.trim().length === 0) {
-                throw new Error("ERROR: Password vacío");
-            }
-
-            //Busco el usuario en la Base de Datos
-            let resultado = await userModel.findOne({email: email});
-            if (!resultado) {
-                //El Usuario no existe en la Base de Datos
-                let oError = {status: 400,
-                    error: "Usuario inexistente"};
-                let cadenaError = JSON.stringify(oError);
-
-                throw new Error (cadenaError);
-
-            }
-
-            //Me fijo la contraseña
-            let esPasswordValido;
-
-            esPasswordValido = this.#isValidPassword(password, resultado.password);
-            
-            if (esPasswordValido === false) {
-                //Contraseña inválida
-                let oError = {status: 403,
-                error: "Contraseña inválida"};
-                let cadenaError = JSON.stringify(oError);
-
-                throw new Error (cadenaError);
-            }
-
-            //Me fijo si el Usuario ya tiene un Carrito asignado
-            if (resultado.cart) {
-                //El Usuario ya tiene un Carrito asignado: lo elimino. Hago esto porque cada carrito está asociado a una Sesion en particular
-                try {
-                    await this.#cartManager.deleteCarritoAsync(resultado.cart);     
-                }
-                catch (error) {
-                    throw (error);
-                }
-
-            }
-
-            //Creo un nuevo Carrito
-            try {
-                nuevoCarrito = await this.#cartManager.addCarritoAsync();
-                //console.log("Nuevo Carrito", nuevoCarrito);
-            }
-            catch (error) {
-                throw (error);
-            }
-
-            //Seteo el nuevoCarrito en el Usuario en la Base de Datos
-            try {
-                await userModel.updateOne({_id: resultado._id}, {$set : {cart: nuevoCarrito.id}});
-            }
-            catch (error) {
-                throw (error);
-            }
-
-            let documentos = [];
-
-            resultado.documents && (documentos = [...resultado.documents]);
-
-            //Creo usuario
-            usuario = {
-                id: resultado._id.toString(),
-                first_name : resultado.first_name,
-                last_name: resultado.last_name,
-                email : resultado.email,
-                age : resultado.age,
-                role : resultado.role,
-                //Omito el password por ser un dato sensible
-                cart : nuevoCarrito.id,
-                //Documentos
-                documents : documentos
-            }
-            
-        }
-        catch (error) {
-            throw (error);
-        }
-
-        return usuario;
-    }
-
+    
     async changePasswordAsync(email = "", nuevoPassword = "") {
         let usuario;
 
@@ -381,6 +291,10 @@ class UserManager {
 
             resultado.documents && (documentos = [...resultado.documents]);
 
+            let ultimaConexion = new Date();
+            
+            resultado.last_connection && (ultimaConexion = resultado.last_connection);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -392,7 +306,8 @@ class UserManager {
                 //Omito el password por ser un dato sensible
                 cart : resultado.cart,
                 //Documents
-                documents: documentos
+                documents: documentos,
+                last_connection: ultimaConexion
             }
 
             //Cambio la contraseña del Usuario
@@ -451,6 +366,10 @@ class UserManager {
 
             resultado.documents && (documentos = [...resultado.documents]);
 
+            let ultimaConexion = new Date();
+            
+            resultado.last_connection && (ultimaConexion = resultado.last_connection);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -462,7 +381,8 @@ class UserManager {
                 //Omito el password por ser un dato sensible
                 cart : resultado.cart,
                 //Documents
-                documents : documentos
+                documents : documentos,
+                last_connection: ultimaConexion
             }
             
         }
@@ -493,6 +413,10 @@ class UserManager {
 
             resultado.documents && (documentos = [...resultado.documents]);
 
+            let ultimaConexion = new Date();
+            
+            resultado.last_connection && (ultimaConexion = resultado.last_connection);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -504,7 +428,8 @@ class UserManager {
                 //Omito el password por ser un dato sensible
                 cart : resultado.cart,
                 //Documents
-                documents: documentos
+                documents: documentos,
+                last_connection: ultimaConexion
             }
             
         }
@@ -534,6 +459,10 @@ class UserManager {
 
             resultado.documents && (documentos = [...resultado.documents]);
 
+            let ultimaConexion = new Date();
+            
+            resultado.last_connection && (ultimaConexion = resultado.last_connection);
+
             //Creo usuario
             usuario = {
                 id: resultado._id.toString(),
@@ -545,7 +474,8 @@ class UserManager {
                 //Omito el password por ser un dato sensible
                 cart : resultado.cart,
                 //Documents
-                documents : documentos
+                documents : documentos,
+                last_connection: ultimaConexion
             }
             
         }
@@ -573,6 +503,17 @@ class UserManager {
                 }
                 else {
                     nuevoRole = "usuario";
+                }
+
+                if (nuevoRole === "premium") {
+                    //Me fijo que tenga la documentación completa
+                    let bDocCompleta = false;
+
+                    bDocCompleta = await this.documentacionCompletaDeUsuario(idUsuario);
+
+                    if (bDocCompleta === false) {
+                        throw new Error("El Usuario no puede cambiar su role a premium porque no tiene su documentación completa");
+                    }
                 }
 
                 let cambios = {role: nuevoRole};
@@ -652,7 +593,148 @@ class UserManager {
 
     }
 
-}
+    async addDocumentosDeUsuarioAsync(idUsuario, documentos) {
+        let usuario;
+        let nuevoUsuario;
+        let documentosActuales = [];
+        let nuevosDocumentos = [];
+        
+
+        try{
+            usuario = await this.getUserByIdAsync(idUsuario);
+            
+            //Obtengo los documentos actuales del usuario
+            usuario.documents && (documentosActuales = usuario.documents);
+
+            //Obtengo los documentos que no fueron pasados como parámetro
+            nuevosDocumentos = documentosActuales.filter(documento => {
+                //documento.name !== "Profile"
+                let bAdentro;
+
+                bAdentro = !(documentos.some(docParametro => docParametro.name === documento.name ));
+
+                return bAdentro;
+            });
+
+            //Agrego los documentos pasados como parámetro a nuevosDocumentos
+            nuevosDocumentos = [
+                ...nuevosDocumentos,
+                ...documentos
+            ]
+
+            //Actualizo el usuario en la base de datos
+            let resultado = await userModel.updateOne({_id: idUsuario}, {$set: {documents: nuevosDocumentos}});
+            
+            //Creo el nuevo usuario con los documents actaulizados
+            nuevoUsuario = {
+                ...usuario,
+                documents: nuevosDocumentos
+            }
+            
+        } 
+        catch (error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error actualizando los documentos de un Usuario",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        //Devuelvo el nuevo usuario
+        return nuevoUsuario;
+
+    }
+
+    async documentacionCompletaDeUsuario(idUsuario) {
+        let bDocCompleta = false;
+        let usuario;
+        let documentosActuales = [];
+        let bIdentificacion = false;
+        let bDomicilo = false;
+        let bEstadoDeCuenta = false;
+
+        try{
+            usuario = await this.getUserByIdAsync(idUsuario);
+            
+            //Obtengo los documentos actuales del usuario
+            usuario.documents && (documentosActuales = usuario.documents);
+
+            //Me fijo si están los tres documentos requeridos
+            //Identificacion
+            bIdentificacion = documentosActuales.some(documento => documento.name === "identificacion");
+            
+
+            //Domicilio
+            bDomicilo = documentosActuales.some(documento => documento.name === "domicilio");
+            
+            //Estado de Cuenta
+            bEstadoDeCuenta = documentosActuales.some(documento => documento.name === "estadodecuenta");
+    
+            if (bIdentificacion && bDomicilo && bEstadoDeCuenta) {
+                bDocCompleta = true;
+            }
+            
+        } 
+        catch (error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error obteniendo los documentos de un Usuario",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        //Devuelvo el resultado
+        return bDocCompleta;
+    }
+
+    async setUltimaConexionDeUsuario(idUsuario) {
+        let ahora;
+
+        try {
+            ahora = new Date();
+
+            let resultado = await userModel.updateOne({_id: idUsuario}, {$set: {last_connection: ahora}});
+
+            //console.log("Resultado: ", resultado);
+        }
+        catch (error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error obteniendo los documentos de un Usuario",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        return ahora;
+    }
+
+    async logOutAsync(idUsuario) {
+        let bTodoOk = false;
+
+        try {
+            //Actualizo la ultima conexion
+            this.setUltimaConexionDeUsuario(idUsuario);
+        }
+        catch (error) {
+            throw new Error("Error en logout: " + error.toString());
+        }
+
+        bTodoOk = true;
+
+        return bTodoOk;
+    }
+
+}   
+
+
+
+
 
 export default UserManager;
 

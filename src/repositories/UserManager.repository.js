@@ -15,6 +15,9 @@ class UserManagerRepository {
         this.deleteUserAsync = this.deleteUserAsync.bind(this);
         this.deleteUserByEmailAsync = this.deleteUserByEmailAsync.bind(this);
         this.setProfileDeUsuarioAsync = this.setProfileDeUsuarioAsync.bind(this);
+        this.addDocumentosDeUsuarioAsync = this.addDocumentosDeUsuarioAsync.bind(this);
+        this.documentacionCompletaDeUsuario = this.documentacionCompletaDeUsuario.bind(this);
+        this.logOutAsync = this.logOutAsync.bind(this);
     }
 
     //Metodos
@@ -61,6 +64,18 @@ class UserManagerRepository {
 
     async setProfileDeUsuarioAsync(idUsuario, sURLArchivo) {
         return await this.#userManagerDAO.setProfileDeUsuarioAsync(idUsuario, sURLArchivo);
+    }
+
+    async addDocumentosDeUsuarioAsync(idUsuario, documentos) {
+        return await this.#userManagerDAO.addDocumentosDeUsuarioAsync(idUsuario, documentos);
+    }
+
+    async documentacionCompletaDeUsuario(idUsuario) {
+        return await this.#userManagerDAO.documentacionCompletaDeUsuario(idUsuario);
+    }
+
+    async logOutAsync(idUsuario) {
+        return await this.#userManagerDAO.logOutAsync(idUsuario);
     }
 }
 

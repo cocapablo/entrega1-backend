@@ -15,8 +15,19 @@ const multerFields = [
     {
         name: "profile", 
         maxcount: 1    
-    }
-    //Agregar los otros documentos acá
+    },
+    {
+        name: "identificacion", 
+        maxcount: 1    
+    },
+    {
+        name: "domicilio", 
+        maxcount: 1    
+    },
+    {
+        name: "estadodecuenta", 
+        maxcount: 1    
+    },
 ];
 
 const router = express.Router();
@@ -27,6 +38,6 @@ router.delete("/api/users/:uid", userController.deleteUser);
 
 router.delete("/api/users", userController.deleteUserByEmail);
 
-router.post("/api/users/:uid/documents", uploader.fields(multerFields), userController.setDocumentsOfUser);
+router.post("/api/users/:uid/documents", uploader.fields(multerFields), userController.addDocumentsToUser);
 
 export default router;

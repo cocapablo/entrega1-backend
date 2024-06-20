@@ -24,7 +24,7 @@ switch (config.persistence) {
         //CarritoManager
         const {default: CarritoManagerMongo} = await import("../dao/mongo/CarritoManagerMongo.js");
         CarritoManager = CarritoManagerMongo;
-        //console.log("CarritoManager: ", CarritoManager);
+        //console.log("CarritoManager: ", CarritoManager); 
 
         //TicketManager
         const {default: TicketManagerMongo} = await import("../dao/mongo/TicketManagerMongo.js");

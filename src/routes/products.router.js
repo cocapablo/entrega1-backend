@@ -7,10 +7,18 @@ import { ProductController } from "../controllers/products.controller.js";
 //Middlewares
 import { usuarioEsAdministrador } from "../middlewares/sessionMiddleware.js";
 import { applyPolicies } from "../middlewares/sessionMiddleware.js";
+import uploader from "../middlewares/uploader.js";
 
 
 const router = express.Router();
 const productController = new ProductController();
+
+const multerFields = [
+    {
+        name: "thumbnailimage", 
+        maxcount: 1    
+    }
+];
 
 
 
@@ -30,6 +38,10 @@ router.put("/api/products/:pid", applyPolicies(["premium", "admin"]), productCon
 router.delete("/api/products/:pid", applyPolicies(["premium", "admin"]), productController.deleteProduct);
 
 router.get("/api/mockingproducts", productController.getMockingProducts);
+
+router.post("/api/products/withimage", applyPolicies(["premium", "admin"]), uploader.fields(multerFields), productController.createProductWithImage);
+
+router.put("/api/products/:pid/withimage", applyPolicies(["premium", "admin"]), uploader.fields(multerFields), productController.updateProductWithImage);
 
 //A partir de acá es el código anterior a crear los controllers
 

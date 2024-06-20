@@ -24,6 +24,8 @@ export class ProductController {
         this.updateProduct = this.updateProduct.bind(this);
         this.deleteProduct = this.deleteProduct.bind(this);
         this.getMockingProducts = this.getMockingProducts.bind(this);
+        this.createProductWithImage = this.createProductWithImage.bind(this);
+        this.updateProductWithImage = this.updateProductWithImage.bind(this);
     }
 
     getService() {
@@ -376,7 +378,7 @@ export class ProductController {
             }
 
             this.#productService.deleteProductAsync(idProducto).then(resultado => {
-                console.log("Resultado: ", resultado);
+                //console.log("Resultado: ", resultado);
                 res.json({
                     status: "accepted",
                     message: "Producto eliminado correctamente"                
@@ -447,5 +449,244 @@ export class ProductController {
         }
 
         res.send(resultado);
+    }
+
+    async createProductWithImage(req, res, next) {
+        let nuevoProducto;
+        let usuario = null;
+        let archivos = null;
+        let archivo = null;
+        let URLarchivo;
+        let pathArchivo;
+        let nombreArchivo;
+
+        //Obtengo los datos del nuevo producto
+        nuevoProducto = req.body;
+
+                
+        //Obtengo el usuario de la session actual
+        req.session && req.session.user && (usuario = req.session.user);
+
+        if (!usuario) {
+            try { 
+                CustomError.createError({
+                    name: "Error creando un Producto",
+                    cause: "No hay ningún usuario logueado en la sesión",
+                    message: "ERROR: No hay ningún usuario logueado en la sesión",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                return next(err);
+            }
+        }
+
+        req.files && req.files && (archivos = req.files);
+
+        if (!archivos) {
+            CustomError.createError({
+                name: "Error creando un Producto con una Imagen",
+                cause: "No hay archivos subidos",
+                message: "ERROR: No hay archivos subidos",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+
+        archivos["thumbnailimage"] && archivos["thumbnailimage"][0] && (archivo = archivos["thumbnailimage"][0])
+        
+        if (!archivo) {
+            CustomError.createError({
+                name: "Error creando un Producto con una Imagen",
+                cause: "No hay archivos subidos",
+                message: "ERROR: No hay archivos subidos",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+        //Obtengo el path del archivo (ver si esto lo convierto a una URL o no o como)
+        nombreArchivo = archivo.filename;
+        pathArchivo = archivo.path;
+        URLarchivo = "/products/" + nombreArchivo;
+
+        //console.log("URLarchivo producto: ", URLarchivo);
+
+        nuevoProducto.thumbnail = URLarchivo;
+
+        //Le agrego el owner a nuevoProducto (el id del usuario)
+        nuevoProducto.owner = usuario.id;
+
+        //console.log("Usuario en la Session: ", usuario);
+        logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
+
+        this.#productService.addProductAsync(nuevoProducto).then(prodAgregado => {
+            res.json({
+                status: "accepted",
+                message: "Producto agregado correctamente",
+                nuevoProducto: prodAgregado
+            })
+
+            //Actualizo los sockets
+            this.#productService.getProductsAsync().then(productos => 
+                socketServer.emit("obtenerProductos", productos)
+            )
+        }
+        ).catch(err => {
+            //console.log("ERROR en productController: ", err.message);
+            /*
+            res.status(404).json({
+                status: "ERROR",
+                error: err.toString()
+            }) */
+
+            //Lanzo el Custom error
+            //throw err;
+            next(err);
+        })    
+    }
+
+    async updateProductWithImage(req, res, next) {
+        let idProducto;
+        let nuevoProducto;
+        let usuario = null;
+        let archivos = null;
+        let archivo = null;
+        let URLarchivo;
+        let pathArchivo;
+        let nombreArchivo;
+
+        //Obtengo los datos a modificar
+        nuevoProducto = req.body;
+        
+        //Obtengo el usuario de la session actual
+        req.session && req.session.user && (usuario = req.session.user);
+
+        if (!usuario) {
+            try { 
+                CustomError.createError({
+                    name: "Error actualizando un Producto",
+                    cause: "No hay ningún usuario logueado en la sesión",
+                    message: "ERROR: No hay ningún usuario logueado en la sesión",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                return next(err);
+            }
+        }
+
+        req.files && req.files && (archivos = req.files);
+
+        if (!archivos) {
+            CustomError.createError({
+                name: "Error actualizando un Producto con una Imagen",
+                cause: "No hay archivos subidos",
+                message: "ERROR: No hay archivos subidos",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+
+        archivos["thumbnailimage"] && archivos["thumbnailimage"][0] && (archivo = archivos["thumbnailimage"][0])
+        
+        if (!archivo) {
+            CustomError.createError({
+                name: "Error actualizando un Producto con una Imagen",
+                cause: "No hay archivos subidos",
+                message: "ERROR: No hay archivos subidos",
+                code: EErrors.INVALID_TYPES_ERROR
+            });
+        }
+
+        //Obtengo el path del archivo (ver si esto lo convierto a una URL o no o como)
+        nombreArchivo = archivo.filename;
+        pathArchivo = archivo.path;
+        URLarchivo = "/products/" + nombreArchivo;
+
+        //console.log("URLarchivo producto: ", URLarchivo);
+
+        nuevoProducto.thumbnail = URLarchivo;
+
+
+        if (req.params.pid) {
+            idProducto = req.params.pid;
+
+            //console.log("idProducto a actualizar: ", idProducto);
+            //Me fijo si el usuario está autorizado para realizar la actualización
+            if (usuario.role === "premium") {
+                //Me fijo si el usuario es el owner del producto
+                try {
+                    let productoActual = await this.#productService.getProductByIdAsync(idProducto);
+
+                    if (productoActual.owner !== usuario.id) {
+                        try { 
+                            CustomError.createError({
+                                name: "Error actualizando un Producto",
+                                cause: "El usuario no es el owner del producto y no tiene privilegios suficientes para realizar la operación",
+                                message: "ERROR: El usuario no es el owner del producto y no tiene privilegios suficientes para realizar la operación",
+                                code: EErrors.INVALID_TYPES_ERROR
+                            })  
+                        } catch (err) {
+                            return next(err);
+                        }                    
+                    }
+                }
+                catch (error) {
+                    try { 
+                        CustomError.createError({
+                            name: "Error actualizando un Producto",
+                            cause: "Error en la Base de Datos",
+                            message: "ERROR: " + error.message,
+                            code: EErrors.DATABASE_ERROR
+                        })  
+                    } catch (err) {
+                        return next(err);
+                    } 
+                    
+                }
+            }
+
+            let prodActualizaciones = {
+                ...nuevoProducto,
+                thumbnail: URLarchivo,
+                id: idProducto
+            }
+
+            this.#productService.updateProductAsync(prodActualizaciones).then(prodModificado => {
+                res.json({
+                    status: "accepted",
+                    message: "Producto actualizado correctamente",
+                    nuevoProducto: prodModificado
+                })
+
+                //Actualizo los sockets
+                this.#productService.getProductsAsync().then(productos => 
+                    socketServer.emit("obtenerProductos", productos)
+                )
+            }
+            ).catch(err => {
+                /* console.log("ERROR: ", err);
+                res.status(404).json({
+                    status: "ERROR",
+                    error: err.toString()
+                }) */
+                //console.log("ERROR en productController.updateProduct: ", err.message);
+                
+                next(err);
+            })
+        }
+        else {
+            /* res.status(404).json({
+                status: "ERROR",
+                error: "Debe especificar un id válido"
+                
+            })  */ 
+            try { 
+                CustomError.createError({
+                    name: "Error actualizando un Producto",
+                    cause: "No se especificó un id válido en productController",
+                    message: "ERROR: Debe especificar un id válido",
+                    code: EErrors.INVALID_TYPES_ERROR
+                })  
+            } catch (err) {
+                next(err);
+            }
+
+        }    
     }
 }

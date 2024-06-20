@@ -1,0 +1,4 @@
+error: Error: ENOENT: no such file or directory, open 'C:\Users\cocap\OneDrive\Escritorio\BackEnd\primera-entrega\src\public\documents\6618c3bbd85edbc649514a85-identificacion.jpg' - Dia: 19/6/2024 - Hora: 15:35:17
+error: Error creando un Producto: products validation failed: thumbnail: Path `thumbnail` is required. - Dia: 20/6/2024 - Hora: 00:10:51
+error: Error actualizando un Producto: ERROR: Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "products" - Dia: 20/6/2024 - Hora: 01:14:14
+error: Error actualizando un Producto: ERROR: Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "products" - Dia: 20/6/2024 - Hora: 01:18:36
