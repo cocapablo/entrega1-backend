@@ -31,6 +31,7 @@ Pablo Coca
     - Se sumó al model de users el campo last_connection que tiene un campo Date que se graba con la fecha y hora actual cada vez que el usuario hace un login y un logout
     - En el router de productos se agregaron dos nuevas rutas: POST "/api/products/withimage" (crea un producto con un archivo subido como imagen de producto) y PUT "/api/products/:pid/withimage" (actualiza un producto subiendo un archivo con su imagen). También se crearon los métodos en el controller de productos para manejar estos dos nuevos endpoints
     - BONUS TRACK: Modifiqué la vista realTimeProducts para permitir subida de imagenes de producto en el CRUD de productos (podés probarlo directamente desde ahí)
+    - BONUS TRACK 2: Modifiqué la vista profile para incorporar la subida de documentos de usuario (así que podés probarlo directamente de ahí también)
 - Notas de la Entrega Nro 17
     - Se implementan los endpoints DELETE /api/users/:uid (elimina un usuario por su id) y DELETE /api/users (elimina a un usuario por su email, que se pasa en el body).
     - Testeos con supertest

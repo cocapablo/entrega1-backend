@@ -10,6 +10,13 @@ class UserDTO {
         this.cart = cart; 
         this.documents = documents;  
         this.last_connection = last_connection; 
+
+        //Me fijo si está configurado el profile
+        let docProfile = documents.find(doc => doc.name === "profile");
+
+        if (docProfile) {
+            this.profile = docProfile.reference
+        }
     }
 }
 

@@ -527,6 +527,25 @@ export class UserController {
 
             //Agrego los documentos al usuario
             nuevoUsuario = await this.#userService.addDocumentosDeUsuarioAsync(idUsuario, documentos);
+
+            //Actualizo los datos del usuario en la sesion
+            let documentosNuevos = [];
+
+            nuevoUsuario.documents && (documentosNuevos = nuevoUsuario.documents);
+
+            let ultimaConexion = new Date();  //de paso actualizo la ultima conexion
+
+            req.session.user = {
+                id: nuevoUsuario.id,
+                first_name: nuevoUsuario.first_name,
+                last_name: nuevoUsuario.last_name,
+                email: nuevoUsuario.email,
+                age: nuevoUsuario.age,
+                role: nuevoUsuario.role,
+                cart: nuevoUsuario.cart,
+                documents: documentosNuevos,
+                last_connection: ultimaConexion
+            } 
         }
         catch (error) {
             //Devuelve un Custom Error, así que llamo al Middleware de Errores con error
