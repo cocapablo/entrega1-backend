@@ -3,6 +3,7 @@ import { userService } from "../repositories/index.js";
 import { CartController } from "./carts.controller.js";
 
 import UserDTO from "../dao/DTOs/user.dto.js";
+import { MiniUserDTO } from "../dao/DTOs/user.dto.js";
 
 import passport from "passport";
 import logger from "../services/logs/logger.js";
@@ -37,6 +38,9 @@ export class UserController {
         this.deleteUserByEmail = this.deleteUserByEmail.bind(this);
         this.addDocumentsToUser = this.addDocumentsToUser.bind(this);
         this.logoutUser = this.logoutUser.bind(this);
+        this.getUsersMini = this.getUsersMini.bind(this);
+        this.deleteInactiveUsers = this.deleteInactiveUsers.bind(this);
+        this.getInactiveUsers = this.getInactiveUsers.bind(this);
         
     }
 
@@ -266,7 +270,7 @@ export class UserController {
             //Paso 2: Obtengo el usuario por su email
             usuario = await this.#userService.getUserAsync(email);
 
-            //Paso 3: Genrro el token con los datos del usuario
+            //Paso 3: Genero el token con los datos del usuario
             const token = generateToken(usuario);
 
             logger.debug("Token generado: " + token);
@@ -561,4 +565,163 @@ export class UserController {
         )
 
     }
+
+    async getUsersMini(req, res, next) {
+        let usuarios = [];
+        let usuarioDTO;
+
+        
+        try {
+            //Obtengo los Usuarios
+            let usuariosDAO = await this.#userService.getUsuariosAsync();
+
+            //Obtengo la versión mini de cada usuario
+            usuariosDAO.forEach(usuario => {
+                let miniUser = new MiniUserDTO(usuario);
+
+                usuarios.push(miniUser);
+            })
+            
+        }
+        catch (error) {
+            //Devuelve un Custom Error, así que llamo al Middleware de Errores con error
+            return next(error);    
+        }
+
+        //Devuelvo los usuarios       
+        res.send(
+            {
+                status: "success",
+                payload: usuarios
+            }
+        )
+
+    }
+
+    async getInactiveUsers(req, res, next) {
+        const dosDiasEnMilisegundos = 2 * 24 * 60 * 60 * 1000;
+        let usuarios = [];
+
+        
+        //Elimino los usuarios inactivos
+        try {
+            //Obtengo los Usuarios
+            usuarios = await this.#userService.getUsuariosInactivosAsync(dosDiasEnMilisegundos);
+
+             /* //Paso 3: Envío un mail a los usuarios inactivos //SACAR TODO ESTO DESPUÉS
+             usuarios.forEach(async usuarioInactivo => {
+                //Generar el mail de notificación de baja
+                const correoOptions = {
+                    from : "SuperStore",
+                    to: usuarioInactivo.email,
+                    subject: "Eliminación de su Cuenta por Inactividad",
+                    html: `<head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+                                <title>SuperStore</title>
+                            </head>
+                            <body>
+                                <h1 style="text-align: center;"> SuperStore - Eliminación de Usuario </h1>
+                                <p> Estimado ${usuarioInactivo.first_name} ${usuarioInactivo.last_name}: </p>
+                                <p> Lamentamos comunicarle que su cuenta ha sido dada de baja por inactividad </p>
+                                <p> Nuestro equipo se toma MUY EN SERIO las relaciones tóxicas, y no podemos permitir de ninguna manera que haya estado 2 eternos días sin utilizar nuestra fantástica plataforma </p>
+                                <p> Le dejamos algunas reflexiones de nuestro equipo:  </p>
+                                <ul>
+                                    <li>¿Que tiene Mercado Libre que no tenga yo?</li>
+                                    <li>¿Sin un feed como Instagram no valgo nada?</li>
+                                    <li>Ya vas a volver llorando cuando ebay te pida el código SWIFT para respirar</li>
+                                </ul>
+                                <p> Atentamente SuperStore  </p>
+                                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+                            </body>
+                            `
+                    }
+
+                    const mailer = new MailingService();    
+                
+                    await mailer.sendSimpleMail(correoOptions);    
+                }) */
+        }
+        catch (error) {
+            //Devuelve un Custom Error, así que llamo al Middleware de Errores con error
+            return next(error);
+        }
+
+        //Los Usuarios se eliminaron con éxito       
+        res.send(
+            {
+                status: "success",
+                payload: usuarios
+            }
+        )
+
+    }
+
+    async deleteInactiveUsers(req, res, next) {
+        const dosDiasEnMilisegundos = 2 * 24 * 60 * 60 * 1000;
+        let resultado;
+        let usuariosInactivos = [];
+
+        
+        //Elimino los usuarios inactivos
+        try {
+            //Paso 1: Obtengo los usuarios inactivos
+            usuariosInactivos = await this.#userService.getUsuariosInactivosAsync(dosDiasEnMilisegundos);
+
+            //Paso 2: elimino los usuarios inactivos
+            resultado = await this.#userService.deleteUsuariosInactivosAsync(dosDiasEnMilisegundos);
+
+            //Paso 3: Envío un mail a los usuarios eliminados
+            usuariosInactivos.forEach(async usuarioInactivo => {
+                //Generar el mail de notificación de baja
+                const correoOptions = {
+                    from : "SuperStore",
+                    to: usuarioInactivo.email,
+                    subject: "Eliminación de su Cuenta por Inactividad",
+                    html: `<head>
+                                <meta charset="UTF-8">
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+                                <title>SuperStore</title>
+                            </head>
+                            <body>
+                                <h1 style="text-align: center;"> SuperStore - Eliminación de Usuario </h1>
+                                <p> Estimado ${usuarioInactivo.first_name} ${usuarioInactivo.last_name}: </p>
+                                <p> Lamentamos comunicarle que su cuenta ha sido dada de baja por inactividad </p>
+                                <p> Nuestro equipo se toma MUY EN SERIO las relaciones tóxicas, y no podemos permitir de ninguna manera que haya estado 2 eternos días sin utilizar nuestra fantástica plataforma </p>
+                                <p> Le dejamos algunas reflexiones de nuestro equipo:  </p>
+                                <ul>
+                                    <li>¿Que tiene Mercado Libre que no tenga yo?</li>
+                                    <li>¿Sin un feed como Instagram no valgo nada?</li>
+                                    <li>Ya vas a volver llorando cuando ebay te pida el código SWIFT para respirar</li>
+                                </ul>
+                                <p> Atentamente SuperStore  </p>
+                                <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+                            </body>
+                            `
+                    }
+
+                    const mailer = new MailingService();    
+                
+                    await mailer.sendSimpleMail(correoOptions);    
+                })
+        }
+
+        catch (error) {
+            //Devuelve un Custom Error, así que llamo al Middleware de Errores con error
+            return next(error);
+        }
+
+        //Los Usuarios se eliminaron con éxito       
+        res.send(
+            {
+                status: "success",
+                message: "Los Usuarios inactivos fueron eliminados con éxito",
+            }
+        )
+
+    }
+
+
 }

@@ -730,6 +730,134 @@ class UserManager {
         return bTodoOk;
     }
 
+    async getUsuariosAsync() {
+        let usuario;
+        let usuarios = [];
+
+        try {
+            //devuelvo todos los usuarios
+            let usuariosBD = await userModel.find();
+
+            usuariosBD.forEach(usuarioBD => {
+                let documentos = [];
+
+                usuarioBD.documents && (documentos = [...usuarioBD.documents]);
+
+                let ultimaConexion = new Date();
+                
+                usuarioBD.last_connection && (ultimaConexion = usuarioBD.last_connection);
+
+                //Creo usuario
+                usuario = {
+                    id: usuarioBD._id.toString(),
+                    first_name : usuarioBD.first_name,
+                    last_name: usuarioBD.last_name,
+                    email : usuarioBD.email,
+                    age : usuarioBD.age,
+                    role : usuarioBD.role,
+                    //Omito el password por ser un dato sensible
+                    cart : usuarioBD.cart,
+                    //Documents
+                    documents: documentos,
+                    last_connection: ultimaConexion
+                }
+
+                //Agrego el usuario al array usuarios
+                usuarios.push(usuario);
+            });
+        }
+        catch (error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error obteniendo los Usuarios",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        return usuarios;    
+    }
+
+    async deleteUsuariosInactivosAsync(milisegundosInactivo) {
+        let resultado;
+        let todoOk = false;
+        let ahora = new Date();
+        let fechaLimite = new Date(ahora.getTime() - milisegundosInactivo);
+
+        logger.debug("Fecha límite de última conexión: " + fechaLimite.toLocaleDateString() + " - " + fechaLimite.toLocaleTimeString());
+
+        try {
+            resultado = await userModel.deleteMany({$or: [{last_connection: {$exists: false}}, {last_connection: {$lte: fechaLimite}}]}); //Podría probarlo con un find primero a ver que usuarios devuelve
+        }
+        catch(error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error eliminando Usuarios inactivos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        todoOk = true;
+
+        return todoOk;
+    }
+
+    async getUsuariosInactivosAsync(milisegundosInactivo) {
+        let usuarios = [];
+        let usuario;
+        let ahora = new Date();
+        let fechaLimite = new Date(ahora.getTime() - milisegundosInactivo);
+
+        logger.debug("Fecha límite de última conexión: " + fechaLimite.toLocaleDateString() + " - " + fechaLimite.toLocaleTimeString());
+
+        try {
+            let usuariosBD = await userModel.find({$or: [{last_connection: {$exists: false}}, {last_connection: {$lte: fechaLimite}}]}); 
+
+            usuariosBD.forEach(usuarioBD => {
+                let documentos = [];
+
+                usuarioBD.documents && (documentos = [...usuarioBD.documents]);
+
+                let ultimaConexion = null;
+                
+                usuarioBD.last_connection && (ultimaConexion = usuarioBD.last_connection);
+
+                //Creo usuario
+                usuario = {
+                    id: usuarioBD._id.toString(),
+                    first_name : usuarioBD.first_name,
+                    last_name: usuarioBD.last_name,
+                    email : usuarioBD.email,
+                    age : usuarioBD.age,
+                    role : usuarioBD.role,
+                    //Omito el password por ser un dato sensible
+                    cart : usuarioBD.cart,
+                    //Documents
+                    documents: documentos,
+                    last_connection: ultimaConexion
+                }
+
+                //Agrego el usuario al array usuarios
+                usuarios.push(usuario);
+            });
+
+        }
+        catch(error) {
+            //Creo un Custom Error
+            CustomError.createError({
+                name: "Error eliminando Usuarios inactivos",
+                cause: generateDatabaseErrorInfo(error),
+                message: error.message,
+                code: EErrors.DATABASE_ERROR
+            })
+        }
+
+        return usuarios;
+    }
+
 }   
 
 

@@ -11,13 +11,21 @@ import EErrors from "../services/errors/enums.js";
 
 import logger from "../services/logs/logger.js";
 
+import MailingService from "../services/mailing/mailing.js";
+import config from "../config/config.js";
+
 
 export class ProductController {
     #productService;
+    #userService;
     
-    constructor() {
+    constructor(userController = null) {
         //this.#productService = new ProductManager(""); //Esto después se cambiará por lo que gestione el Factory
         this.#productService = productService;
+        if (userController) {
+            this.#userService = userController.getService();
+        }
+        
         this.getProductsPaginated = this.getProductsPaginated.bind(this);
         this.getProduct = this.getProduct.bind(this);
         this.createProduct = this.createProduct.bind(this);
@@ -30,6 +38,10 @@ export class ProductController {
 
     getService() {
         return this.#productService;
+    }
+
+    setUserController(userController) {
+        this.#userService = userController.getService();
     }
 
     async getProductsPaginated(req, res, next){
@@ -322,6 +334,11 @@ export class ProductController {
     async deleteProduct(req, res, next) {
         let idProducto;
         let usuario = null;
+        let productoActual;
+        let idOwner;
+        let owner;
+        let emailOwner;
+        let enviarEmail = false;
     
 
         //Obtengo el usuario de la session actual
@@ -377,8 +394,65 @@ export class ProductController {
                 }
             }
 
+            //Me fijo si el producto que voy a eliminar tiene un owner que es un usuario premium
+            try {
+                productoActual = await this.#productService.getProductByIdAsync(idProducto);
+                idOwner = productoActual.owner;
+                owner = await this.#userService.getUserByIdAsync(idOwner);
+                emailOwner = owner.email;
+
+                if ((idOwner !== usuario.id) && (owner.role === "premium")) {
+                    //Hay que el mail de baja del producto luego de darlo de baja
+                    enviarEmail = true;
+
+                }
+
+            }
+            catch(error) {
+                try { 
+                    CustomError.createError({
+                        name: "Error eliminando un Producto",
+                        cause: error.toString(),
+                        message: "ERROR: Error eliminando un Producto - " + error.toString(),
+                        code: EErrors.INVALID_TYPES_ERROR
+                    })  
+                } catch (err) {
+                    return next(err);
+                } 
+            }
+
             this.#productService.deleteProductAsync(idProducto).then(resultado => {
-                //console.log("Resultado: ", resultado);
+                
+                if (enviarEmail === true) {
+                    //Envio el email de baja del producto
+                     //Generar el mail de recuperacion
+                    const correoOptions = {
+                        from : "SuperStore",
+                        to: emailOwner,
+                        subject: "Eliminación de su Producto " + productoActual.title,
+                        html: `<head>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+                                    <title>SuperStore</title>
+                                </head>
+                                <body>
+                                    <h1 style="text-align: center;"> SuperStore - Eliminación de Producto </h1>
+                                    <p> Estimado ${owner.first_name} ${owner.last_name}: </p>
+                                    <p> Hemos eliminado su producto ${productoActual.title} por los caprichos de nuestro administrador del sistema</p>
+                                    
+                                    <p> Atentamente SuperStore  </p>
+                                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+                                </body>
+                            `
+                        }
+
+                    const mailer = new MailingService();    
+                
+                    mailer.sendSimpleMail(correoOptions);
+
+                }
+
                 res.json({
                     status: "accepted",
                     message: "Producto eliminado correctamente"                

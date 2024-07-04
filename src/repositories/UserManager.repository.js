@@ -18,6 +18,10 @@ class UserManagerRepository {
         this.addDocumentosDeUsuarioAsync = this.addDocumentosDeUsuarioAsync.bind(this);
         this.documentacionCompletaDeUsuario = this.documentacionCompletaDeUsuario.bind(this);
         this.logOutAsync = this.logOutAsync.bind(this);
+        this.getUsuariosAsync = this.getUsuariosAsync.bind(this);
+        this.deleteUsuariosInactivosAsync = this.deleteUsuariosInactivosAsync.bind(this);
+        this.getUsuariosInactivosAsync = this.getUsuariosInactivosAsync.bind(this);
+
     }
 
     //Metodos
@@ -76,6 +80,18 @@ class UserManagerRepository {
 
     async logOutAsync(idUsuario) {
         return await this.#userManagerDAO.logOutAsync(idUsuario);
+    }
+
+    async getUsuariosAsync() {
+        return await this.#userManagerDAO.getUsuariosAsync();
+    }
+
+    async deleteUsuariosInactivosAsync(milisegundosInactivo) {
+        return await this.#userManagerDAO.deleteUsuariosInactivosAsync(milisegundosInactivo);
+    }
+
+    async getUsuariosInactivosAsync(milisegundosInactivo) {
+        return await this.#userManagerDAO.getUsuariosInactivosAsync(milisegundosInactivo);
     }
 }
 

@@ -36,8 +36,14 @@ router.put("/api/users/premium/:uid", userController.intercambiarPremiumYUsuario
 
 router.delete("/api/users/:uid", userController.deleteUser);
 
-router.delete("/api/users", userController.deleteUserByEmail);
+router.delete("/api/usersbyemail", userController.deleteUserByEmail);
 
 router.post("/api/users/:uid/documents", uploader.fields(multerFields), userController.addDocumentsToUser);
+
+router.get("/api/users/", userController.getUsersMini);
+
+router.get("/api/users/inactive", userController.getInactiveUsers);
+
+router.delete("/api/users/", userController.deleteInactiveUsers);
 
 export default router;

@@ -52,13 +52,13 @@ describe("Test SuperStore", () => {
             email: mockUser.email
         }
 
-        let result = await requester.delete("/api/users").send(datos);
+        let result = await requester.delete("/api/usersbyemail").send(datos);
         
         datos = {
             email: mockUserComun.email
         }
 
-        result = await requester.delete("/api/users").send(datos);
+        result = await requester.delete("/api/usersbyemail").send(datos);
 
         //console.log("Ejecuté el before");
 

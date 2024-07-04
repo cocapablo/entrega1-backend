@@ -3,6 +3,8 @@ import express from "express";
 //import ProductManager from "../dao/ProductManagerMongo.js";
 import {socketServer} from "../app.js";
 import { ProductController } from "../controllers/products.controller.js";
+import { CartController } from "../controllers/carts.controller.js";
+import { UserController } from "../controllers/users.controller.js";
 
 //Middlewares
 import { usuarioEsAdministrador } from "../middlewares/sessionMiddleware.js";
@@ -12,6 +14,10 @@ import uploader from "../middlewares/uploader.js";
 
 const router = express.Router();
 const productController = new ProductController();
+const cartController = new CartController(productController);
+const userController = new UserController(cartController);
+
+productController.setUserController(userController);
 
 const multerFields = [
     {

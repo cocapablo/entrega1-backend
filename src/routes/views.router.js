@@ -6,8 +6,9 @@ import express, { request } from "express";
 
 import { productService } from "../repositories/index.js";
 import { cartService } from "../repositories/index.js";
+import { userService } from "../repositories/index.js";
 
-import { usuarioLogueado, usuarioNoLogueado, usuarioEsUsuario } from "../middlewares/sessionMiddleware.js";
+import { usuarioLogueado, usuarioNoLogueado, usuarioEsUsuario, usuarioEsAdministrador } from "../middlewares/sessionMiddleware.js";
 import UserDTO from "../dao/DTOs/user.dto.js";
 
 import logger from "../services/logs/logger.js";
@@ -279,6 +280,46 @@ router.get("/changePassword", usuarioNoLogueado, (req, res) => {
     decodedToken.email && (emailUsuario = decodedToken.email);
 
     res.cookie(config.jwtCookie, token, {maxAge: 60 * 60 * 1000, httpOnly: true}).render("changePassword", {error, mensajeError, email: emailUsuario});
+})
+
+router.get("/users", usuarioEsAdministrador, async (req, res) => {
+    let usuario = {};
+    let usuarios = [];
+    let usuariosDTO = [];
+
+    //Obtengo el usuario de la session actual
+    req.session && req.session.user && (usuario = req.session.user);
+
+    //console.log("Usuario en la Session: ", usuario);
+    logger.debug("Usuario en la Session: " + JSON.stringify(usuario, null, 2));
+
+    //Obtengo los usuarios
+    try {
+        usuarios = await userService.getUsuariosAsync();
+
+        //Armo los usuarios DTO
+        usuarios.forEach(usu => {
+            let usuarioDTO = new UserDTO(usu);
+            usuariosDTO.push(usuarioDTO);
+        })
+
+        let datosRender = {
+            user: usuario,
+            users: usuariosDTO
+        }
+
+        res.render("users", datosRender);
+
+    }
+    catch (err) {
+        //console.log("ERROR: ", err);
+        res.status(404).json({
+            status: "ERROR",
+            error: err.toString()
+        });
+    }
+
+    
 })
 
 

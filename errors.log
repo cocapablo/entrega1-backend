@@ -4,3 +4,10 @@ error: Error actualizando un Producto: ERROR: Cast to ObjectId failed for value 
 error: Error actualizando un Producto: ERROR: Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "products" - Dia: 20/6/2024 - Hora: 01:18:36
 error: Error actualizando los documentos de un Usuario: Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "users" - Dia: 25/6/2024 - Hora: 02:28:53
 error: Error actualizando los documentos de un Usuario: Cast to ObjectId failed for value "undefined" (type string) at path "_id" for model "users" - Dia: 25/6/2024 - Hora: 02:34:50
+error: Error obteniendo los Usuarios: resultado is not defined - Dia: 27/6/2024 - Hora: 17:13:37
+error: Error eliminando Usuarios inactivos: usuariosBD.forEach is not a function - Dia: 29/6/2024 - Hora: 04:02:57
+error: Error eliminando un usuario un Usuario: Cast to ObjectId failed for value "inactive" (type string) at path "_id" for model "users" - Dia: 29/6/2024 - Hora: 05:08:48
+error: Error eliminando un usuario un Usuario: Cast to ObjectId failed for value "inactive" (type string) at path "_id" for model "users" - Dia: 29/6/2024 - Hora: 05:12:49
+error: Error eliminando un usuario un Usuario: Cast to ObjectId failed for value "inactive" (type string) at path "_id" for model "users" - Dia: 29/6/2024 - Hora: 05:29:39
+error: Error: else doesn't match if - 26:15 - Dia: 3/7/2024 - Hora: 17:24:14
+error: El Usuario ya existía previemente - Dia: 4/7/2024 - Hora: 15:54:20

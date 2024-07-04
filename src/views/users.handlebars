@@ -1,0 +1,77 @@
+<h1 class="text-center my-5">Administrador de Usuarios </h1> 
+
+
+<table class="table table-striped">
+    <thead class="thead-light">
+        <tr>
+        <th scope="col">Foto</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">Apellido</th>
+        <th scope="col">Email</th>
+        <th scope="col">Rol</th>
+        <th scope="col">Eliminar</th>
+        <th scope="col">Cambiar Rol</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#each users}}
+        <tr>
+            {{#if this.profile}}
+            <td>
+                <img src="{{this.profile}}" alt="Foto de {{this.first_name}} {{this.last_name}}" width="64">
+            </td>
+            
+            {{else}}
+            <td>
+                
+            </td>
+            {{/if}}
+            <td>
+                {{this.first_name}}
+            </td>
+            <td>
+                {{this.last_name}}
+            </td>
+            <td>
+                {{this.email}}
+            </td>
+            <td>
+                {{this.role}}
+            </td>
+            {{#if (igual this.role "admin")}}
+                <td>
+                    
+                </td>
+            {{else}}
+                <td>
+                    <img src="/images/trash3.svg" alt="Eliminar Usuario" width="24" onclick="eliminarUsuario('{{this.id}}')">
+                </td>
+            {{/if}}
+            {{#if (igual this.role "admin")}}
+                <td>
+                    
+                </td>
+            {{else}}
+                <td>
+                    <img src="/images/cambiarrol.png" alt="Cambiar Rol" width="24" onclick="cambiarRolUsuario('{{this.id}}')">
+                </td>
+            {{/if}}
+        </tr>
+      
+    {{/each}}
+    </tbody>
+</table>
+
+<div class="container my-5"></div>
+    <div class="row">
+        <div id="botones" className="col-md-12">
+            <button class="w-15 btn btn-danger" id="btnProductos"><a href="/products?limit=6" class="link-light">Productos</a></button>
+            <button class="w-15 btn btn-success" id="btnEliminarUsuariosInactivos" onclick="eliminarUsuariosInactivos()">Eliminar Usuarios Inactivos</button>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/users.js"></script>

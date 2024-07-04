@@ -57,7 +57,17 @@
                 {{#if (igual user.role "usuario")}}
                     <button class="w-15 btn btn-success" id="btnChat"><a href="/chat" class="link-light" target="_blank">Chatear</a></button>
                 {{/if}}
-            {{/if}}            
+            {{/if}} 
+            {{#if user }}
+                {{#if (igual user.role "premium")}}
+                    <button class="w-15 btn btn-success" id="btnChat"><a href="/chat" class="link-light" target="_blank">Chatear</a></button>
+                {{/if}}
+            {{/if}} 
+            {{#if user }}
+                {{#if (igual user.role "admin")}}
+                    <button class="w-15 btn btn-primary" id="btnUsuarios"><a href="/users" class="link-light" target="_blank">Administrar Usuarios</a></button>
+                {{/if}}
+            {{/if}}             
         </div>
     </div>
 </div>
