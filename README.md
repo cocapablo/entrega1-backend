@@ -13,6 +13,19 @@ Pablo Coca
 - LinkedIn : https://www.linkedin.com/in/cocapablo/
 
 ## NOTAS
+- Notas de la Entrega Final
+    - ITEMS de desarrollo
+        - Se implementó la API GET /api/users que devuelve una versión reducida (solo con la info principal) con los datos de todos los usuarios
+        - Se implementó la API DELETE /api/users que elimina todos los usuarios que hayan tenido un período de inactividad superior a dos día, y se les envía un gracioso mail de aviso
+        - Se creó en handlebars la vista users que administra los usuarios. 
+            - Permite listar todos los usuarios existentes, intentar cambiar su rol de usuario a premium y viceversa (al cambiarlos a premium chequea que tenga la documantación requerida subida)
+            - También permite eliminar a cualquier usuario que no sea Admin
+            - Además permite eliminar a los usuarios inactivos
+        - Se modificó el método deleteProduct de products.controller para que al eliminar un producto si el owner es premium se le envíe un mail de aviso
+    - ITEMS de deploy
+        - Se modificó el archivo config.js para que detecte si ya están configuradas variables de entorno dentro de process y de ser así que no ejecute dotenv.config, y tome los valores ya configurados
+        - Se hizo un deploy exitoso de la app en el branch entrega-final en railway.app. Se configuraron todas las variables de entorno necesarias (las que antes estaban en los archivos .env).
+        - El link de la app en railway es https://entrega1-backend-production.up.railway.app/
 - Notas de la Entrega Nro 18
     - Subida de archivos
         - Se modificó el model de User incorporando el array documents
