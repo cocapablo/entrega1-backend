@@ -15,6 +15,7 @@ import logger from "../services/logs/logger.js";
 
 import config from "../config/config.js";
 import { validateToken } from "../services/jwt/jwtUtils.js";
+import { applyPolicies } from "../middlewares/sessionMiddleware.js";
 
 //const prodManager = new ProductManager("productos.json");
 //const cartManager = new CarritoManager("carrito.json", prodManager);
@@ -54,7 +55,7 @@ router.get("/realTimeProducts", usuarioLogueado, (req, res) => {
     )
 });
 
-router.get("/chat", usuarioLogueado, usuarioEsUsuario, (req, res) => {
+router.get("/chat", usuarioLogueado, applyPolicies(["usuario", "premium"]), (req, res) => {
     let usuario = {};
 
     //Obtengo el usuario de la session actual
