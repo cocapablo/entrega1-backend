@@ -15,6 +15,8 @@ import config from "../config/config.js";
 import CustomError from "../services/errors/CustomError.js";
 import EErrors from "../services/errors/enums.js";
 
+import url from "url";
+
 export class UserController {
     #userService;
     #cartController;   
@@ -255,6 +257,10 @@ export class UserController {
     async resetUserPassword(req, res) {
         let email = null;
         let usuario = null;
+        let urlBase = "";
+        let protocolo = "";
+
+
 
         //Paso 1: cheque que me hayan enviado un email
         req.body && req.body && req.body.email && (email = req.body.email);
@@ -276,6 +282,12 @@ export class UserController {
             logger.debug("Token generado: " + token);
 
             //Generar el mail de recuperacion
+            //Obtengo la urlBase
+            urlBase = req.get('host');
+            console.log("URLBase", urlBase);
+            protocolo = req.protocol;
+            console.log("Protocolo: ", protocolo);
+
             const correoOptions = {
                 from : "SuperStore",
                 to: usuario.email,
@@ -283,14 +295,14 @@ export class UserController {
                 html: `<head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+                            <link href="//cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
                             <title>Productos Pablo Coca</title>
                         </head>
                         <body>
                             <h1 style="text-align: center;"> SuperStore - Recuperar Contraseña </h1>
                             <p> Haga click en el siguiente enlace para recuperar la contraseña: </p>
                             <button class="w-15 btn btn-success">
-                            <a href="http://localhost:8080/api/sessions/reset-password/${token}" 
+                            <a href="${protocolo}://${urlBase}/api/sessions/reset-password/${token}" 
                             Recuperar Contraseña 
                             </a>
                             Recuperar Contraseña 
@@ -300,6 +312,8 @@ export class UserController {
                         </body>
                         `
                 }
+
+            console.log("Correo Option html:" , correoOptions.html);
 
             const mailer = new MailingService();    
         
@@ -570,6 +584,9 @@ export class UserController {
         let usuarios = [];
         let usuarioDTO;
 
+        //Obtengo la urlBase
+        //let urlBase = req.get('host');
+        //console.log("URL Base: ", urlBase);
         
         try {
             //Obtengo los Usuarios

@@ -23,12 +23,23 @@ export function configurarEntorno(opciones) {
     let persistence = null;
     let config = {};
 
-    opciones.Modobd && (modobd = opciones.Modobd);
+    //Paso 1: Me fijo si ya la varables de entorno están configuradas, por si el sistema está en en un server de deploy (sin archivos .env)
+    if (!(process.env.PORT && process.env.PERSISTENCE && process.env.MONGO_URL && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD && process.env.ENV && process.env.MAILING_USER && process.env.MAILING_PASSWORD && process.env.MAILING_HOST && process.env.MAILING_SERVICE && process.env.JWT_COOKIE && process.env.JWT_SECRET)) {
+        //Al menos falta una variable de entorno: Las leo de los .env
+        opciones.Modobd && (modobd = opciones.Modobd);
+        opciones.Persistence && (persistence = opciones.Persistence);
+
+        dotenv.config({
+            path: modobd === "LOCAL" ? "./src/config/.env.local" : "./src/config/.env.cloud"
+        })
+    }
+
+    /* opciones.Modobd && (modobd = opciones.Modobd);
     opciones.Persistence && (persistence = opciones.Persistence);
 
     dotenv.config({
         path: modobd === "LOCAL" ? "./src/config/.env.local" : "./src/config/.env.cloud"
-    })
+    }) */
 
     //Configuro config
     config = {

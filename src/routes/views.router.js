@@ -132,7 +132,8 @@ router.get("/products", usuarioLogueado, async (req, res) => {
         //console.log("Resultado devuelto: ", productos);
 
         //Campos que faltan
-        let baseQuery = "http://localhost:8080/products?";
+        //let baseQuery = "http://localhost:8080/products?";
+        let baseQuery = "/products?";
         let prevQuery = baseQuery;
         prevQuery = prevQuery + (limite ? `limit=${limite}` : "");
         if (consultas.query) {
