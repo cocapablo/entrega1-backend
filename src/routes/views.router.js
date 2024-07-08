@@ -35,7 +35,7 @@ router.get("/", usuarioLogueado, (req, res) => {
 });
 
 
-router.get("/realtimeproducts", usuarioLogueado, (req, res) => {
+router.get("/realTimeProducts", usuarioLogueado, (req, res) => {
     let usuario = {};
 
     //Obtengo el usuario de la session actual
@@ -49,7 +49,7 @@ router.get("/realtimeproducts", usuarioLogueado, (req, res) => {
     productService.getProductsAsync().then(
         productos => {
 
-            res.render("realtimeproducts", { productos, user: usuario});
+            res.render("realTimeProducts", { productos, user: usuario});
         }
     )
 });
