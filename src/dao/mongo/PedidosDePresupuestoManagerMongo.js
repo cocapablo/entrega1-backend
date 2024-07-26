@@ -120,7 +120,7 @@ class PedidosDePresupuestoManager {
             CustomError.createError({
                 name: "Error creando un Pedido de Presupuesto",
                 cause: generateDatabaseErrorInfo(error),
-                message: error.message,
+                message: error.toString(),
                 code: EErrors.DATABASE_ERROR
             })
         }
