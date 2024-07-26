@@ -54,7 +54,7 @@ export class PedidosDePresupuestoController {
         
         //Obtengo los datos del nuevo producto
         nuevoPedido = req.body;
-        urlBase = req.get('origin');
+        urlBase = req.get('host');
 
         logger.debug("Origen del Pedido de Presupuesto: " + urlBase);
 
