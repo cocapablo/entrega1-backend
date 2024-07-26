@@ -8,6 +8,8 @@ export let CarritoManager;
 export let TicketManager;
 export let ChatManager;
 
+export let PedidosDePresupuestoManager;
+
 //console.log("Estoy acá");
 
 switch (config.persistence) {
@@ -35,6 +37,10 @@ switch (config.persistence) {
         const {default: ChatManagerMongo} = await import("../dao/mongo/ChatManagerMongo.js");
         ChatManager = ChatManagerMongo;
 
+        //PedidosDePresupuestoManager
+        const {default: PedidosDePresupuestoManagerMongo} = await import("../dao/mongo/PedidosDePresupuestoManagerMongo.js");
+        PedidosDePresupuestoManager = PedidosDePresupuestoManagerMongo;
+
         break;
     default:
         //DAOs de Mongo
@@ -60,6 +66,10 @@ switch (config.persistence) {
         //chatManager
         const {default: ChatManagerMongo2} = await import("../dao/mongo/ChatManagerMongo.js");
         ChatManager = ChatManagerMongo2;
+
+        //PedidosDePresupuestoManager
+        const {default: PedidosDePresupuestoManagerMongo2} = await import("../dao/mongo/PedidosDePresupuestoManagerMongo.js");
+        PedidosDePresupuestoManager = PedidosDePresupuestoManagerMongo2;
         break;
     
 }
@@ -69,7 +79,8 @@ const DAO = {
     productManager : ProductManager,
     cartManager : CarritoManager,
     ticketManager : TicketManager,
-    chatManager : ChatManager
+    chatManager : ChatManager,
+    pedidosDePresupuestoManager : PedidosDePresupuestoManager
 };
 
 //console.log("DAO", DAO);

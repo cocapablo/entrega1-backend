@@ -19,6 +19,8 @@ import sessionsRouter from "./routes/sessions.router.js";
 import usersRouter from "./routes/users.router.js";
 import logsRouter from "./routes/logs.router.js";
 
+import pedidosDePresupuestoRouter from "./routes/pedidosdepresupuesto.router.js";
+
 import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
 
 import errorMiddleware from "./middlewares/errors/errorMiddleware.js";
@@ -123,6 +125,9 @@ app.use("/", cartsRouter);
 app.use("/", usersRouter);
 app.use("/", viewsRouter);
 app.use("/", logsRouter);
+
+app.use("/", pedidosDePresupuestoRouter);
+
 //Definir api para ver documentación
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerEspec));
 

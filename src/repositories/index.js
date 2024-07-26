@@ -3,6 +3,7 @@ import { ProductManager } from "../dao/factory.js";
 import { CarritoManager } from "../dao/factory.js";
 import { TicketManager } from "../dao/factory.js";
 import { ChatManager } from "../dao/factory.js"; 
+import { PedidosDePresupuestoManager } from "../dao/factory.js";
 
 import DAO from "../dao/factory.js";
 
@@ -12,6 +13,7 @@ import UserManagerRepository from "./UserManager.repository.js";
 import ProductManagerRepository from "./ProductManager.repository.js";
 import CarritoManagerRepository from "./CarritoManager.repository.js";
 import TicketManagerRepository from "./TicketManager.repository.js";
+import PedidosDePresupuestoManagerRepository from "./PedidosDePresupuesto.repository.js";
 
 const path = "" //Esto debería traerse de algún lado
 
@@ -21,6 +23,7 @@ const carritoManagerDAO = new CarritoManager(path, productsManagerDAO);
 const ticketManagerDAO = new TicketManager();
 const userManagerDAO = new UserManager(carritoManagerDAO);
 //const chatManagerDAO = new ChatManager(socketServer);
+const pedidosDePresupuestoDAO = new PedidosDePresupuestoManager();
 
 //Services
 //UserManager
@@ -34,3 +37,6 @@ export const cartService = new CarritoManagerRepository(carritoManagerDAO);
 
 //TicketManager
 export const ticketService = new TicketManagerRepository(ticketManagerDAO);
+
+//PedidosDePresupuestoManager
+export const pedidosDePresupuestoService = new PedidosDePresupuestoManagerRepository(pedidosDePresupuestoDAO);

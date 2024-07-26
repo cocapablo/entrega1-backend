@@ -11,3 +11,10 @@ error: Error eliminando un usuario un Usuario: Cast to ObjectId failed for value
 error: Error eliminando un usuario un Usuario: Cast to ObjectId failed for value "inactive" (type string) at path "_id" for model "users" - Dia: 29/6/2024 - Hora: 05:29:39
 error: Error: else doesn't match if - 26:15 - Dia: 3/7/2024 - Hora: 17:24:14
 error: El Usuario ya existía previemente - Dia: 4/7/2024 - Hora: 15:54:20
+error: Error devolviendo todos los Carrito con sus Productos: Cannot destructure property '_id' of 'producto.id' as it is null. - Dia: 8/7/2024 - Hora: 02:10:34
+error: Error devolviendo todos los Carrito con sus Productos: Cannot destructure property '_id' of 'producto.id' as it is null. - Dia: 8/7/2024 - Hora: 02:13:12
+error: Error devolviendo todos los Carrito con sus Productos: Cannot destructure property '_id' of 'producto.id' as it is null. - Dia: 8/7/2024 - Hora: 02:13:35
+error: Error devolviendo Productos de un Carrito: Not found - Dia: 8/7/2024 - Hora: 02:16:40
+error: Error devolviendo Productos de Carrito: Cannot destructure property '_id' of 'producto.id' as it is null. - Dia: 8/7/2024 - Hora: 02:20:10
+error: Error devolviendo Productos de Carrito: Cannot destructure property '_id' of 'producto.id' as it is null. - Dia: 8/7/2024 - Hora: 02:20:35
+error: Error devolviendo Productos de un Carrito: Not found - Dia: 8/7/2024 - Hora: 02:23:16
