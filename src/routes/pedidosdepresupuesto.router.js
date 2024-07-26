@@ -13,10 +13,12 @@ const corsOptions = {
 
 const router = express.Router();
 
+router.use(cors(corsOptions));
+
 const pedidosDePresupuestoController = new PedidosDePresupuestoController();
 
 router.get("/api/pedidosdepresupuesto", pedidosDePresupuestoController.getPedidosDePresupuesto);
 
-router.post("/api/pedidosdepresupuesto", cors(corsOptions), pedidosDePresupuestoController.createPedidoDePresupuesto);
+router.post("/api/pedidosdepresupuesto", pedidosDePresupuestoController.createPedidoDePresupuesto);
 
 export default router;
