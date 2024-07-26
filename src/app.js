@@ -43,6 +43,8 @@ import  __dirname  from "./services/path/pathUtils.js";
 import { swaggerEspec } from "./config/docConfig.js";
 import swaggerUi from "swagger-ui-express";
 
+import cors from "cors";
+
 
 
 //console.log("Config", config);
@@ -51,6 +53,8 @@ logger.debug("Config: " + JSON.stringify(config, null, 2));
 const port = config.port || 8080;
 
 const app = express();
+
+app.use(cors());
 
 //Directorios
 //const __filename = fileURLToPath(import.meta.url);
