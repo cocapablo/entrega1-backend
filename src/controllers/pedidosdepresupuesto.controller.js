@@ -58,9 +58,11 @@ export class PedidosDePresupuestoController {
 
         logger.debug("Origen del Pedido de Presupuesto: " + urlBase);
 
+        /*
         if (urlBase.includes("improconcert")) {
             nuevoPedido = new ImproConcertPedidoDePresupuestoDTO(nuevoPedido);
         }
+        */
 
         nuevoPedido = {
             origen: urlBase,

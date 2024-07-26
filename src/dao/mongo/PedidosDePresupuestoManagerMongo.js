@@ -65,7 +65,8 @@ class PedidosDePresupuestoManager {
                 //throw new Error("ERROR: title vacío");
                 CustomError.createError({
                     name: "Error creando un Pedido de Presupuesto",
-                    cause: "ERROR: Nombre vacío",
+                    cause: "Nombre vacío",
+                    message: "ERROR: Nombre vacío",
                     code: EErrors.INVALID_TYPES_ERROR
                 })
 
