@@ -67,6 +67,11 @@
                 {{#if (igual user.role "admin")}}
                     <button class="w-15 btn btn-primary" id="btnUsuarios"><a href="/users" class="link-light" target="_blank">Administrar Usuarios</a></button>
                 {{/if}}
+            {{/if}}  
+            {{#if user }}
+                {{#if (igual user.role "admin")}}
+                    <button class="w-15 btn btn-primary" id="btnPedidosDePresupuesto"><a href="/pedidosdepresupuesto" class="link-light" target="_blank">Pedidos de Presupuesto</a></button>
+                {{/if}}
             {{/if}}             
         </div>
     </div>

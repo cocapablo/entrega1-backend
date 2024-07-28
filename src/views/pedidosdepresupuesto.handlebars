@@ -1,0 +1,64 @@
+<h1 class="text-center my-5">Administrador de Pedidos de Presupuesto </h1> 
+
+
+<table class="table table-striped">
+    <thead class="thead-light">
+        <tr>
+        <th scope="col">Origen</th>
+        <th scope="col">Nombre</th>
+        <th scope="col">EMail</th>
+        <th scope="col">Telefono</th>
+        <th scope="col">Tipo de Evento</th>
+        <th scope="col">Localidad</th>
+        <th scope="col">Pais</th>
+        <th scope="col">Cantidad de Invitados</th>
+        <th scope="col">Fecha</th>
+        <th scope="col">Comentario</th>
+        <th scope="col">Fecha del Pedido</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#each pedidosdepresupuesto}}
+        <tr>
+            <td>
+                {{this.origen}}
+            </td>
+            <td>
+                {{this.nombre}}
+            </td>
+            <td>
+                {{this.email}}
+            </td>
+            <td>
+                {{this.telefono}}
+            </td>
+            <td>
+                {{this.tipodeevento}}
+            </td>
+            <td>
+                {{this.localidad}}
+            </td>
+            <td>
+                {{this.pais}}
+            </td>
+            <td>
+                {{this.cantidaddeinvitados}}
+            </td>
+            <td>
+                {{this.fecha}}
+            </td>
+            <td>
+                {{this.comentario}}
+            </td>
+            <td>
+                {{this.fechadelpedido}}
+            </td>
+        </tr>
+      
+    {{/each}}
+    </tbody>
+</table>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/js/pedidosdepresupuesto.js"></script>

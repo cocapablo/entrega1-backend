@@ -35,7 +35,8 @@ class PedidosDePresupuestoManager {
                         pais: pedido.pais,
                         cantidaddeinvitados: pedido.cantidaddeinvitados,
                         fecha: pedido.fecha,
-                        comentario: pedido.comentario  
+                        comentario: pedido.comentario,
+                        fechadelpedido: pedido.fechadelpedido  
                     
                     }
                 )
@@ -58,6 +59,7 @@ class PedidosDePresupuestoManager {
 
     async addPedidoDePresupuestoAsync({origen = "Desconocido", nombre = "", email = "", telefono = "-", tipodeevento = "-", localidad = "-", pais = "-", cantidaddeinvitados = 0, fecha = "-", comentario = "-"}) {
         let nuevoPedido;
+        let fechaActual = new Date();
 
         try {
             //Validaciones
@@ -95,7 +97,8 @@ class PedidosDePresupuestoManager {
                 pais,
                 cantidaddeinvitados,
                 fecha,
-                comentario  
+                comentario,
+                fechadelpedido: fechaActual  
             }
 
             let resultado = await pedidosdepresupuestoModel.create(nuevoPedido);
