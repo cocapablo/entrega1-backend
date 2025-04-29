@@ -7,7 +7,7 @@ import { PedidosDePresupuestoController } from "../controllers/pedidosdepresupue
 import { applyPolicies } from "../middlewares/sessionMiddleware.js";
 
 const corsOptions = {
-    origin: ['https://improconcert.com', 'http://improconcert.com', 'https://www.improconcert.com', 'http://www.improconcert.com'] , // Cambia esto al dominio que desees permitir
+    origin: ['https://improconcert.com', 'http://improconcert.com', 'https://www.improconcert.com', 'http://www.improconcert.com', 'https://pablococa-web.netlify.app/'] , // Cambia esto al dominio que desees permitir
     optionsSuccessStatus: 200, // Algunos navegadores antiguos (como IE11) no manejan bien el código 204
   };
 

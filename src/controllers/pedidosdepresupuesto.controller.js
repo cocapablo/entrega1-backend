@@ -113,7 +113,10 @@ export class PedidosDePresupuestoController {
 
             const mailer = new MailingService();    
         
-            mailer.sendSimpleMail(correoOptions);
+            let resultado = await mailer.sendSimpleMail(correoOptions);
+
+            //console.log("Resultado del envio de mail: ", resultado);
+            logger.debug("Resultado del envio de mail: ", resultado);
 
         } 
         catch (error) {
