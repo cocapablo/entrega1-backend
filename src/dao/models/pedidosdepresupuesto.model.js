@@ -57,7 +57,7 @@ const pedidosdepresupuestoSchema = new mongoose.Schema({
     fechadelpedido: {
         type: Date, 
         required: true,
-    },
+    }
 
 })
 

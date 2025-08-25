@@ -21,6 +21,9 @@ import logsRouter from "./routes/logs.router.js";
 
 import pedidosDePresupuestoRouter from "./routes/pedidosdepresupuesto.router.js";
 
+import expectativasRouter from "./routes/expectativas.router.js";
+import anticiposRouter from "./routes/anticipos.router.js";
+
 import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
 
 import errorMiddleware from "./middlewares/errors/errorMiddleware.js";
@@ -129,6 +132,10 @@ app.use("/", viewsRouter);
 app.use("/", logsRouter);
 
 app.use("/", pedidosDePresupuestoRouter);
+
+app.use("/", expectativasRouter);
+app.use("/", anticiposRouter);
+
 
 //Definir api para ver documentación
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerEspec));

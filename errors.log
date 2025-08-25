@@ -35,3 +35,17 @@ error: Error: Parse error on line 54:
 ...this.fechadelpedido.getDate()}}/{{this.f
 -----------------------^
 Expecting 'ID', got 'INVALID' - Dia: 27/7/2024 - Hora: 23:10:01
+error: Error creando una Expectativa: ReferenceError: nombre is not defined - Dia: 20/8/2025 - Hora: 08:02:02
+error: Error creando una Expectativa: ReferenceError: nombre is not defined - Dia: 20/8/2025 - Hora: 08:09:33
+error: Error creando una Expectativa: ERROR: Título vacío - Dia: 20/8/2025 - Hora: 08:19:55
+error: Error actualizando una Expectativa: ERROR: idExpectativa inválido - Dia: 20/8/2025 - Hora: 08:23:51
+error: Error actualizando una Expectativa: ERROR: idExpectativa inválido - Dia: 20/8/2025 - Hora: 08:24:38
+error: Error actualizando un Anticipo: Error actualizando un Anticipo: ERROR: Anticipo no encontrado o no modificado - Dia: 23/8/2025 - Hora: 05:20:01
+error: Error actualizando un Anticipo: Error actualizando un Anticipo: ERROR: Anticipo no encontrado o no modificado - Dia: 23/8/2025 - Hora: 05:21:49
+error: Error actualizando un Anticipo: Error actualizando un Anticipo: ERROR: Anticipo no encontrado o no modificado - Dia: 23/8/2025 - Hora: 05:22:03
+error: Error buscando un Anticipo: ERROR: Anticipo no encontrado - Dia: 23/8/2025 - Hora: 05:25:13
+error: Error actualizando un Anticipo: Error actualizando un Anticipo: ERROR: Anticipo no encontrado o no modificado - Dia: 23/8/2025 - Hora: 05:25:59
+error: Error actualizando un Anticipo: Error actualizando un Anticipo: ERROR: Anticipo no encontrado o no modificado - Dia: 23/8/2025 - Hora: 05:26:25
+error: Error actualizando una Anticipo: ERROR: idAnticipo inválido - Dia: 23/8/2025 - Hora: 05:32:20
+error: Error actualizando una Anticipo: ERROR: idAnticipo inválido - Dia: 23/8/2025 - Hora: 05:33:33
+error: Error actualizando una Anticipo: ERROR: idAnticipo inválido - Dia: 23/8/2025 - Hora: 05:40:26

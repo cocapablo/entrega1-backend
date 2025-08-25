@@ -1,20 +1,20 @@
 
 class PedidosDePresupuestoManagerRepository {
-    #pedidosDePresupuestoManagerManagerDAO;
+    #pedidosDePresupuestoManagerDAO;
     
-    constructor(pedidosDePresupuestoManagerManagerDAO) {
-        this.#pedidosDePresupuestoManagerManagerDAO = pedidosDePresupuestoManagerManagerDAO;
+    constructor(pedidosDePresupuestoManagerDAO) {
+        this.#pedidosDePresupuestoManagerDAO = pedidosDePresupuestoManagerDAO;
 
         this.getPedidosDePresupuestoAsync = this.getPedidosDePresupuestoAsync.bind(this);
         this.addPedidoDePresupuestoAsync = this.addPedidoDePresupuestoAsync.bind(this);
     }
 
     async getPedidosDePresupuestoAsync() {
-        return await this.#pedidosDePresupuestoManagerManagerDAO.getPedidosDePresupuestoAsync();
+        return await this.#pedidosDePresupuestoManagerDAO.getPedidosDePresupuestoAsync();
     }
 
     async addPedidoDePresupuestoAsync(pedido) {
-        return await this.#pedidosDePresupuestoManagerManagerDAO.addPedidoDePresupuestoAsync(pedido);
+        return await this.#pedidosDePresupuestoManagerDAO.addPedidoDePresupuestoAsync(pedido);
 
     }
 

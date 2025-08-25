@@ -9,6 +9,8 @@ export let TicketManager;
 export let ChatManager;
 
 export let PedidosDePresupuestoManager;
+export let ExpectativasManager;
+export let AnticiposManager;
 
 //console.log("Estoy acá");
 
@@ -41,6 +43,14 @@ switch (config.persistence) {
         const {default: PedidosDePresupuestoManagerMongo} = await import("../dao/mongo/PedidosDePresupuestoManagerMongo.js");
         PedidosDePresupuestoManager = PedidosDePresupuestoManagerMongo;
 
+        //ExpectativasManager
+        const {default: ExpectativasManagerMongo} = await import("../dao/mongo/ExpectativasManagerMongo.js");
+        ExpectativasManager = ExpectativasManagerMongo;
+
+        //AnticiposManager
+        const {default: AnticiposManagerMongo} = await import("../dao/mongo/AnticiposManagerMongo.js");
+        AnticiposManager = AnticiposManagerMongo;
+
         break;
     default:
         //DAOs de Mongo
@@ -70,7 +80,17 @@ switch (config.persistence) {
         //PedidosDePresupuestoManager
         const {default: PedidosDePresupuestoManagerMongo2} = await import("../dao/mongo/PedidosDePresupuestoManagerMongo.js");
         PedidosDePresupuestoManager = PedidosDePresupuestoManagerMongo2;
+
+        //ExpectativasManager
+        const {default: ExpectativasManagerMongo2} = await import("../dao/mongo/ExpectativasManagerMongo.js");
+        ExpectativasManager = ExpectativasManagerMongo2;
+        
+        //AnticiposManager
+        const {default: AnticiposManagerMongo2} = await import("../dao/mongo/AnticiposManagerMongo.js");
+        AnticiposManager = AnticiposManagerMongo2;
         break;
+
+
     
 }
 
@@ -80,7 +100,10 @@ const DAO = {
     cartManager : CarritoManager,
     ticketManager : TicketManager,
     chatManager : ChatManager,
-    pedidosDePresupuestoManager : PedidosDePresupuestoManager
+    pedidosDePresupuestoManager : PedidosDePresupuestoManager,
+    expectativasManager : ExpectativasManager,
+    anticiposManager : AnticiposManager
+    
 };
 
 //console.log("DAO", DAO);

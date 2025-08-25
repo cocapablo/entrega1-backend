@@ -20,6 +20,7 @@ export class PedidosDePresupuestoController {
         
         this.getPedidosDePresupuesto = this.getPedidosDePresupuesto.bind(this);
         this.createPedidoDePresupuesto = this.createPedidoDePresupuesto.bind(this);
+        this.getService = this.getService.bind(this);
         
     }
 
