@@ -114,11 +114,22 @@ export class PedidosDePresupuestoController {
 
             const mailer = new MailingService();    
 
-        
-            let resultado = await mailer.sendSimpleMail(correoOptions);
+            //Para evitar problemas el mail se envía en forma asíncrona, pero no se espera su resultado para responder al cliente    
+            mailer.sendSimpleMail(correoOptions)
+            .then((resultado) => {
+                console.log("Resultado del envio de mail: ", resultado); //Este console log es para ver el resultado en producción
+                logger.debug("Resultado del envio de mail: ", resultado);
+            })
+            .catch((error) => {
+                console.log("Error enviando mail: ", error); //Este console log es para ver el resultado en producción
+                logger.error("Error enviando mail: ", error);
+            })
+
+            //Acá estaba el código anterior que esperaba el resultado del mail, pero lo saco para no demorar la respuesta al cliente
+            /* let resultado = await mailer.sendSimpleMail(correoOptions);
 
             console.log("Resultado del envio de mail: ", resultado); //Este console log es para probar localmente, luego se quita
-            logger.debug("Resultado del envio de mail: ", resultado);
+            logger.debug("Resultado del envio de mail: ", resultado); */
 
         } 
         catch (error) {
