@@ -11,6 +11,7 @@ export default class MailingService {
             host: config.mailingHost,
             //port: 587,
             port : 465,
+            secure: true,
             user: config.mailingUser,
             pass: config.mailingPassword
         }, null, 2));
@@ -19,6 +20,7 @@ export default class MailingService {
             service: config.mailingService,
             host: config.mailingHost,
             port : 465,
+            secure: true,
             //port: 587,
             auth: {
                 user: config.mailingUser,
