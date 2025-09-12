@@ -113,6 +113,7 @@ export class PedidosDePresupuestoController {
                 }
 
             const mailer = new MailingService();    
+
         
             let resultado = await mailer.sendSimpleMail(correoOptions);
 

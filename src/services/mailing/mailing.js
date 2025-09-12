@@ -6,6 +6,14 @@ import logger from '../logs/logger.js';
 export default class MailingService {
     constructor(){
         
+        console.log("Configuración de mailing: " + JSON.stringify({
+            service: config.mailingService,
+            host: config.mailingHost,
+            port: 587,
+            user: config.mailingUser,
+            pass: config.mailingPassword
+        }, null, 2));
+        
         this.client = mailer.createTransport({
             service: config.mailingService,
             host: config.mailingHost,
