@@ -153,8 +153,17 @@ class AnticiposManager {
     }
 
 
-    async updateAnticipoAsync({idAnticipo, titulo = "", descripcion = "", tipoVista = "", origenVista = "", tipoPath = "", path = ""}) {
+    async updateAnticipoAsync({idAnticipo, titulo, descripcion, tipoVista, origenVista, tipoPath, path}) {
         let anticipoActualizado;
+        let anticipoCambios = {};
+
+        if (titulo) anticipoCambios.titulo = titulo;
+        if (descripcion) anticipoCambios.descripcion = descripcion;
+        if (tipoVista) anticipoCambios.tipoVista = tipoVista;
+        if (origenVista) anticipoCambios.origenVista = origenVista;
+        if (tipoPath) anticipoCambios.tipoPath = tipoPath;
+        if (path) anticipoCambios.path = path;
+
 
         
         //Validaciones
@@ -167,100 +176,36 @@ class AnticiposManager {
             })
         }
 
-        
-        
-        if (titulo.trim().length === 0) {
-            //throw new Error("ERROR: titulo vacío");
-            CustomError.createError({
-                name: "Error actualizando un Anticipo",
-                cause: "Título vacío",
-                message: "No se puede actualizar un anticipo con título vacío",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
-
-        if (descripcion.trim().length === 0) {
-            //throw new Error("ERROR: descripcion vacía");
-            CustomError.createError({
-                name: "Error actualizando un Anticipo",
-                cause: "Descripción vacía",
-                message: "No se puede actualizar un anticipo con descripción vacía",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
-
-        if (tipoVista.trim().length === 0) {
-            //throw new Error("ERROR: description vacío");
-            CustomError.createError({
-                name: "Error actualizando un Anticipo",
-                cause: "Tipo de Vista vacío",
-                message: "No se puede actualizar un anticipo con tipo de vista vacío",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
-
-        if (origenVista.trim().length === 0) {
-            //throw new Error("ERROR: description vacío");
-            CustomError.createError({
-                name: "Error actualizando un Anticipo",
-                cause: "Origen de Vista vacío",
-                message: "No se puede actualizar un anticipo con origen de vista vacío",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
-
-        if (tipoPath.trim().length === 0) {
-            //throw new Error("ERROR: description vacío");
-            CustomError.createError({
-                name: "Error actualizando un Anticipo",
-                cause: "Tipo de Path vacío",
-                message: "No se puede actualizar un anticipo con tipo de path vacío",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
-
-        if (path.trim().length === 0) {
-            //throw new Error("ERROR: description vacío");
-            CustomError.createError({
-                name: "Error actualizando un Anticipo",
-                cause: "Path vacío",
-                message: "No se puede actualizar un anticipo con path vacío",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
-
         try {
             //Actualizo el Anticipo en la Base de Datos
 
-            let anticipoModificado = {
-                titulo: titulo,
-                descripcion: descripcion,
-                tipoVista: tipoVista,
-                origenVista: origenVista,
-                tipoPath: tipoPath,
-                path: path
-            }
-
-            let resultado = await anticiposModel.updateOne(
-                {_id: idAnticipo},
-                {$set: anticipoModificado}
+            let resultado = await anticiposModel.findByIdAndUpdate(
+                idAnticipo,
+                anticipoCambios,
+                {new: true} //Para que me devuelva el objeto actualizado
             );
 
-            //Si no se actualizó nada, lanzo un error
-            if (resultado.modifiedCount === 0) {
+            if (!resultado) {
                 CustomError.createError({
                     name: "Error actualizando un Anticipo",
-                    cause: "Anticipo no encontrado o no modificado",
-                    message: "ERROR: Anticipo no encontrado o no modificado",
+                    cause: "Anticipo no encontrado",
+                    message: "ERROR: Anticipo no encontrado",
                     code: EErrors.DATABASE_ERROR
                 })
             }
 
             //Armo el objeto con el formato que utilizamos
             anticipoActualizado = {
-                id: idAnticipo,
-                ...anticipoModificado
+                id: resultado._id.toString(),
+                titulo: resultado.titulo,
+                descripcion: resultado.descripcion,
+                tipoVista: resultado.tipoVista,
+                origenVista: resultado.origenVista,
+                tipoPath: resultado.tipoPath,
+                path: resultado.path
             }
+
+
         }
         catch (error) {
             //Creo un Custom Error

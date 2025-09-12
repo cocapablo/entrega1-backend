@@ -27,7 +27,8 @@ class ExpectativasManager {
                     {
                         id: expectativa._id.toString(),
                         titulo: expectativa.titulo,
-                        descripcion: expectativa.descripcion
+                        descripcion: expectativa.descripcion,
+                        prioridad: expectativa.prioridad ? expectativa.prioridad : 1
                     }
                 )
             })
@@ -47,7 +48,7 @@ class ExpectativasManager {
         return this.#expectativas;
     }
 
-    async addExpectativaAsync({titulo = "", descripcion = ""}) {
+    async addExpectativaAsync({titulo = "", descripcion = "", prioridad = 1}) {
         let nuevaExpectativa;
         
 
@@ -79,7 +80,8 @@ class ExpectativasManager {
 
             nuevaExpectativa = {
                 titulo: titulo,
-                descripcion: descripcion  
+                descripcion: descripcion,
+                prioridad: prioridad 
             }
 
             let resultado = await expectativasModel.create(nuevaExpectativa);
@@ -181,13 +183,20 @@ class ExpectativasManager {
         const expectativaFormateada = {
             id: expectativa._id.toString(),
             titulo: expectativa.titulo,
-            descripcion: expectativa.descripcion
+            descripcion: expectativa.descripcion,
+            prioridad: expectativa.prioridad ? expectativa.prioridad : 1
         }
         //Retorno el objeto formateado
         return expectativaFormateada;
     }
 
-    async updateExpectativaAsync({idExpectativa, titulo = "", descripcion = ""}) {
+    async updateExpectativaAsync({idExpectativa, titulo, descripcion, prioridad}) {
+        let expectativaCambios = {};
+
+        if (titulo) expectativaCambios.titulo = titulo;
+        if (descripcion) expectativaCambios.descripcion = descripcion;
+        if (prioridad) expectativaCambios.prioridad = prioridad;
+
         //Validaciones
         if (!mongoose.isValidObjectId(idExpectativa)) {
             CustomError.createError({
@@ -197,44 +206,33 @@ class ExpectativasManager {
                 code: EErrors.INVALID_TYPES_ERROR
             })
         }
-        if (titulo.trim().length === 0) {
-            CustomError.createError({
-                name: "Error actualizando una Expectativa",
-                cause: "Título vacío",
-                message: "ERROR: Título vacío",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
-        if (descripcion.trim().length === 0) {
-            CustomError.createError({
-                name: "Error actualizando una Expectativa",
-                cause: "Descripción vacía",
-                message: "ERROR: Descripción vacía",
-                code: EErrors.INVALID_TYPES_ERROR
-            })
-        }
+        
         let expectativaActualizada;
+        let resultado;
 
         try {
             //Actualizo la Expectativa en la Base de Datos
-            let resultado = await expectativasModel.updateOne(
-                {_id: idExpectativa},
-                {$set: {titulo: titulo, descripcion: descripcion}}
+            resultado = await expectativasModel.findByIdAndUpdate(
+                idExpectativa,
+                expectativaCambios,
+                {new: true} //Para que me devuelva el objeto actualizado)
             );  
-            //Si no se actualizó nada, lanzo un error
-            if (resultado.modifiedCount === 0) {
+
+            if (!resultado) {
                 CustomError.createError({
                     name: "Error actualizando una Expectativa",
-                    cause: "Expectativa no encontrada o no modificada",
-                    message: "ERROR: Expectativa no encontrada o no modificada",
+                    cause: "Expectativa no encontrada",
+                    message: "ERROR: Expectativa no encontrada",
                     code: EErrors.DATABASE_ERROR
                 })
-            }
+            }     
+
             //Armo el objeto con el formato que utilizamos
             expectativaActualizada = {
-                id: idExpectativa,
-                titulo: titulo,
-                descripcion: descripcion
+                id: resultado._id.toString(),
+                titulo: resultado.titulo,
+                descripcion: resultado.descripcion,
+                prioridad: resultado.prioridad ? resultado.prioridad : 1
             }
         }
         catch (error) {
@@ -247,6 +245,7 @@ class ExpectativasManager {
                 code: EErrors.DATABASE_ERROR
             })
         }
+
         return expectativaActualizada;
     }
 

@@ -116,7 +116,7 @@ export class PedidosDePresupuestoController {
         
             let resultado = await mailer.sendSimpleMail(correoOptions);
 
-            console.log("Resultado del envio de mail: ", resultado);
+            console.log("Resultado del envio de mail: ", resultado); //Este console log es para probar localmente, luego se quita
             logger.debug("Resultado del envio de mail: ", resultado);
 
         } 

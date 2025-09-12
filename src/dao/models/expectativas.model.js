@@ -14,8 +14,12 @@ const expectativasSchema = new mongoose.Schema({
         type: String, 
         required: true,
         max: 500
+    },
+    prioridad: {
+        type: Number, 
+        min: 1
     }
-
+         
 })
 
 
