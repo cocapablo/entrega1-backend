@@ -6,6 +6,7 @@ import { ChatManager } from "../dao/factory.js";
 import { PedidosDePresupuestoManager } from "../dao/factory.js";
 import { ExpectativasManager } from "../dao/factory.js";
 import { AnticiposManager } from "../dao/factory.js";
+import { OpinionesManager } from "../dao/factory.js";
 
 import DAO from "../dao/factory.js";
 
@@ -18,6 +19,10 @@ import TicketManagerRepository from "./TicketManager.repository.js";
 import PedidosDePresupuestoManagerRepository from "./PedidosDePresupuesto.repository.js";
 import ExpectativasManagerRepository from "./Expectativas.repository.js";
 import AnticiposManagerRepository from "./Anticipos.repository.js";
+import OpinionesManagerRepository from "./Opiniones.repository.js";
+
+//Aquí se crean las instancias de los DAOs y se exportan las instancias de los Services
+//
 
 const path = "" //Esto debería traerse de algún lado
 
@@ -30,6 +35,7 @@ const userManagerDAO = new UserManager(carritoManagerDAO);
 const pedidosDePresupuestoDAO = new PedidosDePresupuestoManager();
 const expectativasDAO = new ExpectativasManager();
 const anticiposDAO = new AnticiposManager();
+const opinionesDAO = new OpinionesManager();
 
 //Services
 //UserManager
@@ -52,3 +58,6 @@ export const expectativasService = new ExpectativasManagerRepository(expectativa
 
 //AnticiposManager
 export const anticiposService = new AnticiposManagerRepository(anticiposDAO);
+
+//OpinionesManager
+export const opinionesService = new OpinionesManagerRepository(opinionesDAO);

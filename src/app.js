@@ -23,6 +23,7 @@ import pedidosDePresupuestoRouter from "./routes/pedidosdepresupuesto.router.js"
 
 import expectativasRouter from "./routes/expectativas.router.js";
 import anticiposRouter from "./routes/anticipos.router.js";
+import opinionesRouter from "./routes/opiniones.router.js";
 
 import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
 
@@ -135,6 +136,7 @@ app.use("/", pedidosDePresupuestoRouter);
 
 app.use("/", expectativasRouter);
 app.use("/", anticiposRouter);
+app.use("/", opinionesRouter);
 
 
 //Definir api para ver documentación

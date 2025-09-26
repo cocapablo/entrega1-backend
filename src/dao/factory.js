@@ -11,6 +11,7 @@ export let ChatManager;
 export let PedidosDePresupuestoManager;
 export let ExpectativasManager;
 export let AnticiposManager;
+export let OpinionesManager;
 
 //console.log("Estoy acá");
 
@@ -51,6 +52,10 @@ switch (config.persistence) {
         const {default: AnticiposManagerMongo} = await import("../dao/mongo/AnticiposManagerMongo.js");
         AnticiposManager = AnticiposManagerMongo;
 
+        //OpinionesManager
+        const {default: OpinionesManagerMongo} = await import("../dao/mongo/OpinionesManagerMongo.js");
+        OpinionesManager = OpinionesManagerMongo;
+
         break;
     default:
         //DAOs de Mongo
@@ -88,6 +93,11 @@ switch (config.persistence) {
         //AnticiposManager
         const {default: AnticiposManagerMongo2} = await import("../dao/mongo/AnticiposManagerMongo.js");
         AnticiposManager = AnticiposManagerMongo2;
+
+        //OpinionesManager
+        const {default: OpinionesManagerMongo2} = await import("../dao/mongo/OpinionesManagerMongo.js");
+        OpinionesManager = OpinionesManagerMongo2;
+        
         break;
 
 
