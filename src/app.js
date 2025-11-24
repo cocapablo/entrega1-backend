@@ -24,6 +24,8 @@ import pedidosDePresupuestoRouter from "./routes/pedidosdepresupuesto.router.js"
 import expectativasRouter from "./routes/expectativas.router.js";
 import anticiposRouter from "./routes/anticipos.router.js";
 import opinionesRouter from "./routes/opiniones.router.js";
+import videosRouter from "./routes/videos.router.js";
+import actividadesRouter from "./routes/actividades.router.js";
 
 import { usuarioLogueado } from "./middlewares/sessionMiddleware.js";
 
@@ -137,6 +139,8 @@ app.use("/", pedidosDePresupuestoRouter);
 app.use("/", expectativasRouter);
 app.use("/", anticiposRouter);
 app.use("/", opinionesRouter);
+app.use("/", videosRouter);
+app.use("/", actividadesRouter);
 
 
 //Definir api para ver documentación

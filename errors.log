@@ -50,3 +50,7 @@ error: Error actualizando una Anticipo: ERROR: idAnticipo inválido - Dia: 23/8/
 error: Error actualizando una Anticipo: ERROR: idAnticipo inválido - Dia: 23/8/2025 - Hora: 05:33:33
 error: Error actualizando una Anticipo: ERROR: idAnticipo inválido - Dia: 23/8/2025 - Hora: 05:40:26
 error: Error actualizando una Expectativa: ERROR: Expectativa no encontrada - Dia: 26/9/2025 - Hora: 02:04:18
+error: SyntaxError: Expected double-quoted property name in JSON at position 149 (line 6 column 1) - Dia: 18/11/2025 - Hora: 11:00:43
+error: Error eliminando un Video: Error eliminando un Video: ERROR: Video no encontrado o no eliminado - Dia: 18/11/2025 - Hora: 11:01:55
+error: Error creando una Actividad: No se puede crear una actividad sin srcImagen - Dia: 24/11/2025 - Hora: 03:00:29
+error: SyntaxError: Bad control character in string literal in JSON at position 8 (line 2 column 6) - Dia: 24/11/2025 - Hora: 03:04:42

@@ -7,6 +7,8 @@ import { PedidosDePresupuestoManager } from "../dao/factory.js";
 import { ExpectativasManager } from "../dao/factory.js";
 import { AnticiposManager } from "../dao/factory.js";
 import { OpinionesManager } from "../dao/factory.js";
+import { VideosManager } from "../dao/factory.js";
+import { ActividadesManager } from "../dao/factory.js";
 
 import DAO from "../dao/factory.js";
 
@@ -20,6 +22,8 @@ import PedidosDePresupuestoManagerRepository from "./PedidosDePresupuesto.reposi
 import ExpectativasManagerRepository from "./Expectativas.repository.js";
 import AnticiposManagerRepository from "./Anticipos.repository.js";
 import OpinionesManagerRepository from "./Opiniones.repository.js";
+import VideosManagerRepository from "./VideosManagerRepository.js";
+import ActividadesManagerRepository from "./Actividades.repository.js";
 
 //Aquí se crean las instancias de los DAOs y se exportan las instancias de los Services
 //
@@ -36,6 +40,8 @@ const pedidosDePresupuestoDAO = new PedidosDePresupuestoManager();
 const expectativasDAO = new ExpectativasManager();
 const anticiposDAO = new AnticiposManager();
 const opinionesDAO = new OpinionesManager();
+const videosDAO = new VideosManager();
+const actividadesDAO = new ActividadesManager();
 
 //Services
 //UserManager
@@ -61,3 +67,9 @@ export const anticiposService = new AnticiposManagerRepository(anticiposDAO);
 
 //OpinionesManager
 export const opinionesService = new OpinionesManagerRepository(opinionesDAO);
+
+//VideosManager
+export const videosService = new VideosManagerRepository(videosDAO);
+
+//ActividadesManager
+export const actividadesService = new ActividadesManagerRepository(actividadesDAO);

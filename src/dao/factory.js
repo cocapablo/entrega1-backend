@@ -12,6 +12,8 @@ export let PedidosDePresupuestoManager;
 export let ExpectativasManager;
 export let AnticiposManager;
 export let OpinionesManager;
+export let VideosManager;
+export let ActividadesManager;
 
 //console.log("Estoy acá");
 
@@ -56,6 +58,14 @@ switch (config.persistence) {
         const {default: OpinionesManagerMongo} = await import("../dao/mongo/OpinionesManagerMongo.js");
         OpinionesManager = OpinionesManagerMongo;
 
+        //VideosManager
+        const {default: VideosManagerMongo} = await import("../dao/mongo/VideosManagerMongo.js");
+        VideosManager = VideosManagerMongo;
+
+        //ActividadesManager
+        const {default: ActividadesManagerMongo} = await import("../dao/mongo/ActividadesManagerMongo.js");
+        ActividadesManager = ActividadesManagerMongo;
+
         break;
     default:
         //DAOs de Mongo
@@ -97,6 +107,14 @@ switch (config.persistence) {
         //OpinionesManager
         const {default: OpinionesManagerMongo2} = await import("../dao/mongo/OpinionesManagerMongo.js");
         OpinionesManager = OpinionesManagerMongo2;
+
+        //VideosManager
+        const {default: VideosManagerMongo2} = await import("../dao/mongo/VideosManagerMongo.js");
+        VideosManager = VideosManagerMongo2;
+
+        //ActividadesManager
+        const {default: ActividadesManagerMongo2} = await import("../dao/mongo/ActividadesManagerMongo.js");
+        ActividadesManager = ActividadesManagerMongo2;
         
         break;
 
@@ -112,7 +130,10 @@ const DAO = {
     chatManager : ChatManager,
     pedidosDePresupuestoManager : PedidosDePresupuestoManager,
     expectativasManager : ExpectativasManager,
-    anticiposManager : AnticiposManager
+    anticiposManager : AnticiposManager,
+    opinionesManager : OpinionesManager,
+    videosManager : VideosManager,
+    actividadesManager : ActividadesManager
     
 };
 
